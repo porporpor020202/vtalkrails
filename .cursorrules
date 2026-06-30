@@ -1,0 +1,8 @@
+# Project Rules
+
+This project is a mobile-only application. Please follow these styling and design rules:
+
+- **Mobile-Only Design**: The user interface is built exclusively for mobile viewports.
+- **No Desktop Responsiveness**: Do not use responsive breakpoint prefixes like `md:`, `lg:`, `xl:`, etc.
+- **Widths**: Use `w-full` or absolute widths suitable for mobile screens instead of styling for larger viewports.
+- **Tailwind CSS**: Always use TailwindCSS for styling as per global rules.

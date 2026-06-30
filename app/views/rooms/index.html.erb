@@ -1,21 +1,132 @@
-<% content_for :title, "room" %>
-
-<div class="w-full max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md border border-slate-100">
-  <header class="border-b border-slate-200 pb-4 mb-6">
-    <h1 class="text-2xl font-bold text-slate-900">VTalk Rooms</h1>
-    <p class="text-sm text-slate-500 mt-1">Select a chat room to join the conversation</p>
-  </header>
-
-  <div class="flex flex-col gap-3">
-    <% @rooms.each do |room| %>
-      <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors duration-200">
-        <div>
-          <span class="font-semibold text-slate-700"># <%= room[:name] %></span>
-        </div>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-md transition-colors duration-200">
-          Join
-        </button>
+<div class="w-full flex flex-col h-full">
+  <!-- Room Selection Tabs -->
+  <div class="flex-1 overflow-y-auto p-4 space-y-2" id="rooms-list">
+    <!-- Room 1 (Active by Default) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left bg-gradient-to-r from-indigo-50 to-violet-50/50 border border-indigo-100/80 shadow-sm shadow-indigo-100/20 active-room">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-md shadow-orange-100">
+        🦝
       </div>
-    <% end %>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-800">Raccoon</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">2m ago</span>
+            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/80">Your Turn</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 2 (Deleted) -->
+    <button class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left border border-transparent opacity-60 cursor-not-allowed">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-300 to-yellow-500 flex items-center justify-center text-2xl shadow-md grayscale">
+        🦁
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-500 line-through">Lion</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">5d ago</span>
+            <span class="text-[10px] text-rose-500 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-100/50">Deleted</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 3 (Waiting) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left hover:bg-slate-50 border border-transparent">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-400 to-red-500 flex items-center justify-center text-2xl shadow-md shadow-red-100">
+        🦊
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-700">Fox</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">45m ago</span>
+            <span class="text-[10px] text-slate-400 font-medium bg-slate-100/80 px-2 py-0.5 rounded-full">Waiting</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 4 (Your Turn) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left bg-gradient-to-r from-indigo-50 to-violet-50/50 border border-indigo-100/80 shadow-sm shadow-indigo-100/20">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-slate-400 to-slate-600 flex items-center justify-center text-2xl shadow-md shadow-slate-200">
+        🐼
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-700">Panda</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">4h ago</span>
+            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/80">Your Turn</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 5 (Deleted) -->
+    <button class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left border border-transparent opacity-60 cursor-not-allowed">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-300 to-pink-500 flex items-center justify-center text-2xl shadow-md grayscale">
+        🐱
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-500 line-through">Cat</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">1w ago</span>
+            <span class="text-[10px] text-rose-500 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-100/50">Deleted</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 6 (Waiting) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left hover:bg-slate-50 border border-transparent">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-500 flex items-center justify-center text-2xl shadow-md shadow-sky-100">
+        🐨
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-700">Koala</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">2h ago</span>
+            <span class="text-[10px] text-slate-400 font-medium bg-slate-100/80 px-2 py-0.5 rounded-full">Waiting</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 7 (Your Turn) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left bg-gradient-to-r from-indigo-50 to-violet-50/50 border border-indigo-100/80 shadow-sm shadow-indigo-100/20">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-yellow-400 to-amber-600 flex items-center justify-center text-2xl shadow-md shadow-amber-100">
+        🐯
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-700">Tiger</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">1d ago</span>
+            <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/80">Your Turn</span>
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <!-- Room 8 (Waiting) -->
+    <button onclick="location.href='/rooms/1'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left hover:bg-slate-50 border border-transparent">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-300 to-rose-400 flex items-center justify-center text-2xl shadow-md shadow-rose-100">
+        🐰
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-slate-700">Rabbit</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-slate-400">3d ago</span>
+            <span class="text-[10px] text-slate-400 font-medium bg-slate-100/80 px-2 py-0.5 rounded-full">Waiting</span>
+          </div>
+        </div>
+      </div>
+    </button>
   </div>
 </div>

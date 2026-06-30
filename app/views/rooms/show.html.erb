@@ -1,0 +1,147 @@
+<div class="flex flex-col">
+  <div id="messages-container" class="flex-1 p-6 space-y-6">
+    <!-- Message 1 (Incoming) -->
+    <div class="flex items-end gap-3 max-w-[85%]">
+      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
+        🦝
+      </div>
+      <div class="space-y-1">
+        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:15</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">10:14 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 2 (Outgoing) -->
+    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
+        Me
+      </div>
+      <div class="space-y-1 text-right">
+        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-white pr-3 duration-label">0:07</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">10:15 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 3 (Incoming) -->
+    <div class="flex items-end gap-3 max-w-[85%]">
+      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
+        🦝
+      </div>
+      <div class="space-y-1">
+        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:19</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">10:30 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 4 (Outgoing) -->
+    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
+        Me
+      </div>
+      <div class="space-y-1 text-right">
+        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-white pr-3 duration-label">0:04</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">10:32 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 5 (Incoming) -->
+    <div class="flex items-end gap-3 max-w-[85%]">
+      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
+        🦝
+      </div>
+      <div class="space-y-1">
+        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:11</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">10:45 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 6 (Outgoing) -->
+    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
+        Me
+      </div>
+      <div class="space-y-1 text-right">
+        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-white pr-3 duration-label">0:08</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">11:00 AM</p>
+      </div>
+    </div>
+
+    <!-- Message 7 (Incoming) -->
+    <div class="flex items-end gap-3 max-w-[85%]">
+      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
+        🦝
+      </div>
+      <div class="space-y-1">
+        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
+          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
+            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:05</span>
+        </div>
+        <p class="text-[10px] text-slate-400 px-1">Just now</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="fixed bottom-4 right-6 z-50">
+  <a href="/rooms/new" class="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/40 active:scale-95 transition-all focus:outline-none ring-4 ring-white/80">
+    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+    </svg>
+  </a>
+</div>
+
+<script>
+    function togglePlay(btn) {
+        const playIcon = btn.querySelector('.play-icon');
+        const pauseIcon = btn.querySelector('.pause-icon');
+
+        if (playIcon.classList.contains('hidden')) {
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        } else {
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+        }
+    }
+</script>

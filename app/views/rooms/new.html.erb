@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between p-6">
+  <!-- Header with Close Button -->
+  <div class="flex justify-between items-center w-full">
+    <h1 class="text-lg font-semibold tracking-tight text-white">Voice Recorder</h1>
+    <button onclick="history.back()" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors focus:outline-none">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Recording Area -->
+  <div class="flex-1 flex flex-col items-center justify-center my-8 space-y-8">
+    <!-- Timer -->
+    <div class="text-center">
+      <div id="recording-timer" class="text-5xl font-mono font-medium tracking-wider text-rose-500 animate-pulse">00:03</div>
+      <p class="text-xs text-slate-400 mt-2 font-medium tracking-wide">RECORDING VOICE MESSAGE</p>
+    </div>
+
+    <!-- Animated Waveform Visualizer Mock -->
+    <div class="w-full max-w-xs h-20 flex items-center justify-center gap-1.5 px-4">
+      <div class="w-1 h-8 bg-rose-500 rounded-full animate-[pulse_1s_infinite_100ms]"></div>
+      <div class="w-1 h-14 bg-rose-500 rounded-full animate-[pulse_1s_infinite_200ms]"></div>
+      <div class="w-1 h-20 bg-rose-500 rounded-full animate-[pulse_1s_infinite_300ms]"></div>
+      <div class="w-1 h-16 bg-rose-500 rounded-full animate-[pulse_1s_infinite_400ms]"></div>
+      <div class="w-1 h-24 bg-rose-500 rounded-full animate-[pulse_1s_infinite_500ms]"></div>
+      <div class="w-1 h-12 bg-rose-500 rounded-full animate-[pulse_1s_infinite_600ms]"></div>
+      <div class="w-1 h-18 bg-rose-500 rounded-full animate-[pulse_1s_infinite_700ms]"></div>
+      <div class="w-1 h-10 bg-rose-500 rounded-full animate-[pulse_1s_infinite_800ms]"></div>
+    </div>
+
+    <!-- Massive Glowing Record Button -->
+    <div class="relative flex items-center justify-center">
+      <div class="absolute w-36 h-36 rounded-full bg-rose-500/20 animate-ping opacity-75"></div>
+      <div class="absolute w-28 h-28 rounded-full bg-rose-500/30 animate-pulse"></div>
+
+      <button class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 to-red-600 text-white flex items-center justify-center shadow-2xl shadow-red-500/50 hover:brightness-110 active:scale-95 transition-all focus:outline-none ring-4 ring-rose-500/30">
+        <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24">
+          <rect x="6" y="6" width="12" height="12" rx="1.5" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Action Buttons -->
+  <div class="w-full grid grid-cols-2 gap-4">
+    <button onclick="history.back()" class="py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 font-semibold text-slate-300 transition-colors text-center">
+      Cancel
+    </button>
+    <button onclick="history.back()" class="py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:brightness-110 font-semibold text-white transition-all shadow-lg shadow-red-500/20 text-center">
+      Send Message
+    </button>
+  </div>
+</div>
