@@ -1,5 +1,6 @@
 class RoomsController < ApplicationController
   def index
+    @rooms = current_user.rooms.order(updated_at: :desc)
   end
 
   def show
@@ -8,4 +9,3 @@ class RoomsController < ApplicationController
   def new
   end
 end
-

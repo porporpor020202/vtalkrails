@@ -9,10 +9,10 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  
+
   # Defines the root path route ("/")
-  root "rooms#index"
-  
+  root to: redirect("/rooms")
+
   resources :configurations, only: [] do
     get :ios_v1, on: :collection
     get :android_v1, on: :collection
@@ -20,8 +20,36 @@ Rails.application.routes.draw do
 
   resources :rooms
 
-  resource :lab, only: [:show], controller: 'lab'
+  resource :settings, only: [ :show ], controller: "settings"
 
-  resource :mypage, only: [:show], controller: 'mypage'
-  resource :map, only: [:show]
+  resource :mypage, only: [ :show ], controller: "mypage"
+  resource :map, only: [ :show ]
+
+  resources :hikes, only: [] do
+    get :map, on: :member
+  end
+
+  resources :demos, only: [ :index ] do
+    collection do
+      get :cors_allowed
+      get :cors_blocked
+    end
+  end
+
+  resource :apple_oauth_sessions, only: %i[ new create ] do
+    collection do
+      get :authenticate_by_token
+      post :callback
+    end
+  end
+
+  resource :google_oauth_sessions, only: %i[ new create ] do
+    collection do
+      get :authenticate_by_token
+      get :callback
+    end
+  end
+
+  resource :session
+  resources :passwords, param: :token
 end

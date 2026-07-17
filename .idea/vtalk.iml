@@ -43,6 +43,7 @@
     <orderEntry type="library" scope="PROVIDED" name="addressable (v2.9.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ast (v2.4.3, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="base64 (v0.3.0, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bcrypt (v3.1.22, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bcrypt_pbkdf (v1.1.2, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bigdecimal (v4.1.2, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bindex (v0.8.1, rbenv: 3.4.8) [gem]" level="application" />
@@ -66,6 +67,7 @@
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.17.4, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fugit (v1.12.2, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.3.0, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="hotwire-livereload (v2.1.1, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.15.2, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="image_processing (v1.14.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="importmap-rails (v2.2.3, rbenv: 3.4.8) [gem]" level="application" />
@@ -73,9 +75,11 @@
     <orderEntry type="library" scope="PROVIDED" name="irb (v1.18.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jbuilder (v2.15.1, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v2.19.9, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="jwt (v3.1.2, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kamal (v2.12.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="language_server-protocol (v3.17.0.5, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="lint_roller (v1.1.0, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="listen (v3.10.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="logger (v1.7.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="loofah (v2.25.1, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mail (v2.9.0, rbenv: 3.4.8) [gem]" level="application" />
@@ -117,6 +121,8 @@
     <orderEntry type="library" scope="PROVIDED" name="railties (v8.1.3, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rainbow (v3.1.1, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v13.4.2, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rb-fsevent (v0.11.2, rbenv: 3.4.8) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rb-inotify (v0.11.1, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rdoc (v7.2.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="regexp_parser (v2.12.0, rbenv: 3.4.8) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="reline (v0.6.3, rbenv: 3.4.8) [gem]" level="application" />

@@ -1,0 +1,18 @@
+{
+  "name": "vtalk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/porporpor020202/vtalkrails.git"
+  },
+  "private": true,
+  "dependencies": {
+    "@hotwired/hotwire-native-bridge": "^1.2.2",
+    "tailwindcss": "^4.3.2"
+  }
+}

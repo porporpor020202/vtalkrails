@@ -1,0 +1,43 @@
+<div class="min-h-[100dvh] bg-zinc-950 flex flex-col justify-between px-6 pt-[env(safe-area-inset-top,2.5rem)] pb-[env(safe-area-inset-bottom,2.5rem)] text-white font-sans relative overflow-hidden">
+  <!-- Decorative Background Glows -->
+  <div class="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] rounded-full bg-indigo-900/20 blur-[80px] transform translate-z-0 pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[80%] h-[40%] rounded-full bg-violet-900/20 blur-[80px] transform translate-z-0 pointer-events-none"></div>
+
+  <!-- Content Container -->
+  <div class="w-full max-w-sm mx-auto flex-1 flex flex-col justify-center items-center z-10">
+    <!-- Header/Logo Area -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.35)] mb-5">
+        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Vtalk</h1>
+      <p class="text-zinc-400 text-sm mt-2">Sign in to start your conversation</p>
+    </div>
+
+    <!-- Alert Message -->
+    <% if alert.present? %>
+      <div class="w-full mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-sm flex items-start gap-3">
+        <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span><%= alert %></span>
+      </div>
+    <% end %>
+
+    <!-- Apple Sign In Option -->
+    <div class="w-full">
+      <%= render "shared/sign_in_with_apple" %>
+    </div>
+
+    <div class="w-full">
+      <%= render "shared/sign_in_with_google" %>
+    </div>
+  </div>
+
+  <!-- Footer Info / Copyright -->
+  <div class="w-full text-center mt-8 z-10">
+    <p class="text-xs text-zinc-600">&copy; <%= Time.current.year %> Vtalk. All rights reserved.</p>
+  </div>
+</div>

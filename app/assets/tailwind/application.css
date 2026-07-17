@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@custom-variant hotwire-native {
+    html[data-hotwire-native] & {
+        @slot
+    }
+}
+
+@custom-variant not-hotwire-native {
+    html:not([data-hotwire-native]) & {
+        @slot
+    }
+}
