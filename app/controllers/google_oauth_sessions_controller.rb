@@ -1,6 +1,5 @@
 # https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow
 class GoogleOauthSessionsController < ApplicationController
-  layout "session"
   skip_before_action :verify_authenticity_token, only: [ :callback ]
   allow_unauthenticated_access
 

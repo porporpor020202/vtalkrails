@@ -1,5 +1,4 @@
 class AppleOauthSessionsController < ApplicationController
-  layout "session"
   skip_before_action :verify_authenticity_token, only: [ :callback ]
   allow_unauthenticated_access
   before_action :verify_oauth_state, only: [ :callback ]
