@@ -40,6 +40,7 @@ Rails.application.routes.draw do
     collection do
       get :authenticate_by_token
       post :callback
+      post :native_authenticate
     end
   end
 
@@ -52,4 +53,9 @@ Rails.application.routes.draw do
 
   resource :session
   resources :passwords, param: :token
+
+  resources :notification_tokens, only: :create do
+    post :test_push, on: :collection
+  end
 end
+

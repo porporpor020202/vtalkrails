@@ -20,7 +20,7 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: <%= Rails.application.credentials.dig(:postgres, :user) %>
   password: <%= Rails.application.credentials.dig(:postgres, :password) %>
-  host: 127.0.0.1
+  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
   port: 5432
 
 

@@ -50,4 +50,21 @@
       <% end %>
     <% end %>
   </div>
+
+  <!-- User Profile & Logout -->
+  <div class="p-4 border-t border-slate-100 bg-white flex flex-col items-center gap-3">
+    <div class="text-sm font-medium text-slate-600">
+      Logged in as: <span class="font-bold text-indigo-600"><%= current_user.email_address %></span>
+    </div>
+
+    <%= button_to "🔔 푸시 알림 테스트 보내기", test_push_notification_tokens_path, method: :post, class: "w-full py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold rounded-xl transition-all duration-200 text-center text-sm border border-indigo-200" %>
+
+    <%= button_to "Log out", session_path, method: :delete, data: { turbo: false }, class: "w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-xl transition-all duration-200 text-center text-sm" %>
+  </div>
 </div>
+
+
+<% if authenticated? %>
+  <meta data-controller="bridge--notification-token" />
+<% end %>
+

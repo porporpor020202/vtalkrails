@@ -69,3 +69,8 @@ group :test do
 end
 
 gem "jwt", "~> 3.1.2"
+
+gem "noticed", "~> 3.0"
+gem "apnotic", "~> 1.8"
+
+gem "googleauth", "~> 1.17"

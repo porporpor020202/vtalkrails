@@ -1,8 +1,45 @@
 class AppleOauthSessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [ :callback ]
+  skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
   before_action :verify_oauth_state, only: [ :callback ]
   before_action :verify_oauth_nonce, only: [ :callback ]
+
+  def native_authenticate
+    identity_token = params[:identity_token]
+    if identity_token.blank?
+      render json: { error: "Missing identity token" }, status: :bad_request
+      return
+    end
+
+    oauth_client = AppleOauthClient.new
+    begin
+      user_info = oauth_client.decode_id_token(identity_token)
+      uid = user_info["sub"]
+      email = user_info["email"]
+
+      if uid.blank?
+        render json: { error: "Invalid identity token: missing sub" }, status: :unprocessable_entity
+        return
+      end
+
+      user = OauthUserService.find_or_create(
+        oauth_provider: :apple,
+        current_user: authenticated? ? current_user : nil,
+        uid: uid,
+        email: email
+      )
+
+      if user.persisted?
+        token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
+        render json: { token: token }
+      else
+        render json: { error: "Unable to create or find user: #{user.errors.full_messages.join(', ')}" }, status: :unprocessable_entity
+      end
+    rescue => e
+      Rails.logger.error "Native Apple Auth failed: #{e.class} - #{e.message}"
+      render json: { error: "Authentication failed" }, status: :unprocessable_entity
+    end
+  end
 
   def new
     render :new, layout: false

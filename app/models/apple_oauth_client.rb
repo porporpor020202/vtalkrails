@@ -39,6 +39,12 @@ class AppleOauthClient
     }
   end
 
+  def decode_id_token(id_token)
+    jwks = JSON.parse(Net::HTTP.get(URI(KEYS_URL)), symbolize_names: true)
+    jwks_keys = jwks[:keys]
+    JWT.decode(id_token, nil, true, { jwks: { keys: jwks_keys }, algorithm: "RS256" }).first
+  end
+
   class AuthenticationError < StandardError; end
 
   private
@@ -79,11 +85,5 @@ class AppleOauthClient
     )
 
     JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
-  end
-
-  def decode_id_token(id_token)
-    jwks = JSON.parse(Net::HTTP.get(URI(KEYS_URL)), symbolize_names: true)
-    jwks_keys = jwks[:keys]
-    JWT.decode(id_token, nil, true, { jwks: { keys: jwks_keys }, algorithm: "RS256" }).first
   end
 end

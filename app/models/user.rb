@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :sessions, dependent: :destroy
   has_many :rooms, dependent: :destroy
+  has_many :notification_tokens, dependent: :destroy
 
   enum :oauth_provider, { apple: 0, google: 1 }
 
@@ -24,7 +25,7 @@ class User < ApplicationRecord
 
   def assign_random_name_and_icon
     return if name.present? && icon.present?
-    
+
     animals = [
       { name: "Raccoon", icon: "🦝" },
       { name: "Lion", icon: "🦁" },
