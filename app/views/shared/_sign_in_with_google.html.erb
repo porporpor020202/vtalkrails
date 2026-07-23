@@ -3,7 +3,7 @@
       method: :post,
       class: "w-full mt-3",
       data: {
-        turbo: hotwire_native_app?,
+        turbo: false,
         controller: "bridge--sign-in-with-oauth",
         action: "submit->bridge--sign-in-with-oauth#interceptSubmit",
         bridge__sign_in_with_oauth_start_path_value: new_google_oauth_sessions_path(platform: "native"),

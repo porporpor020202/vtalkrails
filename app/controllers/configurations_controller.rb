@@ -26,17 +26,42 @@ class ConfigurationsController < ApplicationController
             custom_detent_ratio: 0.6
           }
         },
-        # 2. session/new는 뒤에 배치하고, context를 default로 덮어씌워 모달을 해제
+        # 2. session/new는 뒤에 배치하고, context를 default로 덮어씌워 모달을 해제 (하단 탭바 숨김)
         {
           patterns: [
             "/session/new$",
-            "/session$",
-            "/settings$"
+            "/session$"
           ],
           properties: {
             context: "default", # 모달 설정을 일반 화면으로 덮어씀
             hide_navigation_bar: true,
+            hides_bottom_bar: true,
+            bounces: false,
             pull_to_refresh_enabled: false
+          }
+        },
+        # 3. settings 화면은 탭바 유지
+        {
+          patterns: [
+            "/settings$"
+          ],
+          properties: {
+            context: "default",
+            hide_navigation_bar: true,
+            hides_bottom_bar: false,
+            bounces: false,
+            pull_to_refresh_enabled: false
+          }
+        },
+        # 4. 메인/루트 화면에서는 상단 네비게이션 바 및 뒤로가기 버튼 숨김
+        {
+          patterns: [
+            "^/rooms",
+            "^/$"
+          ],
+          properties: {
+            hide_navigation_bar: true,
+            hides_back_button: true
           }
         }
       ]
@@ -69,17 +94,42 @@ class ConfigurationsController < ApplicationController
             custom_detent_ratio: 0.6
           }
         },
-        # 2. session/new는 뒤에 배치하고, context를 default로 덮어씌워 모달을 해제
+        # 2. session/new는 뒤에 배치하고, context를 default로 덮어씌워 모달을 해제 (하단 탭바 숨김)
         {
           patterns: [
             "/session/new$",
-            "/session$",
-            "/settings$"
+            "/session$"
           ],
           properties: {
             context: "default", # 모달 설정을 일반 화면으로 덮어씀
             hide_navigation_bar: true,
+            hides_bottom_bar: true,
+            bounces: false,
             pull_to_refresh_enabled: false
+          }
+        },
+        # 3. settings 화면은 탭바 유지
+        {
+          patterns: [
+            "/settings$"
+          ],
+          properties: {
+            context: "default",
+            hide_navigation_bar: true,
+            hides_bottom_bar: false,
+            bounces: false,
+            pull_to_refresh_enabled: false
+          }
+        },
+        # 4. 메인/루트 화면에서는 상단 네비게이션 바 및 뒤로가기 버튼 숨김
+        {
+          patterns: [
+            "^/rooms",
+            "^/$"
+          ],
+          properties: {
+            hide_navigation_bar: true,
+            hides_back_button: true
           }
         }
       ]

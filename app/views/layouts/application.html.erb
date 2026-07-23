@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html <%= "data-hotwire-native" if hotwire_native_app? %>>
+<html>
   <head>
     <title><%= content_for(:title) || "Vtalk" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Vtalk">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,8 +23,13 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="flex flex-col min-h-screen bg-slate-50 text-slate-800">
-    <main class="flex-1">
+  <body class="relative min-h-dvh flex flex-col">
+    <% if dev_mode? %>
+      <div class="absolute top-20 right-3 z-[9999] pointer-events-none">
+        <span class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-amber-400 text-amber-950 border border-amber-300 shadow-md tracking-wider">DEV 모드</span>
+      </div>
+    <% end %>
+    <main class="flex-1 flex flex-col w-full pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
       <%= yield %>
     </main>
   </body>

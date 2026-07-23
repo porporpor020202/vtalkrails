@@ -84,6 +84,11 @@ class AppleOauthClient
       redirect_uri:
     )
 
-    JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
+    unless response.is_a?(Net::HTTPSuccess)
+      Rails.logger.error "[Apple] Token exchange failed: HTTP #{response.code} - #{response.body}"
+      return nil
+    end
+
+    JSON.parse(response.body)
   end
 end

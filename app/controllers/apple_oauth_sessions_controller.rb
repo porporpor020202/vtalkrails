@@ -50,8 +50,9 @@ class AppleOauthSessionsController < ApplicationController
     state = SecureRandom.hex(24) + ":" + params[:platform]
     redirect_uri = callback_apple_oauth_sessions_url
 
-    cookies.encrypted[:apple_oauth_state] = { same_site: :none, expires: 1.hour.from_now, secure: true, value: state }
-    cookies.encrypted[:apple_oauth_nonce] = { same_site: :none, expires: 1.hour.from_now, secure: true, value: nonce }
+    secure_cookie = Rails.env.production? || request.ssl?
+    cookies.encrypted[:apple_oauth_state] = { same_site: :none, expires: 1.hour.from_now, secure: secure_cookie, value: state }
+    cookies.encrypted[:apple_oauth_nonce] = { same_site: :none, expires: 1.hour.from_now, secure: secure_cookie, value: nonce }
 
     oauth_client = AppleOauthClient.new
     authorization_url = oauth_client.authorization_url(
@@ -119,7 +120,7 @@ class AppleOauthSessionsController < ApplicationController
   def verify_oauth_state
     stored_state = cookies.encrypted[:apple_oauth_state]
     cookies.delete(:apple_oauth_state)
-    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state], stored_state)
+    unless stored_state.present? && params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state], stored_state)
       redirect_to new_session_path, alert: "Invalid request. Please try again."
     end
   end

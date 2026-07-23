@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_many :rooms, dependent: :destroy
   has_many :notification_tokens, dependent: :destroy
 
-  enum :oauth_provider, { apple: 0, google: 1 }
+  enum :oauth_provider, { apple: "apple", google: "google" }
 
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
 

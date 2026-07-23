@@ -21,7 +21,10 @@ module Vtalk
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    config.time_zone = "Seoul"
+    ActiveSupport.on_load(:active_record_postgresqladapter) do
+      self.datetime_type = :timestamptz
+    end
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

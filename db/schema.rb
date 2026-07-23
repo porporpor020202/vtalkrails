@@ -15,25 +15,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_071623) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "noticed_events", force: :cascade do |t|
-    t.datetime "created_at", null: false
+    t.timestamp "created_at", precision: 6, null: false
     t.integer "notifications_count"
     t.jsonb "params"
     t.bigint "record_id"
     t.string "record_type"
     t.string "type"
-    t.datetime "updated_at", null: false
+    t.timestamp "updated_at", precision: 6, null: false
     t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
   end
 
   create_table "noticed_notifications", force: :cascade do |t|
-    t.datetime "created_at", null: false
+    t.timestamp "created_at", precision: 6, null: false
     t.bigint "event_id", null: false
-    t.datetime "read_at", precision: nil
+    t.timestamp "read_at"
     t.bigint "recipient_id", null: false
     t.string "recipient_type", null: false
-    t.datetime "seen_at", precision: nil
+    t.timestamp "seen_at"
     t.string "type"
-    t.datetime "updated_at", null: false
+    t.timestamp "updated_at", precision: 6, null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
   end
@@ -72,7 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_071623) do
     t.boolean "guest", default: false, null: false
     t.string "icon"
     t.string "name"
-    t.integer "oauth_provider"
+    t.string "oauth_provider"
     t.string "oauth_uid"
     t.string "password_digest"
     t.datetime "updated_at", null: false
