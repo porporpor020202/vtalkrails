@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) %></title>
+    <title><%= content_for(:title) || "say one thing" %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Vtalk">
+    <meta name="application-name" content="say one thing">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -14,33 +14,27 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/say_one_thing_icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-slate-100 dark:bg-slate-950 min-h-dvh flex items-center justify-center font-sans antialiased text-slate-900 dark:text-slate-100">
-    <!-- Phone Mockup Container (Mobile: Full screen / Desktop: Smartphone view) -->
-    <div class="w-full min-h-dvh md:min-h-0 md:h-[844px] md:max-h-[92vh] md:w-[390px] md:rounded-[44px] md:border-[10px] md:border-slate-800 md:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] bg-white dark:bg-slate-900 relative flex flex-col overflow-hidden">
+  <body class="min-h-dvh bg-slate-100 font-sans text-slate-950 antialiased">
+    <div class="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-white shadow-xl">
       <% if dev_mode? %>
         <div class="absolute top-4 right-3 z-[9999] pointer-events-none">
-          <span class="px-2.5 py-1 text-[11px] font-extrabold rounded-full bg-amber-400 text-amber-950 border border-amber-300 shadow-md tracking-wider">DEV 모드</span>
+          <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
         </div>
       <% end %>
 
-      <!-- Main Content Area (Turbo Frame for React-like instant top screen swapping) -->
-      <main class="flex-1 flex flex-col overflow-y-auto">
-        <turbo-frame id="main_content" data-turbo-action="advance" class="flex-1 flex flex-col min-h-full">
-          <%= yield %>
-        </turbo-frame>
+      <main class="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <%= yield %>
       </main>
 
-      <!-- Persistent Bottom Navigation Bar -->
-      <% unless content_for?(:hide_bottom_nav) || @hide_bottom_nav %>
+      <% if authenticated? && !content_for?(:hide_bottom_nav) && !@hide_bottom_nav %>
         <%= render "shared/bottom_nav" %>
       <% end %>
     </div>

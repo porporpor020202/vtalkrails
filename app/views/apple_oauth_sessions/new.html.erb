@@ -1,12 +1,5 @@
 <!DOCTYPE html>
-<%= tag.html(
-  data: {
-    rails_env: Rails.env,
-    hotwire_native: hotwire_native_app?,
-    hotwire_native_android: android_app?,
-    hotwire_native_ios: ios_app?,
-  },
-  ) do %>
+<html lang="en">
   <head>
     <title>Redirecting to Apple Sign In...</title>
 
@@ -29,4 +22,4 @@
     <%= form.hidden_field :platform, value: params[:platform] %>
   <% end %>
   </body>
-<% end %>
+</html>

@@ -1,149 +1,114 @@
+<% content_for :title, "#{@opponent.name} · say one thing" %>
 <% content_for :hide_bottom_nav, true %>
 
-<div class="flex-1 flex flex-col">
-  <div id="messages-container" class="flex-1 p-6 space-y-6">
-    <!-- Message 1 (Incoming) -->
-    <div class="flex items-end gap-3 max-w-[85%]">
-      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
-        🦝
-      </div>
-      <div class="space-y-1">
-        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:15</span>
-        </div>
-        <p class="text-[10px] text-slate-400 px-1">10:14 AM</p>
-      </div>
+<section class="flex min-h-full flex-1 flex-col bg-slate-50" data-controller="voice-recorder confirmation-modal" data-voice-recorder-endpoint-value="<%= room_voice_messages_path(@room) %>" data-voice-recorder-max-duration-value="30000">
+  <header class="sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b border-slate-200 bg-white/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
+    <%= link_to rooms_path, class: "flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition active:bg-slate-100", aria: { label: "Back to rooms" } do %>
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-xl"><%= @opponent.icon %></div>
+    <div class="min-w-0">
+      <h1 class="truncate text-[15px] font-extrabold text-slate-950"><%= @opponent.name %></h1>
+      <p class="text-[11px] font-medium text-slate-400">Voice by voice</p>
     </div>
+    <% unless @room.hidden_for?(current_user) %>
+      <%= button_to room_path(@room),
+            method: :delete,
+            form: { class: "ml-auto shrink-0", data: { confirmation_modal_target: "form", action: "submit->confirmation-modal#submit" } },
+            class: "flex h-10 w-10 items-center justify-center rounded-full text-slate-400 transition active:bg-rose-50 active:text-rose-600",
+            aria: { label: "Delete conversation" } do %>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12m-9 0v-2a1 1 0 011-1h2a1 1 0 011 1v2m-5 4v6m4-6v6m-7-10l.8 11.2a2 2 0 002 1.8h4.4a2 2 0 002-1.8L18 7" />
+        </svg>
+      <% end %>
+    <% end %>
+  </header>
 
-    <!-- Message 2 (Outgoing) -->
-    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
-        Me
+  <div class="flex-1 space-y-5 px-4 py-6 pb-32">
+    <% if @room.deleted? %>
+      <div class="mx-auto max-w-[320px] rounded-3xl border border-rose-100 bg-rose-50 px-5 py-4 text-center text-sm font-semibold leading-6 text-rose-700" role="status">
+        <%= @opponent.name %> no longer wants to continue this conversation.
       </div>
-      <div class="space-y-1 text-right">
-        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-white pr-3 duration-label">0:07</span>
-        </div>
-        <p class="text-[10px] text-slate-400 px-1">10:15 AM</p>
-      </div>
-    </div>
+    <% end %>
 
-    <!-- Message 3 (Incoming) -->
-    <div class="flex items-end gap-3 max-w-[85%]">
-      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
-        🦝
-      </div>
-      <div class="space-y-1">
-        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:19</span>
+    <% @messages.each do |message| %>
+      <% outgoing = message.sender_id == current_user.id %>
+      <article class="flex max-w-[88%] items-end gap-2 <%= outgoing ? "ml-auto flex-row-reverse" : "" %>">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl <%= outgoing ? "bg-slate-900 text-[10px] font-black text-white" : "bg-indigo-50 text-base" %>">
+          <%= outgoing ? "ME" : @opponent.icon %>
         </div>
-        <p class="text-[10px] text-slate-400 px-1">10:30 AM</p>
-      </div>
-    </div>
+        <div class="min-w-0 <%= outgoing ? "text-right" : "" %>">
+          <div class="rounded-3xl p-3 shadow-sm <%= outgoing ? "bg-gradient-to-br from-indigo-600 to-violet-600" : "border border-slate-200 bg-white" %>">
+            <audio controls preload="metadata" controlslist="nodownload" class="h-10 w-[230px] max-w-full" src="<%= rails_blob_path(message.audio, disposition: "inline") %>">
+              Your browser does not support audio playback.
+            </audio>
+          </div>
+          <p class="mt-1 px-2 text-[10px] font-medium text-slate-400">
+            <%= message.duration_seconds %>s · <%= message.created_at.strftime("%l:%M %p").strip %>
+          </p>
+        </div>
+      </article>
+    <% end %>
+  </div>
 
-    <!-- Message 4 (Outgoing) -->
-    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
-        Me
+  <footer class="fixed inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[430px] border-t border-slate-200 bg-white/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+    <% if @room.deleted? %>
+      <div class="rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-bold text-slate-500">
+        Conversation ended
       </div>
-      <div class="space-y-1 text-right">
-        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-white pr-3 duration-label">0:04</span>
-        </div>
-        <p class="text-[10px] text-slate-400 px-1">10:32 AM</p>
+    <% elsif @room.can_reply?(current_user) %>
+      <%= render "voice_recorder_trigger",
+            trigger_label: "Reply with voice",
+            trigger_classes: "flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-rose-500/20 transition active:scale-[0.99]" %>
+    <% else %>
+      <div class="rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-bold text-slate-500">
+        Waiting for <%= @opponent.name %>'s voice
       </div>
-    </div>
+    <% end %>
+  </footer>
 
-    <!-- Message 5 (Incoming) -->
-    <div class="flex items-end gap-3 max-w-[85%]">
-      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
-        🦝
-      </div>
-      <div class="space-y-1">
-        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:11</span>
+  <div data-confirmation-modal-target="dialog"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+       role="presentation"
+       aria-hidden="true"
+       hidden
+       data-action="click->confirmation-modal#closeOnBackdrop">
+    <div class="w-full max-w-[390px] rounded-[28px] bg-white p-5 shadow-2xl"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="delete-room-title"
+         data-action="click->confirmation-modal#stopPropagation">
+      <div class="flex items-start gap-4">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-600" aria-hidden="true">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-9 0h12" />
+          </svg>
         </div>
-        <p class="text-[10px] text-slate-400 px-1">10:45 AM</p>
-      </div>
-    </div>
-
-    <!-- Message 6 (Outgoing) -->
-    <div class="flex items-end gap-3 max-w-[85%] ml-auto flex-row-reverse">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-505 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
-        Me
-      </div>
-      <div class="space-y-1 text-right">
-        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-full p-1.5 shadow-md shadow-indigo-100 flex items-center gap-3 hover:brightness-105 transition-all">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center transition-all shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-white pr-3 duration-label">0:08</span>
+        <div class="min-w-0">
+          <h2 id="delete-room-title" class="text-lg font-extrabold text-slate-950">
+            <%= @room.deleted? ? "Remove this conversation?" : "Delete this conversation?" %>
+          </h2>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            <%= @room.deleted? ? "This conversation will be removed from your Rooms list." : "All voice messages in this conversation will be permanently removed." %>
+          </p>
         </div>
-        <p class="text-[10px] text-slate-400 px-1">11:00 AM</p>
       </div>
-    </div>
-
-    <!-- Message 7 (Incoming) -->
-    <div class="flex items-end gap-3 max-w-[85%]">
-      <div class="active-avatar-small w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-base shadow-sm shrink-0">
-        🦝
-      </div>
-      <div class="space-y-1">
-        <div class="bg-white border border-slate-200/80 rounded-full p-1.5 shadow-sm flex items-center gap-3 hover:border-slate-300 transition-colors">
-          <button onclick="togglePlay(this)" class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all shadow-sm shrink-0">
-            <svg class="w-5 h-5 fill-current play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="w-5 h-5 fill-current pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-          <span class="text-xs font-semibold text-slate-500 pr-3 duration-label">0:05</span>
-        </div>
-        <p class="text-[10px] text-slate-400 px-1">Just now</p>
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <button type="button"
+                class="rounded-2xl bg-slate-100 px-4 py-3.5 text-sm font-bold text-slate-700 transition active:scale-[0.98]"
+                data-action="confirmation-modal#cancel">
+          Cancel
+        </button>
+        <button type="button"
+                class="rounded-2xl bg-rose-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-rose-600/20 transition active:scale-[0.98]"
+                data-confirmation-modal-target="confirmButton"
+                data-action="confirmation-modal#confirm">
+          Delete
+        </button>
       </div>
     </div>
   </div>
-
-</div>
-
-<div class="fixed bottom-4 right-6 z-50">
-  <a href="/rooms/new" class="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/40 active:scale-95 transition-all focus:outline-none ring-4 ring-white/80">
-    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
-      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-    </svg>
-  </a>
-</div>
-
-<script>
-    function togglePlay(btn) {
-        const playIcon = btn.querySelector('.play-icon');
-        const pauseIcon = btn.querySelector('.pause-icon');
-
-        if (playIcon.classList.contains('hidden')) {
-            playIcon.classList.remove('hidden');
-            pauseIcon.classList.add('hidden');
-        } else {
-            playIcon.classList.add('hidden');
-            pauseIcon.classList.remove('hidden');
-        }
-    }
-</script>
+<%= render "voice_recorder_sheet" %>
+</section>

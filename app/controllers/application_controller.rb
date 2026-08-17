@@ -7,15 +7,30 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  helper_method :android_app?, :ios_app?
+  before_action :track_user_activity
+
+  helper_method :native_app?, :android_app?, :ios_app?
 
   protected
 
+  def native_app?
+    android_app? || ios_app?
+  end
+
   def android_app?
-    hotwire_native_app? && request.user_agent.include?("Android")
+    request.user_agent.to_s.include?("VtalkAndroid/")
   end
 
   def ios_app?
-    hotwire_native_app? && request.user_agent.include?("iOS")
+    request.user_agent.to_s.include?("VtalkiOS/")
+  end
+
+  private
+
+  def track_user_activity
+    return unless Current.user
+    return if Current.user.last_active_at && Current.user.last_active_at > 5.minutes.ago
+
+    Current.user.update_column(:last_active_at, Time.current)
   end
 end

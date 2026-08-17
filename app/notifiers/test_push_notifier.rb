@@ -5,7 +5,7 @@ class TestPushNotifier < ApplicationNotifier
     }
 
     config.format = ->(apn) {
-      apn.alert = params[:message] || "🔔 푸시 알림 테스트입니다!"
+      apn.alert = params[:message] || "🔔 This is a test notification."
       apn.custom_payload = {
         path: params[:path] || rooms_path
       }
@@ -34,8 +34,8 @@ class TestPushNotifier < ApplicationNotifier
         message: {
           token: device_token,
           notification: {
-            title: "VTalk 알림",
-            body: params[:message] || "🔔 테스트 푸시 알림입니다!"
+            title: "say one thing",
+            body: params[:message] || "🔔 This is a test notification."
           },
           data: {
             path: params[:path] || rooms_path
@@ -45,4 +45,3 @@ class TestPushNotifier < ApplicationNotifier
     }
   end
 end
-

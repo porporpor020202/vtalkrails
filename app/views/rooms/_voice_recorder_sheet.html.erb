@@ -1,0 +1,35 @@
+<div class="fixed inset-0 z-[100] hidden overflow-y-auto bg-slate-950/70 p-4 backdrop-blur-sm" data-voice-recorder-target="sheet">
+  <div class="mx-auto flex min-h-full max-w-[430px] items-end justify-center py-4">
+    <div class="max-h-[calc(100dvh-2rem)] w-full overflow-y-auto rounded-[32px] bg-white px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Voice message</p>
+          <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-950">Say one short thing</h2>
+        </div>
+        <button type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500" data-action="voice-recorder#close" aria-label="Close recorder">✕</button>
+      </div>
+
+      <div class="my-8 text-center">
+        <div class="font-mono text-5xl font-black tracking-tight text-slate-950" data-voice-recorder-target="timer">00:00</div>
+        <p class="mt-3 min-h-5 text-sm font-semibold text-slate-500" data-voice-recorder-target="status">Tap record when you are ready.</p>
+      </div>
+
+      <div class="flex justify-center">
+        <button type="button" class="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-xl shadow-rose-500/30 ring-8 ring-rose-100 transition active:scale-95" data-voice-recorder-target="recordButton" data-action="voice-recorder#start" aria-label="Start recording">
+          <svg class="h-10 w-10 fill-current" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" /></svg>
+        </button>
+        <button type="button" class="hidden h-24 w-24 items-center justify-center rounded-full bg-slate-950 text-white shadow-xl ring-8 ring-slate-200 transition active:scale-95" data-voice-recorder-target="stopButton" data-action="voice-recorder#stop" aria-label="Stop recording">
+          <svg class="h-9 w-9 fill-current" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+        </button>
+      </div>
+
+      <div class="mt-8 hidden" data-voice-recorder-target="previewArea">
+        <audio controls class="w-full" data-voice-recorder-target="preview"></audio>
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <button type="button" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-extrabold text-slate-600" data-action="voice-recorder#discard">Record again</button>
+          <button type="button" class="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-indigo-500/20" data-voice-recorder-target="sendButton" data-action="voice-recorder#send">Send voice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

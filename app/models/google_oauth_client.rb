@@ -17,6 +17,19 @@ class GoogleOauthClient
     }
   end
 
+  def authenticate_id_token(id_token, nonce:)
+    user_info = decode_id_token(id_token)
+    raise AuthenticationError, "Email not verified" unless user_info["email_verified"] == true
+    raise AuthenticationError, "Nonce verification failed" unless user_info["nonce"] == nonce
+
+    {
+      uid: user_info["sub"],
+      email: user_info["email"]
+    }
+  rescue JWT::DecodeError => e
+    raise AuthenticationError, e.message
+  end
+
   class AuthenticationError < StandardError; end
 
   private

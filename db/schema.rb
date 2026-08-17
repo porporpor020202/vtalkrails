@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_21_071623) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "noticed_events", force: :cascade do |t|
     t.timestamp "created_at", precision: 6, null: false
@@ -49,11 +77,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_071623) do
 
   create_table "rooms", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.bigint "deleted_by_id"
+    t.bigint "dismissed_by_id"
+    t.datetime "last_message_at"
+    t.bigint "last_sender_id"
     t.bigint "opponent_id", null: false
     t.integer "status", default: 1, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["deleted_by_id"], name: "index_rooms_on_deleted_by_id"
+    t.index ["dismissed_by_id"], name: "index_rooms_on_dismissed_by_id"
+    t.index ["last_message_at"], name: "index_rooms_on_last_message_at"
+    t.index ["last_sender_id"], name: "index_rooms_on_last_sender_id"
     t.index ["opponent_id"], name: "index_rooms_on_opponent_id"
+    t.index ["user_id", "opponent_id"], name: "index_rooms_on_user_id_and_opponent_id"
     t.index ["user_id"], name: "index_rooms_on_user_id"
   end
 
@@ -71,17 +108,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_071623) do
     t.string "email_address"
     t.boolean "guest", default: false, null: false
     t.string "icon"
+    t.datetime "last_active_at"
     t.string "name"
     t.string "oauth_provider"
     t.string "oauth_uid"
     t.string "password_digest"
     t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", unique: true, where: "(email_address IS NOT NULL)"
+    t.index ["email_address"], name: "index_users_on_email_address", where: "(email_address IS NOT NULL)"
+    t.index ["last_active_at"], name: "index_users_on_last_active_at"
+    t.index ["name"], name: "index_users_on_name_unique", unique: true, where: "(name IS NOT NULL)"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true, where: "((oauth_provider IS NOT NULL) AND (oauth_uid IS NOT NULL))"
   end
 
+  create_table "voice_messages", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "duration_ms", null: false
+    t.bigint "room_id", null: false
+    t.bigint "sender_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id"], name: "index_voice_messages_on_room_id"
+    t.index ["sender_id"], name: "index_voice_messages_on_sender_id"
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "notification_tokens", "users"
   add_foreign_key "rooms", "users"
+  add_foreign_key "rooms", "users", column: "deleted_by_id"
+  add_foreign_key "rooms", "users", column: "dismissed_by_id"
+  add_foreign_key "rooms", "users", column: "last_sender_id"
   add_foreign_key "rooms", "users", column: "opponent_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "voice_messages", "rooms"
+  add_foreign_key "voice_messages", "users", column: "sender_id"
 end

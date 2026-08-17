@@ -1,4 +1,5 @@
 require "net/http"
+require "digest"
 
 class AppleOauthClient
   AUTHORIZE_URL = "https://appleid.apple.com/auth/authorize"
@@ -39,10 +40,27 @@ class AppleOauthClient
     }
   end
 
-  def decode_id_token(id_token)
+  def decode_id_token(id_token, audience: client_id)
     jwks = JSON.parse(Net::HTTP.get(URI(KEYS_URL)), symbolize_names: true)
     jwks_keys = jwks[:keys]
-    JWT.decode(id_token, nil, true, { jwks: { keys: jwks_keys }, algorithm: "RS256" }).first
+    JWT.decode(id_token, nil, true, {
+      jwks: { keys: jwks_keys },
+      algorithm: "RS256",
+      verify_iss: true,
+      iss: "https://appleid.apple.com",
+      verify_aud: true,
+      aud: audience
+    }).first
+  end
+
+  def decode_native_id_token(id_token, nonce:)
+    user_info = decode_id_token(id_token, audience: native_app_identifier)
+    expected_nonce = Digest::SHA256.hexdigest(nonce)
+    raise AuthenticationError, "Nonce verification failed" unless user_info["nonce"] == expected_nonce
+
+    user_info
+  rescue JWT::DecodeError => e
+    raise AuthenticationError, e.message
   end
 
   class AuthenticationError < StandardError; end
@@ -51,6 +69,10 @@ class AppleOauthClient
 
   def client_id
     Rails.application.credentials.dig(:apple, :service_identifier)
+  end
+
+  def native_app_identifier
+    ENV.fetch("APPLE_IOS_APP_IDENTIFIER", "com.porporpor020202.vtalkios")
   end
 
   def generate_client_secret

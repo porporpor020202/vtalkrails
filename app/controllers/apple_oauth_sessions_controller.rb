@@ -6,14 +6,15 @@ class AppleOauthSessionsController < ApplicationController
 
   def native_authenticate
     identity_token = params[:identity_token]
-    if identity_token.blank?
-      render json: { error: "Missing identity token" }, status: :bad_request
+    nonce = params[:nonce]
+    if identity_token.blank? || nonce.blank?
+      render json: { error: "Missing identity token or nonce" }, status: :bad_request
       return
     end
 
     oauth_client = AppleOauthClient.new
     begin
-      user_info = oauth_client.decode_id_token(identity_token)
+      user_info = oauth_client.decode_native_id_token(identity_token, nonce: nonce)
       uid = user_info["sub"]
       email = user_info["email"]
 

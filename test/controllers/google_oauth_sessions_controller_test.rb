@@ -6,12 +6,21 @@ class GoogleOauthClient
   end
 
   alias_method :original_authenticate, :authenticate
+  alias_method :original_authenticate_id_token, :authenticate_id_token
 
   def authenticate(code:, redirect_uri:)
     if GoogleOauthClient.mocked_result
       GoogleOauthClient.mocked_result
     else
       original_authenticate(code: code, redirect_uri: redirect_uri)
+    end
+  end
+
+  def authenticate_id_token(id_token, nonce:)
+    if GoogleOauthClient.mocked_result
+      GoogleOauthClient.mocked_result
+    else
+      original_authenticate_id_token(id_token, nonce: nonce)
     end
   end
 end
@@ -44,6 +53,17 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # --- Native Platform Flow ---
+
+  test "native Google identity token returns a short-lived session token" do
+    GoogleOauthClient.mocked_result = { uid: "google-native-123", email: "native-google@example.com" }
+
+    post native_authenticate_google_oauth_sessions_path,
+      params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
+      headers: { "Content-Type" => "application/json" }
+
+    assert_response :success
+    assert JSON.parse(response.body)["token"].present?
+  end
 
   test "google login success redirects to custom native scheme for native platform" do
     post google_oauth_sessions_path, params: { platform: "native" }

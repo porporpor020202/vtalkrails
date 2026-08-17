@@ -13,19 +13,17 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
 
-  # Defines the root path route ("/")
-  root to: redirect("/rooms")
+  root "rooms#index"
 
-  resources :configurations, only: [] do
-    get :ios_v1, on: :collection
-    get :android_v1, on: :collection
+  resources :rooms, only: %i[index show destroy] do
+    resources :voice_messages, only: :create
   end
-
-  resources :rooms
+  resource :voice_drop, only: :create
 
   resource :settings, only: [ :show ], controller: "settings"
 
-  resource :mypage, only: [ :show ], controller: "mypage"
+  resource :mypage, only: [ :show ], controller: "mypages"
+  resource :account, only: [ :destroy ]
   resource :map, only: [ :show ]
 
   resources :hikes, only: [] do
@@ -51,11 +49,11 @@ Rails.application.routes.draw do
     collection do
       get :authenticate_by_token
       get :callback
+      post :native_authenticate
     end
   end
 
-  resource :session
-  resources :passwords, param: :token
+  resource :session, only: %i[new destroy]
 
   resources :notification_tokens, only: :create do
     post :test_push, on: :collection

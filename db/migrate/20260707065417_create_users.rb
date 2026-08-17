@@ -11,7 +11,8 @@ class CreateUsers < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :users, :email_address, unique: true, where: "email_address IS NOT NULL"
+    add_index :users, :email_address, where: "email_address IS NOT NULL"
+    add_index :users, :name, unique: true, where: "name IS NOT NULL", name: :index_users_on_name_unique
     add_index :users, [ :oauth_provider, :oauth_uid ], unique: true, where: "oauth_provider IS NOT NULL AND oauth_uid IS NOT NULL"
   end
 end

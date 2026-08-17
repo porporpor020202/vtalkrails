@@ -1,18 +1,18 @@
 require "test_helper"
 
-# Apple의 실제 JWT 검증을 우회하기 위해 decode_id_token 메서드를 목(mock)으로 교체
+# Apple의 실제 JWT 검증을 우회하기 위해 네이티브 토큰 검증을 목(mock)으로 교체
 class AppleOauthClient
   class << self
     attr_accessor :mocked_user_info
   end
 
-  alias_method :original_decode_id_token, :decode_id_token
+  alias_method :original_decode_native_id_token, :decode_native_id_token
 
-  def decode_id_token(id_token)
+  def decode_native_id_token(id_token, nonce:)
     if AppleOauthClient.mocked_user_info
       AppleOauthClient.mocked_user_info
     else
-      original_decode_id_token(id_token)
+      original_decode_native_id_token(id_token, nonce: nonce)
     end
   end
 end
@@ -37,7 +37,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     AppleOauthClient.mocked_user_info = { "sub" => "apple-uid-123", "email" => @user.email_address }
 
     post native_authenticate_apple_oauth_sessions_path,
-      params: { identity_token: "dummy.jwt.token" }.to_json,
+      params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
       headers: { "Content-Type" => "application/json" }
 
     assert_response :success
@@ -49,7 +49,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     AppleOauthClient.mocked_user_info = { "sub" => "apple-new-uid-999", "email" => "newapple@example.com" }
 
     post native_authenticate_apple_oauth_sessions_path,
-      params: { identity_token: "dummy.jwt.token" }.to_json,
+      params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
       headers: { "Content-Type" => "application/json" }
 
     assert_response :success
@@ -65,7 +65,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :bad_request
     json = JSON.parse(response.body)
-    assert_equal "Missing identity token", json["error"]
+    assert_equal "Missing identity token or nonce", json["error"]
   end
 
   # -------------------------------------------------

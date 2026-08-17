@@ -28,12 +28,12 @@ export default class extends Controller {
       
       if (isActive) {
         link.setAttribute("aria-current", "page")
-        link.classList.add("text-indigo-600", "dark:text-indigo-400", "font-semibold")
-        link.classList.remove("text-slate-500", "dark:text-slate-400")
+        link.classList.add("text-indigo-600")
+        link.classList.remove("text-slate-400")
       } else {
         link.removeAttribute("aria-current")
-        link.classList.remove("text-indigo-600", "dark:text-indigo-400", "font-semibold")
-        link.classList.add("text-slate-500", "dark:text-slate-400")
+        link.classList.remove("text-indigo-600")
+        link.classList.add("text-slate-400")
       }
     })
   }

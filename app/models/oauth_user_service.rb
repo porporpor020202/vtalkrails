@@ -13,14 +13,6 @@ class OauthUserService
       return current_user
     end
 
-    if email.present?
-      user = User.find_by(email_address: email)
-      if user
-        user.update(oauth_provider: oauth_provider, oauth_uid: uid)
-        return user
-      end
-    end
-
     User.create(
       oauth_provider: oauth_provider,
       oauth_uid: uid,

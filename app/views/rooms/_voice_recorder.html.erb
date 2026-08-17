@@ -1,0 +1,4 @@
+<div data-controller="voice-recorder" data-voice-recorder-endpoint-value="<%= endpoint %>" data-voice-recorder-max-duration-value="30000">
+  <%= render "voice_recorder_trigger", trigger_classes: trigger_classes, trigger_label: local_assigns.fetch(:trigger_label, "Drop a voice") %>
+  <%= render "voice_recorder_sheet" %>
+</div>

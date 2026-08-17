@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
-@custom-variant hotwire-native {
-    html[data-hotwire-native] & {
-        @slot
-    }
+@theme {
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 }
 
-@custom-variant not-hotwire-native {
-    html:not([data-hotwire-native]) & {
-        @slot
-    }
+html {
+    background: #f1f5f9;
+}
+
+html,
+body {
+    min-height: 100%;
+    overscroll-behavior: none;
 }
