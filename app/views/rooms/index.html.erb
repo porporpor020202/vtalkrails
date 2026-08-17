@@ -1,70 +1,8 @@
-<div class="w-full flex flex-col h-full">
-  <!-- Room Selection Tabs -->
-  <div class="flex-1 overflow-y-auto p-4 space-y-2" id="rooms-list">
-    <% @rooms.each_with_index do |room, index| %>
-      <% if room.your_turn? %>
-        <button onclick="location.href='/rooms/<%= room.id %>'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left bg-gradient-to-r from-indigo-50 to-violet-50/50 border border-indigo-100/80 shadow-sm shadow-indigo-100/20 <%= 'active-room' if index == 0 %>">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr <%= room_gradient_class(room, index) %> flex items-center justify-center text-2xl shadow-md">
-            <%= room.opponent.icon %>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-slate-800"><%= room.opponent.name %></span>
-              <div class="flex items-center gap-1.5">
-                <span class="text-[10px] text-slate-400"><%= short_time_ago(room.updated_at) %></span>
-                <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/80">Your Turn</span>
-              </div>
-            </div>
-          </div>
-        </button>
-      <% elsif room.waiting? %>
-        <button onclick="location.href='/rooms/<%= room.id %>'" class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left hover:bg-slate-50 border border-transparent">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr <%= room_gradient_class(room, index) %> flex items-center justify-center text-2xl shadow-md">
-            <%= room.opponent.icon %>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-slate-700"><%= room.opponent.name %></span>
-              <div class="flex items-center gap-1.5">
-                <span class="text-[10px] text-slate-400"><%= short_time_ago(room.updated_at) %></span>
-                <span class="text-[10px] text-slate-400 font-medium bg-slate-100/80 px-2 py-0.5 rounded-full">Waiting</span>
-              </div>
-            </div>
-          </div>
-        </button>
-      <% elsif room.deleted? %>
-        <button class="room-btn w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 text-left border border-transparent opacity-60 cursor-not-allowed">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr <%= room_gradient_class(room, index) %> flex items-center justify-center text-2xl shadow-md grayscale">
-            <%= room.opponent.icon %>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-slate-500 line-through"><%= room.opponent.name %></span>
-              <div class="flex items-center gap-1.5">
-                <span class="text-[10px] text-slate-400"><%= short_time_ago(room.updated_at) %></span>
-                <span class="text-[10px] text-rose-500 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-100/50">Deleted</span>
-              </div>
-            </div>
-          </div>
-        </button>
-      <% end %>
-    <% end %>
-  </div>
-
-  <!-- User Profile & Logout -->
-  <div class="p-4 border-t border-slate-100 bg-white flex flex-col items-center gap-3">
-    <div class="text-sm font-medium text-slate-600">
-      Logged in as: <span class="font-bold text-indigo-600"><%= current_user.email_address %></span>
-    </div>
-
-    <%= button_to "🔔 푸시 알림 테스트 보내기", test_push_notification_tokens_path, method: :post, class: "w-full py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold rounded-xl transition-all duration-200 text-center text-sm border border-indigo-200" %>
-
-    <%= button_to "Log out", session_path, method: :delete, data: { turbo: false }, class: "w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-xl transition-all duration-200 text-center text-sm" %>
-  </div>
-</div>
-
-
-<% if authenticated? %>
-  <meta data-controller="bridge--notification-token" />
+<%= button_to session_path,
+              method: :delete,
+              class: "w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-semibold rounded-2xl shadow-lg shadow-rose-100 hover:shadow-xl hover:shadow-rose-200/50 transform active:scale-[0.98] transition-all duration-200 cursor-pointer" do %>
+  <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+  Sign Out
 <% end %>
-

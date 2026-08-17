@@ -30,7 +30,7 @@ module Authentication
     end
 
     def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      Session.find_by(id: cookies.encrypted[:session_id]) if cookies.encrypted[:session_id]
     end
 
     def request_authentication
@@ -42,10 +42,11 @@ module Authentication
       session.delete(:return_to_after_authenticating) || root_url
     end
 
+
     def start_new_session_for(user)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
-        cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        cookies.encrypted.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
       end
     end
 

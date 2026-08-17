@@ -19,11 +19,12 @@ class TestPushNotifier < ApplicationNotifier
       config.apns_key = credentials.apns_key
     end
 
-    config.development = Rails.env.local?
+    config.development = true
   end
 
   deliver_by :fcm do |config|
-    config.credentials = Rails.application.credentials.fcm.to_h
+    credentials = Rails.application.credentials.fcm
+    config.credentials = credentials.present? ? credentials.to_h : {}
 
     config.device_tokens = -> {
       recipient.notification_tokens.where(platform: :fcm).pluck(:token)
@@ -33,7 +34,8 @@ class TestPushNotifier < ApplicationNotifier
         message: {
           token: device_token,
           notification: {
-            title: "FCM 타이틀 테스트!"
+            title: "VTalk 알림",
+            body: params[:message] || "🔔 테스트 푸시 알림입니다!"
           },
           data: {
             path: params[:path] || rooms_path

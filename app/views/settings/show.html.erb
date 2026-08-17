@@ -12,11 +12,11 @@
   <!-- User Profile Section -->
   <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm shadow-slate-100/50 flex items-center gap-4 relative overflow-hidden">
     <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 rounded-full blur-2xl transform translate-x-4 -translate-y-4"></div>
-    
+
     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-indigo-100 shrink-0">
-      <%= current_user.guest? ? "G" : (current_user.email_address&.first&.upcase || "U") %>
+      <%= (current_user.email_address&.first&.upcase || "U") %>
     </div>
-    
+
     <div class="flex-1 min-w-0">
       <h2 class="font-semibold text-slate-800 truncate">
         <%= current_user.guest? ? "Guest User" : "Account Owner" %>
@@ -24,7 +24,7 @@
       <p class="text-xs text-slate-400 truncate">
         <%= current_user.guest? ? "Temporary Account" : current_user.email_address %>
       </p>
-      
+
       <% if current_user.oauth_provider.present? %>
         <div class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
           <% if current_user.oauth_provider == "google" %>

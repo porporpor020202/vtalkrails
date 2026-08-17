@@ -133,7 +133,7 @@ class AppleOauthSessionsController < ApplicationController
 
   def sign_in_and_redirect_user(user)
     start_new_session_for user
-    redirect_to after_authentication_url
+    redirect_to root_url
   end
 
   def stored_nonce
