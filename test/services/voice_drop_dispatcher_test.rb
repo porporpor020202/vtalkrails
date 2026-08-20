@@ -2,6 +2,7 @@ require "test_helper"
 
 class VoiceDropDispatcherTest < ActiveSupport::TestCase
   setup do
+    User.update_all(guest: true)
     @sender = create_user("sender@example.com", last_active_at: Time.current)
   end
 

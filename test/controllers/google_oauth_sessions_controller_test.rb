@@ -52,6 +52,19 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id].present?
   end
 
+  test "google login returns to the protected account deletion confirmation" do
+    get confirm_account_deletion_path
+    assert_redirected_to new_session_path
+
+    post google_oauth_sessions_path, params: { platform: "web" }
+    state = session[:google_oauth_state]
+    GoogleOauthClient.mocked_result = { uid: "google-12345", email: @user.email_address }
+
+    get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
+
+    assert_redirected_to confirm_account_deletion_path
+  end
+
   # --- Native Platform Flow ---
 
   test "native Google identity token returns a short-lived session token" do

@@ -54,6 +54,14 @@ class AppleOauthSessionsController < ApplicationController
     secure_cookie = Rails.env.production? || request.ssl?
     cookies.encrypted[:apple_oauth_state] = { same_site: :none, expires: 1.hour.from_now, secure: secure_cookie, value: state }
     cookies.encrypted[:apple_oauth_nonce] = { same_site: :none, expires: 1.hour.from_now, secure: secure_cookie, value: nonce }
+    if session[:return_to_after_authenticating].present?
+      cookies.encrypted[:apple_oauth_return_to] = {
+        same_site: :none,
+        expires: 1.hour.from_now,
+        secure: secure_cookie,
+        value: session[:return_to_after_authenticating]
+      }
+    end
 
     oauth_client = AppleOauthClient.new
     authorization_url = oauth_client.authorization_url(
@@ -134,7 +142,16 @@ class AppleOauthSessionsController < ApplicationController
 
   def sign_in_and_redirect_user(user)
     start_new_session_for user
-    redirect_to root_url
+    redirect_to apple_oauth_return_url
+  end
+
+  def apple_oauth_return_url
+    return_url = cookies.encrypted[:apple_oauth_return_to]
+    secure_cookie = Rails.env.production? || request.ssl?
+    cookies.delete(:apple_oauth_return_to, same_site: :none, secure: secure_cookie)
+
+    session.delete(:return_to_after_authenticating)
+    return_url.presence || root_url
   end
 
   def stored_nonce

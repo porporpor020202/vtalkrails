@@ -108,6 +108,27 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     AppleOauthClient.remove_method(:authenticate) rescue nil
   end
 
+  test "callback: 계정 삭제 인증 후 확인 화면으로 돌아간다" do
+    @user.update!(oauth_provider: :apple, oauth_uid: "apple-deletion-uid")
+    user_uid = "apple-deletion-uid"
+    user_email = @user.email_address
+
+    get confirm_account_deletion_path
+    assert_redirected_to new_session_path
+    post apple_oauth_sessions_path, params: { platform: "web" }
+    state_from_url = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
+
+    AppleOauthClient.define_method(:authenticate) do |code:, redirect_uri:, nonce:|
+      { uid: user_uid, email: user_email }
+    end
+
+    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state_from_url }
+
+    assert_redirected_to confirm_account_deletion_path
+  ensure
+    AppleOauthClient.remove_method(:authenticate) rescue nil
+  end
+
   test "callback: 네이티브 플랫폼 로그인 성공 시 커스텀 스킴으로 리다이렉트된다" do
     @user.update!(oauth_provider: :apple, oauth_uid: "apple-native-uid-789")
     user_uid   = "apple-native-uid-789"

@@ -107,6 +107,6 @@ class GoogleOauthSessionsController < ApplicationController
 
   def sign_in_and_redirect_user(user)
     start_new_session_for user
-    redirect_to root_path
+    redirect_to after_authentication_url
   end
 end
