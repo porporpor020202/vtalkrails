@@ -16,12 +16,16 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
     assert room.voice_messages.first.audio.attached?
   end
 
-  test "does not deliver to inactive users" do
-    create_user("inactive@example.com", last_active_at: 8.days.ago)
+  test "delivers to an inactive registered user during store review" do
+    recipient = create_user("inactive@example.com", last_active_at: 8.days.ago)
 
-    assert_raises VoiceDropDispatcher::NoRecipientAvailable do
-      VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: 4_000)
-    end
+    # Previous production behavior while the 7-day activity filter was enabled:
+    # assert_raises VoiceDropDispatcher::NoRecipientAvailable do
+    #   VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: 4_000)
+    # end
+    room = VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: 4_000)
+
+    assert_equal recipient, room.opponent_for(@sender)
   end
 
   test "does not create a second room for an existing pair" do

@@ -16,7 +16,9 @@ class VoiceDropDispatcher
       return room if room
     end
 
-    raise NoRecipientAvailable, "No active listener is available right now"
+    # Previous production message while the active-user filter was enabled:
+    # raise NoRecipientAvailable, "No active listener is available right now"
+    raise NoRecipientAvailable, "No listener account is available right now"
   end
 
   private
@@ -25,7 +27,10 @@ class VoiceDropDispatcher
 
   def ranked_candidates
     User.registered
-      .active_since(ACTIVE_WINDOW.ago)
+      # Store review: keep registered Apple and Google review accounts eligible
+      # even when either account has not been active during the last 7 days.
+      # Re-enable this scope after review if recent activity should be required:
+      # .active_since(ACTIVE_WINDOW.ago)
       .where.not(id: sender.id)
       .order(last_active_at: :desc)
       .limit(CANDIDATE_LIMIT)
@@ -34,7 +39,7 @@ class VoiceDropDispatcher
       .reject { |candidate| active_room_between?(candidate) }
       .map { |candidate| [ candidate, pending_room_count(candidate), candidate.last_active_at ] }
       .select { |_, pending_count, _| pending_count < MAX_PENDING_ROOMS }
-      .sort_by { |_, pending_count, last_active_at| [ last_active_at < RECENT_WINDOW.ago ? 1 : 0, pending_count, rand ] }
+      .sort_by { |_, pending_count, last_active_at| [ last_active_at.nil? || last_active_at < RECENT_WINDOW.ago ? 1 : 0, pending_count, rand ] }
       .map(&:first)
   end
 

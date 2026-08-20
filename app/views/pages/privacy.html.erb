@@ -1,0 +1,184 @@
+<% content_for :title, "개인정보처리방침 · say one thing" %>
+<% content_for :html_lang, "ko" %>
+<% @hide_bottom_nav = true %>
+
+<article class="min-h-full bg-slate-50 px-5 pb-16 pt-[max(2rem,env(safe-area-inset-top))] text-slate-700">
+  <div class="mx-auto max-w-3xl">
+    <header class="border-b border-slate-200 pb-8">
+      <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-indigo-600">say one thing</p>
+      <h1 class="mt-3 text-4xl font-black tracking-[-0.045em] text-slate-950">개인정보처리방침</h1>
+      <p class="mt-4 text-sm leading-6 text-slate-500">시행일: 2026년 8월 20일</p>
+    </header>
+
+    <div class="mt-8 space-y-10 text-[15px] leading-7">
+      <p>
+        <strong class="font-bold text-slate-950"><%= @privacy_operator_name %></strong>(이하 “운영자”)은
+        「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 안전하게 보호하기 위해 다음과 같이
+        개인정보처리방침을 수립·공개합니다.
+      </p>
+
+      <section aria-labelledby="privacy-purpose">
+        <h2 id="privacy-purpose" class="text-xl font-extrabold tracking-tight text-slate-950">1. 개인정보의 처리 목적, 항목 및 보유기간</h2>
+        <p class="mt-3">운영자는 아래 목적에 필요한 범위에서 개인정보를 처리합니다.</p>
+
+        <div class="mt-4 space-y-4">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">회원가입 및 로그인</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold text-slate-700">처리 목적:</dt> <dd class="inline">이용자 식별, Google·Apple 로그인, 계정 관리, 부정 이용 방지</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">처리 항목:</dt> <dd class="inline">이메일 주소, 로그인 제공자, 제공자별 이용자 식별값, 서비스 내부 이용자 ID, 자동 생성 닉네임·아이콘</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">보유기간:</dt> <dd class="inline">회원 탈퇴 시까지</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">게스트 이용</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold text-slate-700">처리 목적:</dt> <dd class="inline">임시 계정 생성, 서비스 제공, 이용자 구분</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">처리 항목:</dt> <dd class="inline">서비스 내부 이용자 ID, 자동 생성 닉네임·아이콘, 게스트 여부</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">보유기간:</dt> <dd class="inline">회원 탈퇴 또는 게스트 계정 삭제 시까지</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">음성 대화 서비스</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold text-slate-700">처리 목적:</dt> <dd class="inline">상대방 연결, 음성 메시지 녹음·전송·재생, 대화 상태 관리</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">처리 항목:</dt> <dd class="inline">음성 파일, 녹음 길이, 발신자·수신자, 전송 시각, 대화방 및 메시지 상태</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">보유기간:</dt> <dd class="inline">대화방 삭제 또는 회원 탈퇴 시까지</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">알림 및 서비스 운영</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold text-slate-700">처리 목적:</dt> <dd class="inline">푸시 알림 전송, 로그인 상태 유지, 보안, 장애 대응 및 서비스 개선</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">처리 항목:</dt> <dd class="inline">푸시 토큰, 기기 플랫폼, IP 주소, 사용자 에이전트, 암호화된 세션 식별자, 접속·활동 일시 및 서비스 이용기록</dd></div>
+              <div><dt class="inline font-semibold text-slate-700">보유기간:</dt> <dd class="inline">푸시 토큰은 회원 탈퇴 시까지, 세션 정보는 로그아웃 또는 회원 탈퇴 시까지, 운영기록은 목적 달성 시까지</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <p class="mt-4 text-sm text-slate-500">
+          관계 법령에 따라 보존할 의무가 있는 정보는 해당 법령에서 정한 기간 동안 별도로 보관한 뒤 파기합니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-collection">
+        <h2 id="privacy-collection" class="text-xl font-extrabold tracking-tight text-slate-950">2. 개인정보의 수집 방법 및 법적 근거</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-5 marker:text-indigo-500">
+          <li>Google 또는 Apple 로그인 과정에서 이용자가 동의한 정보를 제공받습니다.</li>
+          <li>이용자가 앱에서 계정 생성, 음성 녹음·전송, 알림 설정 등의 기능을 사용할 때 직접 수집합니다.</li>
+          <li>서비스 이용 과정에서 IP 주소, 사용자 에이전트, 세션 및 이용기록이 자동으로 생성될 수 있습니다.</li>
+          <li>서비스 제공에 필요한 정보는 이용자와의 계약 체결·이행을 근거로 처리하며, 동의가 필요한 정보는 이용자의 동의를 근거로 처리합니다.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="privacy-sharing">
+        <h2 id="privacy-sharing" class="text-xl font-extrabold tracking-tight text-slate-950">3. 개인정보의 제3자 제공</h2>
+        <p class="mt-3">
+          운영자는 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 다만, 음성 대화 기능을 제공하기 위해
+          이용자가 전송한 닉네임·아이콘, 음성 메시지 및 전송 시각이 대화 상대방에게 제공됩니다. 제공 정보는 대화방 삭제
+          또는 관련 계정 삭제 시까지 보관되며, 법령에 근거가 있거나 이용자가 별도로 동의한 경우에는 예외로 합니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-overseas">
+        <h2 id="privacy-overseas" class="text-xl font-extrabold tracking-tight text-slate-950">4. 개인정보 처리의 국외 위탁</h2>
+        <p class="mt-3">
+          운영자는 로그인 및 푸시 알림 기능 제공을 위해 아래와 같이 개인정보 처리를 국외에 위탁합니다.
+          이전은 서비스 계약의 체결·이행을 위해 필요한 처리위탁으로서 「개인정보 보호법」 제28조의8 제1항 제3호에 근거합니다.
+        </p>
+
+        <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div class="border-b border-slate-200 p-5">
+            <h3 class="font-bold text-slate-950">Google LLC</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold">연락처:</dt> <dd class="inline"><a class="text-indigo-600 underline underline-offset-2" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 개인정보처리방침</a></dd></div>
+              <div><dt class="inline font-semibold">이전 국가:</dt> <dd class="inline">미국 등 Google이 데이터 처리 시설을 운영하는 국가</dd></div>
+              <div><dt class="inline font-semibold">이전 항목:</dt> <dd class="inline">Google 로그인 토큰·이용자 식별값·이메일 주소, Android 푸시 토큰 및 알림 내용</dd></div>
+              <div><dt class="inline font-semibold">이전 목적:</dt> <dd class="inline">Google 로그인 인증 및 Firebase Cloud Messaging을 통한 알림 전송</dd></div>
+              <div><dt class="inline font-semibold">시기·방법:</dt> <dd class="inline">로그인 또는 알림 전송 시 암호화된 네트워크를 통해 이전</dd></div>
+              <div><dt class="inline font-semibold">보유·이용 기간:</dt> <dd class="inline">처리 목적 달성 시까지 또는 Google의 정책에 따른 기간</dd></div>
+            </dl>
+          </div>
+
+          <div class="p-5">
+            <h3 class="font-bold text-slate-950">Apple Inc.</h3>
+            <dl class="mt-3 space-y-2 text-sm leading-6">
+              <div><dt class="inline font-semibold">연락처:</dt> <dd class="inline"><a class="text-indigo-600 underline underline-offset-2" href="https://www.apple.com/legal/privacy/contact/" target="_blank" rel="noopener noreferrer">Apple 개인정보 문의</a></dd></div>
+              <div><dt class="inline font-semibold">이전 국가:</dt> <dd class="inline">미국 등 Apple이 데이터 처리 시설을 운영하는 국가</dd></div>
+              <div><dt class="inline font-semibold">이전 항목:</dt> <dd class="inline">Apple 로그인 토큰·이용자 식별값·이메일 주소, iOS 푸시 토큰 및 알림 내용</dd></div>
+              <div><dt class="inline font-semibold">이전 목적:</dt> <dd class="inline">Apple 로그인 인증 및 Apple Push Notification service를 통한 알림 전송</dd></div>
+              <div><dt class="inline font-semibold">시기·방법:</dt> <dd class="inline">로그인 또는 알림 전송 시 암호화된 네트워크를 통해 이전</dd></div>
+              <div><dt class="inline font-semibold">보유·이용 기간:</dt> <dd class="inline">처리 목적 달성 시까지 또는 Apple의 정책에 따른 기간</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <p class="mt-4 text-sm text-slate-500">
+          국외 이전을 원하지 않는 이용자는 Google·Apple 로그인 또는 푸시 알림 사용을 중단할 수 있습니다.
+          다만 로그인 정보의 국외 이전을 거부하면 해당 로그인 방식으로 서비스를 이용할 수 없고, 푸시 알림 이전을 거부하면 알림을 받을 수 없습니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-destruction">
+        <h2 id="privacy-destruction" class="text-xl font-extrabold tracking-tight text-slate-950">5. 개인정보의 파기 절차 및 방법</h2>
+        <p class="mt-3">
+          보유기간이 끝나거나 처리 목적이 달성된 개인정보는 지체 없이 파기합니다. 전자적 파일은 복구할 수 없는 방법으로 삭제하고,
+          종이 문서가 발생한 경우에는 분쇄 또는 소각합니다. 다른 법령에 따라 보존해야 하는 정보는 별도 분리하여 보관한 후 보존기간이 끝나면 파기합니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-rights">
+        <h2 id="privacy-rights" class="text-xl font-extrabold tracking-tight text-slate-950">6. 이용자와 법정대리인의 권리 및 행사 방법</h2>
+        <p class="mt-3">
+          이용자는 자신의 개인정보에 대해 열람, 정정·삭제, 처리정지 및 동의 철회를 요구할 수 있습니다. 앱의 마이페이지에서
+          계정을 삭제하거나 아래 개인정보 문의처로 요청할 수 있습니다. 운영자는 본인 확인 후 관련 법령에서 정한 기간 안에 조치합니다.
+          만 14세 미만 아동의 개인정보를 처리하게 되는 경우 법정대리인의 동의를 받으며, 법정대리인도 같은 권리를 행사할 수 있습니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-cookies">
+        <h2 id="privacy-cookies" class="text-xl font-extrabold tracking-tight text-slate-950">7. 자동 수집 장치의 설치·운영 및 거부</h2>
+        <p class="mt-3">
+          운영자는 로그인 상태 유지를 위해 암호화된 세션 쿠키를 사용합니다. 이 쿠키는 맞춤형 광고나 이용자 추적에 사용하지 않습니다.
+          이용자는 브라우저 설정에서 쿠키 저장을 거부하거나 삭제할 수 있으나, 이 경우 로그인이 필요한 기능을 이용할 수 없습니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="privacy-security">
+        <h2 id="privacy-security" class="text-xl font-extrabold tracking-tight text-slate-950">8. 개인정보의 안전성 확보 조치</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-5 marker:text-indigo-500">
+          <li>전송 구간 암호화(HTTPS) 및 세션 쿠키 암호화</li>
+          <li>개인정보 접근 권한의 최소화 및 접근 통제</li>
+          <li>비밀번호 등 인증정보의 안전한 저장</li>
+          <li>보안 취약점 점검, 접속기록 관리 및 개인정보가 포함된 요청 정보의 로그 필터링</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="privacy-contact">
+        <h2 id="privacy-contact" class="text-xl font-extrabold tracking-tight text-slate-950">9. 개인정보 보호 담당부서 및 권익침해 구제</h2>
+        <div class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
+          <p class="font-bold text-slate-950">개인정보 보호 담당부서: <%= @privacy_operator_name %></p>
+          <p class="mt-1">이메일: <a class="font-semibold text-indigo-700 underline underline-offset-2" href="mailto:<%= @privacy_contact_email %>"><%= @privacy_contact_email %></a></p>
+        </div>
+        <p class="mt-4">개인정보 침해에 관한 상담이나 신고가 필요한 경우 아래 기관에 문의할 수 있습니다.</p>
+        <ul class="mt-3 space-y-2">
+          <li><a class="text-indigo-600 underline underline-offset-2" href="https://privacy.kisa.or.kr" target="_blank" rel="noopener noreferrer">개인정보침해 신고센터</a>: 국번 없이 118</li>
+          <li><a class="text-indigo-600 underline underline-offset-2" href="https://www.kopico.go.kr" target="_blank" rel="noopener noreferrer">개인정보분쟁조정위원회</a>: 1833-6972</li>
+          <li><a class="text-indigo-600 underline underline-offset-2" href="https://www.spo.go.kr" target="_blank" rel="noopener noreferrer">대검찰청</a>: 국번 없이 1301</li>
+          <li><a class="text-indigo-600 underline underline-offset-2" href="https://ecrm.police.go.kr" target="_blank" rel="noopener noreferrer">경찰청 사이버범죄 신고시스템</a>: 국번 없이 182</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="privacy-changes">
+        <h2 id="privacy-changes" class="text-xl font-extrabold tracking-tight text-slate-950">10. 개인정보처리방침의 변경</h2>
+        <p class="mt-3">
+          이 방침의 내용이 변경되는 경우 시행 전에 서비스 내 공지사항 또는 이 페이지를 통해 알립니다.
+        </p>
+        <p class="mt-2 font-semibold text-slate-950">공고일·시행일: 2026년 8월 20일</p>
+      </section>
+    </div>
+  </div>
+</article>
