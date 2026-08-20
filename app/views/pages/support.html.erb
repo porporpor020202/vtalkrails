@@ -1,0 +1,76 @@
+<% content_for :title, "Support · say one thing" %>
+<% content_for :html_lang, "en" %>
+<% @hide_bottom_nav = true %>
+
+<article class="min-h-full bg-slate-50 px-5 pb-16 pt-[max(2rem,env(safe-area-inset-top))] text-slate-700">
+  <div class="mx-auto max-w-3xl">
+    <header class="border-b border-slate-200 pb-8">
+      <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-indigo-600">say one thing</p>
+      <h1 class="mt-3 text-4xl font-black tracking-[-0.045em] text-slate-950">Support</h1>
+      <p class="mt-4 text-[15px] leading-7 text-slate-600">
+        Need help with your account, recording, or a voice conversation? We are here to help.
+      </p>
+    </header>
+
+    <div class="mt-8 space-y-8 text-[15px] leading-7">
+      <section aria-labelledby="support-contact">
+        <div class="rounded-3xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm">
+          <h2 id="support-contact" class="text-xl font-extrabold tracking-tight text-slate-950">Contact support</h2>
+          <p class="mt-2">Email us about app issues, feedback, or feature requests.</p>
+          <a class="mt-5 inline-flex rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-200"
+             href="mailto:<%= @support_contact_email %>?subject=say%20one%20thing%20support"
+             data-turbo="false">
+            <%= @support_contact_email %>
+          </a>
+          <p class="mt-4 text-sm text-slate-500">We aim to respond within three business days.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="support-details">
+        <h2 id="support-details" class="text-xl font-extrabold tracking-tight text-slate-950">Help us understand the issue</h2>
+        <p class="mt-3">When contacting us, please include:</p>
+        <ul class="mt-3 list-disc space-y-2 pl-5 marker:text-indigo-500">
+          <li>The email address used to sign in</li>
+          <li>Your iPhone model and iOS version</li>
+          <li>A short description of what happened and when</li>
+          <li>A screenshot of the error, if available</li>
+        </ul>
+        <p class="mt-3 text-sm text-slate-500">Never send your password, sign-in token, or other authentication credentials.</p>
+      </section>
+
+      <section aria-labelledby="support-faq">
+        <h2 id="support-faq" class="text-xl font-extrabold tracking-tight text-slate-950">Common questions</h2>
+        <div class="mt-4 space-y-4">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">I cannot sign in</h3>
+            <p class="mt-2">Check your internet connection and try the same Apple or Google account you previously used. Close and reopen the app before trying again.</p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">The microphone does not work</h3>
+            <p class="mt-2">Open iPhone Settings, find say one thing, and allow microphone access. Then return to the app and record again.</p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">My voice message will not send</h3>
+            <p class="mt-2">Record a message of up to 30 seconds and confirm that your connection is stable. If sending still fails, reopen the app and try again.</p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 class="font-bold text-slate-950">I am waiting for a reply</h3>
+            <p class="mt-2">Conversations happen with real people, so response times vary. You will receive a notification when your partner replies if notifications are enabled.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="support-links">
+        <h2 id="support-links" class="text-xl font-extrabold tracking-tight text-slate-950">Account, privacy, and safety</h2>
+        <ul class="mt-3 space-y-3">
+          <li><%= link_to "Privacy Policy", privacy_path, class: "font-semibold text-indigo-700 underline underline-offset-2" %></li>
+          <li><%= link_to "Account and Data Deletion", delete_account_path, class: "font-semibold text-indigo-700 underline underline-offset-2" %></li>
+          <li><%= link_to "Child Safety Standards", child_safety_path, class: "font-semibold text-indigo-700 underline underline-offset-2" %></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</article>
