@@ -1,8 +1,10 @@
 class PagesController < ApplicationController
   allow_unauthenticated_access
-  before_action :set_privacy_contact, only: %i[privacy delete_account]
+  before_action :set_privacy_contact, only: %i[privacy child_safety delete_account]
 
   def privacy; end
+
+  def child_safety; end
 
   def delete_account; end
 
