@@ -9,7 +9,7 @@ class PagesController < ApplicationController
   private
 
   def set_privacy_contact
-    @privacy_operator_name = ENV.fetch("PRIVACY_OPERATOR_NAME", "say one thing 운영팀")
+    @privacy_operator_name = ENV.fetch("PRIVACY_OPERATOR_NAME", "say one thing Team")
     @privacy_contact_email = ENV.fetch("PRIVACY_CONTACT_EMAIL", "privacy@vtalks.net")
   end
 end

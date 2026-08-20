@@ -5,11 +5,11 @@ class AccountDeletionPageTest < ActionDispatch::IntegrationTest
     get delete_account_path
 
     assert_response :success
-    assert_select "h1", text: "계정 및 데이터 삭제"
-    assert_select "a[href='#{confirm_account_deletion_path}']", text: /계정 삭제 요청 시작/
-    assert_select "#deleted-data", text: "삭제되는 데이터"
-    assert_select "#retained-data", text: "추가 보관되는 데이터와 기간"
-    assert_select "a[href='#{privacy_path}']", text: "개인정보처리방침"
+    assert_select "h1", text: "Account and Data Deletion"
+    assert_select "a[href='#{confirm_account_deletion_path}']", text: /Start account deletion/
+    assert_select "#deleted-data", text: "Data that will be deleted"
+    assert_select "#retained-data", text: "Data retained for an additional period"
+    assert_select "a[href='#{privacy_path}']", text: "Privacy Policy"
   end
 
   test "confirmation requires authentication and preserves its return URL" do
