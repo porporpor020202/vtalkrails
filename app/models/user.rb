@@ -13,6 +13,26 @@ class User < ApplicationRecord
     inverse_of: :sender,
     dependent: :destroy
   has_many :notification_tokens, dependent: :destroy
+  has_many :initiated_blocks,
+    class_name: "UserBlock",
+    foreign_key: :blocker_id,
+    inverse_of: :blocker,
+    dependent: :destroy
+  has_many :received_blocks,
+    class_name: "UserBlock",
+    foreign_key: :blocked_id,
+    inverse_of: :blocked,
+    dependent: :destroy
+  has_many :submitted_content_reports,
+    class_name: "ContentReport",
+    foreign_key: :reporter_id,
+    inverse_of: :reporter,
+    dependent: :destroy
+  has_many :received_content_reports,
+    class_name: "ContentReport",
+    foreign_key: :reported_user_id,
+    inverse_of: :reported_user,
+    dependent: :destroy
 
   enum :oauth_provider, { apple: "apple", google: "google" }
 

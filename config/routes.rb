@@ -22,6 +22,9 @@ Rails.application.routes.draw do
 
   resources :rooms, only: %i[index show destroy] do
     resources :voice_messages, only: :create
+    resource :safety, only: :show, controller: "room_safeties"
+    resource :report, only: :create, controller: "content_reports"
+    resource :block, only: :create, controller: "user_blocks"
   end
   resource :voice_drop, only: :create
 

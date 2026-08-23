@@ -54,6 +54,18 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
     assert_equal 2, Room.between(@sender, recipient).count
   end
 
+  test "does not match users when either user has blocked the other" do
+    blocked_by_sender = create_user("blocked-by-sender@example.com", last_active_at: 2.minutes.ago)
+    blocked_sender = create_user("blocked-sender@example.com", last_active_at: 3.minutes.ago)
+    available = create_user("safe-listener@example.com", last_active_at: 10.minutes.ago)
+    UserBlock.create!(blocker: @sender, blocked: blocked_by_sender)
+    UserBlock.create!(blocker: blocked_sender, blocked: @sender)
+
+    room = VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: 4_000)
+
+    assert_equal available, room.opponent_for(@sender)
+  end
+
   private
 
   def create_user(email, last_active_at:)

@@ -32,6 +32,8 @@ class VoiceDropDispatcher
       # Re-enable this scope after review if recent activity should be required:
       # .active_since(ACTIVE_WINDOW.ago)
       .where.not(id: sender.id)
+      .where.not(id: UserBlock.where(blocker: sender).select(:blocked_id))
+      .where.not(id: UserBlock.where(blocked: sender).select(:blocker_id))
       .order(last_active_at: :desc)
       .limit(CANDIDATE_LIMIT)
       # A deleted conversation should not block a new voice drop between the

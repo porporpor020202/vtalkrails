@@ -6,6 +6,7 @@ class Room < ApplicationRecord
   belongs_to :dismissed_by, class_name: "User", optional: true
 
   has_many :voice_messages, dependent: :destroy
+  has_many :content_reports, dependent: :destroy
 
   enum :status, { your_turn: 0, waiting: 1, deleted: 2 }, default: :waiting
 

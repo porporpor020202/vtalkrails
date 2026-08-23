@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "content_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.string "reason", null: false
+    t.bigint "reported_user_id", null: false
+    t.bigint "reporter_id", null: false
+    t.bigint "room_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reported_user_id"], name: "index_content_reports_on_reported_user_id"
+    t.index ["reporter_id"], name: "index_content_reports_on_reporter_id"
+    t.index ["room_id"], name: "index_content_reports_on_room_id"
+    t.index ["status"], name: "index_content_reports_on_status"
   end
 
   create_table "noticed_events", force: :cascade do |t|
@@ -103,6 +118,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "user_blocks", force: :cascade do |t|
+    t.bigint "blocked_id", null: false
+    t.bigint "blocker_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blocked_id"], name: "index_user_blocks_on_blocked_id"
+    t.index ["blocker_id", "blocked_id"], name: "index_user_blocks_on_blocker_id_and_blocked_id", unique: true
+    t.index ["blocker_id"], name: "index_user_blocks_on_blocker_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address"
@@ -132,6 +157,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "content_reports", "rooms"
+  add_foreign_key "content_reports", "users", column: "reported_user_id"
+  add_foreign_key "content_reports", "users", column: "reporter_id"
   add_foreign_key "notification_tokens", "users"
   add_foreign_key "rooms", "users"
   add_foreign_key "rooms", "users", column: "deleted_by_id"
@@ -139,6 +167,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_182000) do
   add_foreign_key "rooms", "users", column: "last_sender_id"
   add_foreign_key "rooms", "users", column: "opponent_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "user_blocks", "users", column: "blocked_id"
+  add_foreign_key "user_blocks", "users", column: "blocker_id"
   add_foreign_key "voice_messages", "rooms"
   add_foreign_key "voice_messages", "users", column: "sender_id"
 end

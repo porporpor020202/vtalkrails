@@ -1,0 +1,78 @@
+<% content_for :title, "Safety · say one thing" %>
+<% content_for :hide_bottom_nav, true %>
+
+<section class="flex min-h-full flex-1 flex-col bg-slate-50">
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
+    <%= link_to room_path(@room), class: "flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition active:bg-slate-100", aria: { label: "Back to conversation" } do %>
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <div>
+      <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-rose-500">Trust &amp; Safety</p>
+      <h1 class="text-lg font-black tracking-tight text-slate-950">Report or block</h1>
+    </div>
+  </header>
+
+  <div class="space-y-5 px-5 py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <div class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-center gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-2xl" aria-hidden="true"><%= @opponent.icon %></div>
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-slate-400">Conversation with</p>
+          <p class="truncate text-base font-extrabold text-slate-950"><%= @opponent.name %></p>
+        </div>
+      </div>
+      <p class="mt-4 text-sm leading-6 text-slate-500">Reports are reviewed by the safety team. The other person will not be told who submitted the report.</p>
+    </div>
+
+    <div class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 class="text-base font-extrabold text-slate-950">Report this conversation</h2>
+      <p class="mt-1 text-xs leading-5 text-slate-500">Choose the reason that best describes the voice content or behavior.</p>
+
+      <%= form_with model: @content_report, url: room_report_path(@room), class: "mt-5 space-y-4" do |form| %>
+        <% if @content_report.errors.any? %>
+          <div class="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700" role="alert">
+            <%= @content_report.errors.full_messages.to_sentence %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= form.label :reason, "Reason", class: "mb-2 block text-xs font-extrabold uppercase tracking-wide text-slate-600" %>
+          <%= form.select :reason,
+                ContentReport::REASONS.map { |value, label| [ label, value ] },
+                { prompt: "Select a reason" },
+                class: "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800" %>
+        </div>
+
+        <div>
+          <%= form.label :details, "Additional details (optional)", class: "mb-2 block text-xs font-extrabold uppercase tracking-wide text-slate-600" %>
+          <%= form.text_area :details,
+                maxlength: 1_000,
+                rows: 4,
+                placeholder: "Tell us what happened.",
+                class: "w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-300" %>
+        </div>
+
+        <%= form.submit "Submit report", class: "flex h-13 w-full items-center justify-center rounded-2xl bg-rose-600 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-rose-600/20 transition active:scale-[0.99]" %>
+      <% end %>
+    </div>
+
+    <div class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 class="text-base font-extrabold text-slate-950">Block this user</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-500">Blocking ends this conversation and prevents future matching in either direction.</p>
+
+      <% if @blocked %>
+        <div class="mt-4 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-bold text-slate-500" role="status">This user is blocked.</div>
+      <% else %>
+        <%= button_to "Block user",
+              room_block_path(@room),
+              method: :post,
+              form: { class: "mt-4", data: { turbo_confirm: "Block this user and end the conversation?" } },
+              class: "flex h-13 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-4 text-sm font-extrabold text-slate-700 transition active:scale-[0.99]" %>
+      <% end %>
+    </div>
+
+    <p class="px-2 text-center text-xs leading-5 text-slate-400">For urgent safety concerns, contact <a class="font-semibold text-indigo-600 underline" href="mailto:privacy@vtalks.net">privacy@vtalks.net</a>.</p>
+  </div>
+</section>

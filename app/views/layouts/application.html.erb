@@ -31,6 +31,14 @@
       <% end %>
 
       <main class="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <% unless controller_name == "sessions" %>
+          <% if notice.present? %>
+            <div class="mx-4 mt-[max(0.75rem,env(safe-area-inset-top))] rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" role="status"><%= notice %></div>
+          <% end %>
+          <% if alert.present? %>
+            <div class="mx-4 mt-[max(0.75rem,env(safe-area-inset-top))] rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" role="alert"><%= alert %></div>
+          <% end %>
+        <% end %>
         <%= yield %>
       </main>
 
