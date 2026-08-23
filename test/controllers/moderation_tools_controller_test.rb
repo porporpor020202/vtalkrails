@@ -23,6 +23,7 @@ class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{room_report_path(@room)}']"
     assert_select "form[action='#{room_block_path(@room)}']"
     assert_select "option", text: "Harassment or bullying"
+    assert_select "input[type='submit'][data-turbo-submits-with='Submitting report...']"
   end
 
   test "participant can report the conversation" do

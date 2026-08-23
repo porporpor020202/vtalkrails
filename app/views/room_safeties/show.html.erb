@@ -54,7 +54,9 @@
                 class: "w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-300" %>
         </div>
 
-        <%= form.submit "Submit report", class: "flex h-13 w-full items-center justify-center rounded-2xl bg-rose-600 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-rose-600/20 transition active:scale-[0.99]" %>
+        <%= form.submit "Submit report",
+              data: { turbo_submits_with: "Submitting report..." },
+              class: "flex h-13 w-full items-center justify-center rounded-2xl bg-rose-600 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-rose-600/20 transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-60" %>
       <% end %>
     </div>
 
