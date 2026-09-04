@@ -41,6 +41,14 @@ Its web configuration should include each supported domain and corresponding URL
 - `https://vtalks.net/apple_oauth_sessions/callback`
 - `https://www.vtalks.net/apple_oauth_sessions/callback`
 
+On 2026-09-05, `www.vtalks.net` and its callback were added to the existing
+Apple Services ID. The saved configuration retains the original `vtalks.net`
+and `dev.vtalks.net` domains and callbacks. The `www` authorization request now
+opens Apple's sign-in screen instead of `Invalid web redirect url`.
+End-to-end Apple sign-in on `www.vtalks.net` was verified on 2026-09-05:
+after the account holder authenticated, Apple returned to Rails, the existing
+account's rooms appeared, and the session persisted after a page reload.
+
 Apple returns a cross-site POST. The state, nonce, and return-location cookies use
 `SameSite=None; Secure`, so browser testing must use HTTPS. A plain HTTP local
 browser can discard these cookies even when controller tests succeed.
