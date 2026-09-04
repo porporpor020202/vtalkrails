@@ -37,6 +37,34 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   # --- Web Platform Flow ---
 
+  test "web authorization requests an ID token and the exact HTTPS callback" do
+    https!
+    host! "vtalks.net"
+    post google_oauth_sessions_path
+
+    query = URI.decode_www_form(URI.parse(response.location).query).to_h
+    assert_equal "openid email profile", query["scope"]
+    assert_equal "https://vtalks.net/google_oauth_sessions/callback", query["redirect_uri"]
+    assert_equal "code", query["response_type"]
+    assert_equal "web", query["state"].split(":").last
+  end
+
+  test "cancelled Google sign in does not create a session" do
+    post google_oauth_sessions_path, params: { platform: "web" }
+    state = session[:google_oauth_state]
+    assert_no_difference "Session.count" do
+      get callback_google_oauth_sessions_path, params: { error: "access_denied", state: state }
+    end
+    assert_redirected_to new_session_path
+    assert_nil session[:google_oauth_state]
+  end
+
+  test "callback without a saved state is rejected" do
+    get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: "unsolicited" }
+    assert_redirected_to new_session_path
+    assert_nil cookies[:session_id]
+  end
+
   test "google login success redirects to root_path for web" do
     post google_oauth_sessions_path, params: { platform: "web" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}

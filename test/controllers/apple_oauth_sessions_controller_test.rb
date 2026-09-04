@@ -7,6 +7,7 @@ class AppleOauthClient
   end
 
   alias_method :original_decode_native_id_token, :decode_native_id_token
+  alias_method :original_authenticate, :authenticate
 
   def decode_native_id_token(id_token, nonce:)
     if AppleOauthClient.mocked_user_info
@@ -25,6 +26,32 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   teardown do
     AppleOauthClient.mocked_user_info = nil
+    AppleOauthClient.alias_method :authenticate, :original_authenticate
+  end
+
+  test "Apple browser authorization defaults to web and uses an HTTPS form POST callback" do
+    https!
+    host! "vtalks.net"
+    post apple_oauth_sessions_path
+
+    query = URI.decode_www_form(URI.parse(response.location).query).to_h
+    assert_equal "web", query["state"].split(":").last
+    assert_equal "https://vtalks.net/apple_oauth_sessions/callback", query["redirect_uri"]
+    assert_equal "form_post", query["response_mode"]
+    assert query["nonce"].present?
+    oauth_cookies = response.headers["Set-Cookie"].to_s
+    assert_match(/samesite=none/i, oauth_cookies)
+    assert_match(/secure/i, oauth_cookies)
+  end
+
+  test "cancelled Apple sign in does not create a session" do
+    post apple_oauth_sessions_path, params: { platform: "web" }
+    state = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
+    assert_no_difference "Session.count" do
+      post callback_apple_oauth_sessions_path, params: { error: "user_cancelled_authorize", state: state }
+    end
+    assert_redirected_to new_session_path
+    assert_nil cookies[:session_id]
   end
 
   # -------------------------------------------------

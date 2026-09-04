@@ -19,3 +19,31 @@ Do not ship either app while any client ID still starts with `REPLACE_WITH`.
 - Android uses Apple's browser authorization flow in a Chrome Custom Tab. Keep the Apple Services ID, HTTPS callback URL, private key, key ID, and team ID in Rails credentials.
 
 Both native token endpoints validate the issuer, audience, signature, and nonce before Rails issues a five-minute mobile session handoff token.
+
+## Browser sign-in
+
+The web sign-in buttons POST to Rails with Turbo disabled. Rails uses a browser
+authorization-code flow and creates an ordinary web session after the callback.
+
+The Google Web OAuth client must have these authorized redirect URIs (exactly):
+
+- `https://vtalks.net/google_oauth_sessions/callback`
+- `https://www.vtalks.net/google_oauth_sessions/callback`
+
+These were registered on 2026-09-05 for the existing `Vtalk Server` client in
+project `vtalk-7951d`; the missing registrations caused `redirect_uri_mismatch`.
+Rails requests `openid email profile`, then verifies Google's signed ID token.
+No JavaScript origin registration is needed for this server-side flow.
+
+Apple web sign-in uses Services ID `com.vtalk.app.signin`, not the iOS bundle ID.
+Its web configuration should include each supported domain and corresponding URL:
+
+- `https://vtalks.net/apple_oauth_sessions/callback`
+- `https://www.vtalks.net/apple_oauth_sessions/callback`
+
+Apple returns a cross-site POST. The state, nonce, and return-location cookies use
+`SameSite=None; Secure`, so browser testing must use HTTPS. A plain HTTP local
+browser can discard these cookies even when controller tests succeed.
+
+References: [Google OpenID Connect](https://developers.google.com/identity/openid-connect/openid-connect)
+and [Apple web configuration](https://developer.apple.com/help/account/capabilities/configure-sign-in-with-apple-for-the-web).

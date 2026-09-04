@@ -48,7 +48,8 @@ class AppleOauthSessionsController < ApplicationController
 
   def create
     nonce = SecureRandom.urlsafe_base64(16)
-    state = SecureRandom.hex(24) + ":" + params[:platform]
+    platform = params[:platform] == "native" ? "native" : "web"
+    state = SecureRandom.hex(24) + ":" + platform
     redirect_uri = callback_apple_oauth_sessions_url
 
     secure_cookie = Rails.env.production? || request.ssl?
@@ -74,6 +75,11 @@ class AppleOauthSessionsController < ApplicationController
   end
 
   def callback
+    if params[:error].present? || params[:code].blank?
+      redirect_to new_session_path, alert: "Sign in was not completed. Please try again."
+      return
+    end
+
     user_info = authenticate_with_apple
     user = create_user(user_info)
     unless user.persisted?

@@ -41,11 +41,18 @@ class GoogleOauthSessionsController < ApplicationController
     client_id = Rails.application.credentials.dig(:google, :client_id)
     callback_uri = callback_google_oauth_sessions_url
 
-    platform = params[:platform] || "web"
+    platform = params[:platform] == "native" ? "native" : "web"
     state = SecureRandom.hex(24) + ":" + platform
     session[:google_oauth_state] = state
 
-    redirect_url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=#{client_id}&redirect_uri=#{callback_uri}&response_type=code&scope=email profile&access_type=offline&include_granted_scopes=true&state=#{state}&prompt=consent"
+    query = {
+      client_id: client_id,
+      redirect_uri: callback_uri,
+      response_type: "code",
+      scope: "openid email profile",
+      state: state
+    }.to_query
+    redirect_url = "https://accounts.google.com/o/oauth2/v2/auth?#{query}"
     redirect_to redirect_url, allow_other_host: true
   end
 
@@ -53,8 +60,13 @@ class GoogleOauthSessionsController < ApplicationController
     request_state = params[:state]
     session_state = session[:google_oauth_state]
     session.delete(:google_oauth_state)
-    unless request_state.present? && ActiveSupport::SecurityUtils.secure_compare(request_state, session_state)
+    unless request_state.present? && session_state.present? && ActiveSupport::SecurityUtils.secure_compare(request_state, session_state)
       redirect_to new_session_path, alert: "Invalid request. Please try again."
+      return
+    end
+
+    if params[:error].present? || params[:code].blank?
+      redirect_to new_session_path, alert: "Sign in was not completed. Please try again."
       return
     end
 
