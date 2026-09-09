@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+bin/development_db_up
 
 if ! gem list foreman -i --silent; then
   echo "Installing foreman..."

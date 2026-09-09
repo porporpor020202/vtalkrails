@@ -9,5 +9,12 @@
       <working-dir>$ProjectFileDir$</working-dir>
       <time-zone>Asia/Seoul</time-zone>
     </data-source>
+    <data-source source="LOCAL" name="postgres@production" uuid="fbb55b34-4e22-4bb1-a7ff-589ac8758560">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
