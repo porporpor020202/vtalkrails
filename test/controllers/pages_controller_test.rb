@@ -1,6 +1,18 @@
 require "test_helper"
 
 class PagesControllerTest < ActionDispatch::IntegrationTest
+  test "about page explains the app without requiring sign in" do
+    get about_path
+
+    assert_response :success
+    assert_select "h1", text: "say onething."
+    assert_select "a[href='#{new_session_path}']", minimum: 1
+    assert_select "a[href='#{privacy_path}']", minimum: 1
+    assert_select "a[href='#{support_path}']"
+    assert_select "link[rel='canonical'][href='https://vtalks.net/about']"
+    assert_nil cookies[:session_id]
+  end
+
   test "support page is public and provides contact and self-service links" do
     get support_path
 

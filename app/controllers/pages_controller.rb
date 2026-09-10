@@ -5,6 +5,10 @@ class PagesController < ApplicationController
 
   def support; end
 
+  def about
+    render layout: "public"
+  end
+
   def privacy; end
 
   def child_safety; end

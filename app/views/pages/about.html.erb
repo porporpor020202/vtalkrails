@@ -1,0 +1,70 @@
+<div class="mx-auto max-w-6xl px-6 sm:px-10">
+  <header class="flex items-center justify-between gap-4 border-b border-[#eadbd4] py-6">
+    <%= link_to about_path, class: "flex items-center gap-3 font-bold tracking-tight" do %>
+      <img src="/say_one_thing_icon.png" alt="" width="40" height="40" class="rounded-xl">
+      <span>say one thing</span>
+    <% end %>
+    <%= link_to "Open app ↗", new_session_path, class: "rounded-full border border-slate-900 px-5 py-2.5 text-sm font-semibold transition hover:bg-slate-900 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4" %>
+  </header>
+
+  <main>
+    <section class="grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2 lg:gap-20" aria-labelledby="about-title">
+      <div>
+        <p class="text-xs font-extrabold uppercase tracking-[0.24em] text-[#b83b29]">A tiny voice ritual</p>
+        <h1 id="about-title" class="mt-5 text-6xl font-black leading-[0.95] tracking-[-0.06em] sm:text-8xl">say one<br>thing<span class="text-[#e6523d]">.</span></h1>
+        <p class="mt-7 max-w-md text-xl leading-8 text-slate-700">One short thought. One real person.</p>
+        <p class="mt-3 max-w-md text-base leading-7 text-slate-600">Practice English out loud through short voice messages. Share a little of your day, listen to someone else, and see where the conversation goes.</p>
+        <%= link_to "Start with one thought →", new_session_path, class: "mt-8 inline-flex rounded-full bg-slate-950 px-7 py-4 font-bold text-white transition hover:bg-[#b83b29] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900" %>
+        <p class="mt-4 text-xs leading-5 text-slate-600">Sign in with Google or Apple to send and receive messages.<br>For adults aged 18 and over.</p>
+      </div>
+      <div class="relative mx-auto w-full max-w-md">
+        <img src="/say_one_thing_icon.png" alt="say one thing: an orange speech bubble with a white voice waveform" width="1024" height="1024" class="w-full rounded-[3rem] shadow-xl">
+        <div class="relative mx-5 -mt-10 rounded-3xl border border-[#eadbd4] bg-white p-6 shadow-lg">
+          <p class="text-xs font-bold uppercase tracking-widest text-[#b83b29]">Your first thought could be…</p>
+          <p class="mt-3 text-xl font-semibold leading-7 tracking-tight">“Today, something small made me smile.”</p>
+          <p class="mt-3 text-sm text-slate-500">Up to 30 seconds. In your own words.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-[#eadbd4] py-14 sm:py-20" aria-labelledby="how-it-works">
+      <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-[#b83b29]">How it works</p>
+      <h2 id="how-it-works" class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">A conversation starts small.</h2>
+      <div class="mt-10 grid gap-9 sm:grid-cols-3">
+        <% [
+          ["01", "Say it out loud", "Record a voice message of up to 30 seconds. Talk about your day, a question, or a thought you want to share."],
+          ["02", "Reach a real person", "We deliver your message to a recently active listener. There is no need to be online at the same time."],
+          ["03", "Keep talking", "Listen to their reply and continue in your conversation room. Build a little more confidence, one message at a time."]
+        ].each do |number, title, description| %>
+          <div>
+            <span class="text-sm font-bold text-[#b83b29]"><%= number %></span>
+            <h3 class="mt-4 text-xl font-bold tracking-tight"><%= title %></h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600"><%= description %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="mb-16 grid gap-8 rounded-3xl bg-[#f0e9e4] p-7 sm:grid-cols-2 sm:p-10" aria-labelledby="your-space">
+      <div>
+        <h2 id="your-space" class="text-2xl font-bold tracking-tight">Your voice. Your choice.</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">Your voice messages are shared with your conversation partner. You can report inappropriate content, block a user, or delete your account and associated data.</p>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold">Clear about your information</h3>
+        <p class="mt-3 text-sm leading-7 text-slate-600">Google or Apple sign-in identifies your account. Read how say one thing handles account information and voice messages in our privacy policy.</p>
+        <%= link_to "Read our privacy policy ↗", privacy_path, class: "mt-4 inline-block text-sm font-bold underline underline-offset-4" %>
+      </div>
+    </section>
+  </main>
+
+  <footer class="flex flex-col justify-between gap-6 border-t border-[#eadbd4] py-8 text-xs leading-6 text-slate-600 sm:flex-row">
+    <p>© <%= Time.current.year %> say one thing Team<br>A little English. A little connection.</p>
+    <nav aria-label="About and support" class="flex flex-wrap gap-x-6 gap-y-2">
+      <%= link_to "Privacy", privacy_path, class: "underline underline-offset-4" %>
+      <%= link_to "Support", support_path, class: "underline underline-offset-4" %>
+      <%= link_to "Safety", child_safety_path, class: "underline underline-offset-4" %>
+      <%= link_to "Delete account", delete_account_path, class: "underline underline-offset-4" %>
+    </nav>
+  </footer>
+</div>
