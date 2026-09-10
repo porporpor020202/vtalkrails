@@ -1,4 +1,13 @@
 module ApplicationHelper
+  def profile_icon_tag(user, size: 40)
+    image_tag UserDisplayNameGenerator.image_path_for(user.icon),
+      alt: "",
+      width: size,
+      height: size,
+      class: "shrink-0 object-contain",
+      aria: { hidden: true }
+  end
+
   def dev_mode?
     request.host.start_with?("dev.") || request.host.include?("dev.vtalks") || Rails.env.development?
   end

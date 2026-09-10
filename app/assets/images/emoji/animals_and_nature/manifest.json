@@ -1,0 +1,762 @@
+[
+  {
+    "name": "ant",
+    "emoji": "🐜",
+    "file": "ant_3d.png"
+  },
+  {
+    "name": "baby chick",
+    "emoji": "🐤",
+    "file": "baby_chick_3d.png"
+  },
+  {
+    "name": "badger",
+    "emoji": "🦡",
+    "file": "badger_3d.png"
+  },
+  {
+    "name": "bat",
+    "emoji": "🦇",
+    "file": "bat_3d.png"
+  },
+  {
+    "name": "bear",
+    "emoji": "🐻",
+    "file": "bear_3d.png"
+  },
+  {
+    "name": "beaver",
+    "emoji": "🦫",
+    "file": "beaver_3d.png"
+  },
+  {
+    "name": "beetle",
+    "emoji": "🪲",
+    "file": "beetle_3d.png"
+  },
+  {
+    "name": "bird",
+    "emoji": "🐦",
+    "file": "bird_3d.png"
+  },
+  {
+    "name": "bison",
+    "emoji": "🦬",
+    "file": "bison_3d.png"
+  },
+  {
+    "name": "black cat",
+    "emoji": "🐈‍⬛",
+    "file": "black_cat_3d.png"
+  },
+  {
+    "name": "black bird",
+    "emoji": "🐦‍⬛",
+    "file": "blackbird_3d.png"
+  },
+  {
+    "name": "blossom",
+    "emoji": "🌼",
+    "file": "blossom_3d.png"
+  },
+  {
+    "name": "blowfish",
+    "emoji": "🐡",
+    "file": "blowfish_3d.png"
+  },
+  {
+    "name": "boar",
+    "emoji": "🐗",
+    "file": "boar_3d.png"
+  },
+  {
+    "name": "bouquet",
+    "emoji": "💐",
+    "file": "bouquet_3d.png"
+  },
+  {
+    "name": "bug",
+    "emoji": "🐛",
+    "file": "bug_3d.png"
+  },
+  {
+    "name": "butterfly",
+    "emoji": "🦋",
+    "file": "butterfly_3d.png"
+  },
+  {
+    "name": "cactus",
+    "emoji": "🌵",
+    "file": "cactus_3d.png"
+  },
+  {
+    "name": "camel",
+    "emoji": "🐪",
+    "file": "camel_3d.png"
+  },
+  {
+    "name": "cat face",
+    "emoji": "🐱",
+    "file": "cat_face_3d.png"
+  },
+  {
+    "name": "cat",
+    "emoji": "🐈",
+    "file": "cat_3d.png"
+  },
+  {
+    "name": "cherry blossom",
+    "emoji": "🌸",
+    "file": "cherry_blossom_3d.png"
+  },
+  {
+    "name": "chicken",
+    "emoji": "🐔",
+    "file": "chicken_3d.png"
+  },
+  {
+    "name": "chipmunk",
+    "emoji": "🐿️",
+    "file": "chipmunk_3d.png"
+  },
+  {
+    "name": "cockroach",
+    "emoji": "🪳",
+    "file": "cockroach_3d.png"
+  },
+  {
+    "name": "coral",
+    "emoji": "🪸",
+    "file": "coral_3d.png"
+  },
+  {
+    "name": "cow face",
+    "emoji": "🐮",
+    "file": "cow_face_3d.png"
+  },
+  {
+    "name": "cow",
+    "emoji": "🐄",
+    "file": "cow_3d.png"
+  },
+  {
+    "name": "cricket",
+    "emoji": "🦗",
+    "file": "cricket_3d.png"
+  },
+  {
+    "name": "crocodile",
+    "emoji": "🐊",
+    "file": "crocodile_3d.png"
+  },
+  {
+    "name": "deciduous tree",
+    "emoji": "🌳",
+    "file": "deciduous_tree_3d.png"
+  },
+  {
+    "name": "deer",
+    "emoji": "🦌",
+    "file": "deer_3d.png"
+  },
+  {
+    "name": "dodo",
+    "emoji": "🦤",
+    "file": "dodo_3d.png"
+  },
+  {
+    "name": "dog face",
+    "emoji": "🐶",
+    "file": "dog_face_3d.png"
+  },
+  {
+    "name": "dog",
+    "emoji": "🐕",
+    "file": "dog_3d.png"
+  },
+  {
+    "name": "dolphin",
+    "emoji": "🐬",
+    "file": "dolphin_3d.png"
+  },
+  {
+    "name": "donkey",
+    "emoji": "🫏",
+    "file": "donkey_3d.png"
+  },
+  {
+    "name": "dove",
+    "emoji": "🕊️",
+    "file": "dove_3d.png"
+  },
+  {
+    "name": "dragon face",
+    "emoji": "🐲",
+    "file": "dragon_face_3d.png"
+  },
+  {
+    "name": "dragon",
+    "emoji": "🐉",
+    "file": "dragon_3d.png"
+  },
+  {
+    "name": "duck",
+    "emoji": "🦆",
+    "file": "duck_3d.png"
+  },
+  {
+    "name": "eagle",
+    "emoji": "🦅",
+    "file": "eagle_3d.png"
+  },
+  {
+    "name": "elephant",
+    "emoji": "🐘",
+    "file": "elephant_3d.png"
+  },
+  {
+    "name": "empty nest",
+    "emoji": "🪹",
+    "file": "empty_nest_3d.png"
+  },
+  {
+    "name": "evergreen tree",
+    "emoji": "🌲",
+    "file": "evergreen_tree_3d.png"
+  },
+  {
+    "name": "ewe",
+    "emoji": "🐑",
+    "file": "ewe_3d.png"
+  },
+  {
+    "name": "fallen leaf",
+    "emoji": "🍂",
+    "file": "fallen_leaf_3d.png"
+  },
+  {
+    "name": "feather",
+    "emoji": "🪶",
+    "file": "feather_3d.png"
+  },
+  {
+    "name": "fish",
+    "emoji": "🐟",
+    "file": "fish_3d.png"
+  },
+  {
+    "name": "flamingo",
+    "emoji": "🦩",
+    "file": "flamingo_3d.png"
+  },
+  {
+    "name": "fly",
+    "emoji": "🪰",
+    "file": "fly_3d.png"
+  },
+  {
+    "name": "four leaf clover",
+    "emoji": "🍀",
+    "file": "four_leaf_clover_3d.png"
+  },
+  {
+    "name": "fox",
+    "emoji": "🦊",
+    "file": "fox_3d.png"
+  },
+  {
+    "name": "frog",
+    "emoji": "🐸",
+    "file": "frog_3d.png"
+  },
+  {
+    "name": "front-facing baby chick",
+    "emoji": "🐥",
+    "file": "front-facing_baby_chick_3d.png"
+  },
+  {
+    "name": "giraffe",
+    "emoji": "🦒",
+    "file": "giraffe_3d.png"
+  },
+  {
+    "name": "goat",
+    "emoji": "🐐",
+    "file": "goat_3d.png"
+  },
+  {
+    "name": "goose",
+    "emoji": "🪿",
+    "file": "goose_3d.png"
+  },
+  {
+    "name": "gorilla",
+    "emoji": "🦍",
+    "file": "gorilla_3d.png"
+  },
+  {
+    "name": "guide dog",
+    "emoji": "🦮",
+    "file": "guide_dog_3d.png"
+  },
+  {
+    "name": "hamster",
+    "emoji": "🐹",
+    "file": "hamster_3d.png"
+  },
+  {
+    "name": "hatching chick",
+    "emoji": "🐣",
+    "file": "hatching_chick_3d.png"
+  },
+  {
+    "name": "hedgehog",
+    "emoji": "🦔",
+    "file": "hedgehog_3d.png"
+  },
+  {
+    "name": "herb",
+    "emoji": "🌿",
+    "file": "herb_3d.png"
+  },
+  {
+    "name": "hibiscus",
+    "emoji": "🌺",
+    "file": "hibiscus_3d.png"
+  },
+  {
+    "name": "hippopotamus",
+    "emoji": "🦛",
+    "file": "hippopotamus_3d.png"
+  },
+  {
+    "name": "honeybee",
+    "emoji": "🐝",
+    "file": "honeybee_3d.png"
+  },
+  {
+    "name": "horse face",
+    "emoji": "🐴",
+    "file": "horse_face_3d.png"
+  },
+  {
+    "name": "horse",
+    "emoji": "🐎",
+    "file": "horse_3d.png"
+  },
+  {
+    "name": "hyacinth",
+    "emoji": "🪻",
+    "file": "hyacinth_3d.png"
+  },
+  {
+    "name": "jellyfish",
+    "emoji": "🪼",
+    "file": "jellyfish_3d.png"
+  },
+  {
+    "name": "kangaroo",
+    "emoji": "🦘",
+    "file": "kangaroo_3d.png"
+  },
+  {
+    "name": "koala",
+    "emoji": "🐨",
+    "file": "koala_3d.png"
+  },
+  {
+    "name": "lady beetle",
+    "emoji": "🐞",
+    "file": "lady_beetle_3d.png"
+  },
+  {
+    "name": "leaf fluttering in wind",
+    "emoji": "🍃",
+    "file": "leaf_fluttering_in_wind_3d.png"
+  },
+  {
+    "name": "leopard",
+    "emoji": "🐆",
+    "file": "leopard_3d.png"
+  },
+  {
+    "name": "lion",
+    "emoji": "🦁",
+    "file": "lion_3d.png"
+  },
+  {
+    "name": "lizard",
+    "emoji": "🦎",
+    "file": "lizard_3d.png"
+  },
+  {
+    "name": "llama",
+    "emoji": "🦙",
+    "file": "llama_3d.png"
+  },
+  {
+    "name": "lotus",
+    "emoji": "🪷",
+    "file": "lotus_3d.png"
+  },
+  {
+    "name": "mammoth",
+    "emoji": "🦣",
+    "file": "mammoth_3d.png"
+  },
+  {
+    "name": "maple leaf",
+    "emoji": "🍁",
+    "file": "maple_leaf_3d.png"
+  },
+  {
+    "name": "microbe",
+    "emoji": "🦠",
+    "file": "microbe_3d.png"
+  },
+  {
+    "name": "monkey face",
+    "emoji": "🐵",
+    "file": "monkey_face_3d.png"
+  },
+  {
+    "name": "monkey",
+    "emoji": "🐒",
+    "file": "monkey_3d.png"
+  },
+  {
+    "name": "moose",
+    "emoji": "🫎",
+    "file": "moose_3d.png"
+  },
+  {
+    "name": "mosquito",
+    "emoji": "🦟",
+    "file": "mosquito_3d.png"
+  },
+  {
+    "name": "mouse face",
+    "emoji": "🐭",
+    "file": "mouse_face_3d.png"
+  },
+  {
+    "name": "mouse",
+    "emoji": "🐁",
+    "file": "mouse_3d.png"
+  },
+  {
+    "name": "nest with eggs",
+    "emoji": "🪺",
+    "file": "nest_with_eggs_3d.png"
+  },
+  {
+    "name": "octopus",
+    "emoji": "🐙",
+    "file": "octopus_3d.png"
+  },
+  {
+    "name": "orangutan",
+    "emoji": "🦧",
+    "file": "orangutan_3d.png"
+  },
+  {
+    "name": "otter",
+    "emoji": "🦦",
+    "file": "otter_3d.png"
+  },
+  {
+    "name": "owl",
+    "emoji": "🦉",
+    "file": "owl_3d.png"
+  },
+  {
+    "name": "ox",
+    "emoji": "🐂",
+    "file": "ox_3d.png"
+  },
+  {
+    "name": "palm tree",
+    "emoji": "🌴",
+    "file": "palm_tree_3d.png"
+  },
+  {
+    "name": "panda",
+    "emoji": "🐼",
+    "file": "panda_3d.png"
+  },
+  {
+    "name": "parrot",
+    "emoji": "🦜",
+    "file": "parrot_3d.png"
+  },
+  {
+    "name": "paw prints",
+    "emoji": "🐾",
+    "file": "paw_prints_3d.png"
+  },
+  {
+    "name": "peacock",
+    "emoji": "🦚",
+    "file": "peacock_3d.png"
+  },
+  {
+    "name": "penguin",
+    "emoji": "🐧",
+    "file": "penguin_3d.png"
+  },
+  {
+    "name": "phoenix",
+    "emoji": "🐦‍🔥",
+    "file": "phoenix_bird_3d.png"
+  },
+  {
+    "name": "pig face",
+    "emoji": "🐷",
+    "file": "pig_face_3d.png"
+  },
+  {
+    "name": "pig nose",
+    "emoji": "🐽",
+    "file": "pig_nose_3d.png"
+  },
+  {
+    "name": "pig",
+    "emoji": "🐖",
+    "file": "pig_3d.png"
+  },
+  {
+    "name": "polar bear",
+    "emoji": "🐻‍❄️",
+    "file": "polar_bear_3d.png"
+  },
+  {
+    "name": "poodle",
+    "emoji": "🐩",
+    "file": "poodle_3d.png"
+  },
+  {
+    "name": "potted plant",
+    "emoji": "🪴",
+    "file": "potted_plant_3d.png"
+  },
+  {
+    "name": "rabbit face",
+    "emoji": "🐰",
+    "file": "rabbit_face_3d.png"
+  },
+  {
+    "name": "rabbit",
+    "emoji": "🐇",
+    "file": "rabbit_3d.png"
+  },
+  {
+    "name": "raccoon",
+    "emoji": "🦝",
+    "file": "raccoon_3d.png"
+  },
+  {
+    "name": "ram",
+    "emoji": "🐏",
+    "file": "ram_3d.png"
+  },
+  {
+    "name": "rat",
+    "emoji": "🐀",
+    "file": "rat_3d.png"
+  },
+  {
+    "name": "rhinoceros",
+    "emoji": "🦏",
+    "file": "rhinoceros_3d.png"
+  },
+  {
+    "name": "rooster",
+    "emoji": "🐓",
+    "file": "rooster_3d.png"
+  },
+  {
+    "name": "rose",
+    "emoji": "🌹",
+    "file": "rose_3d.png"
+  },
+  {
+    "name": "rosette",
+    "emoji": "🏵️",
+    "file": "rosette_3d.png"
+  },
+  {
+    "name": "sauropod",
+    "emoji": "🦕",
+    "file": "sauropod_3d.png"
+  },
+  {
+    "name": "scorpion",
+    "emoji": "🦂",
+    "file": "scorpion_3d.png"
+  },
+  {
+    "name": "seal",
+    "emoji": "🦭",
+    "file": "seal_3d.png"
+  },
+  {
+    "name": "seedling",
+    "emoji": "🌱",
+    "file": "seedling_3d.png"
+  },
+  {
+    "name": "service dog",
+    "emoji": "🐕‍🦺",
+    "file": "service_dog_3d.png"
+  },
+  {
+    "name": "shamrock",
+    "emoji": "☘️",
+    "file": "shamrock_3d.png"
+  },
+  {
+    "name": "shark",
+    "emoji": "🦈",
+    "file": "shark_3d.png"
+  },
+  {
+    "name": "sheaf of rice",
+    "emoji": "🌾",
+    "file": "sheaf_of_rice_3d.png"
+  },
+  {
+    "name": "skunk",
+    "emoji": "🦨",
+    "file": "skunk_3d.png"
+  },
+  {
+    "name": "sloth",
+    "emoji": "🦥",
+    "file": "sloth_3d.png"
+  },
+  {
+    "name": "snail",
+    "emoji": "🐌",
+    "file": "snail_3d.png"
+  },
+  {
+    "name": "snake",
+    "emoji": "🐍",
+    "file": "snake_3d.png"
+  },
+  {
+    "name": "spider web",
+    "emoji": "🕸️",
+    "file": "spider_web_3d.png"
+  },
+  {
+    "name": "spider",
+    "emoji": "🕷️",
+    "file": "spider_3d.png"
+  },
+  {
+    "name": "spiral shell",
+    "emoji": "🐚",
+    "file": "spiral_shell_3d.png"
+  },
+  {
+    "name": "spouting whale",
+    "emoji": "🐳",
+    "file": "spouting_whale_3d.png"
+  },
+  {
+    "name": "sunflower",
+    "emoji": "🌻",
+    "file": "sunflower_3d.png"
+  },
+  {
+    "name": "swan",
+    "emoji": "🦢",
+    "file": "swan_3d.png"
+  },
+  {
+    "name": "T-Rex",
+    "emoji": "🦖",
+    "file": "t-rex_3d.png"
+  },
+  {
+    "name": "tiger face",
+    "emoji": "🐯",
+    "file": "tiger_face_3d.png"
+  },
+  {
+    "name": "tiger",
+    "emoji": "🐅",
+    "file": "tiger_3d.png"
+  },
+  {
+    "name": "tropical fish",
+    "emoji": "🐠",
+    "file": "tropical_fish_3d.png"
+  },
+  {
+    "name": "tulip",
+    "emoji": "🌷",
+    "file": "tulip_3d.png"
+  },
+  {
+    "name": "turkey",
+    "emoji": "🦃",
+    "file": "turkey_3d.png"
+  },
+  {
+    "name": "turtle",
+    "emoji": "🐢",
+    "file": "turtle_3d.png"
+  },
+  {
+    "name": "two-hump camel",
+    "emoji": "🐫",
+    "file": "two-hump_camel_3d.png"
+  },
+  {
+    "name": "unicorn",
+    "emoji": "🦄",
+    "file": "unicorn_3d.png"
+  },
+  {
+    "name": "water buffalo",
+    "emoji": "🐃",
+    "file": "water_buffalo_3d.png"
+  },
+  {
+    "name": "whale",
+    "emoji": "🐋",
+    "file": "whale_3d.png"
+  },
+  {
+    "name": "white flower",
+    "emoji": "💮",
+    "file": "white_flower_3d.png"
+  },
+  {
+    "name": "wilted flower",
+    "emoji": "🥀",
+    "file": "wilted_flower_3d.png"
+  },
+  {
+    "name": "wing",
+    "emoji": "🪽",
+    "file": "wing_3d.png"
+  },
+  {
+    "name": "wolf",
+    "emoji": "🐺",
+    "file": "wolf_3d.png"
+  },
+  {
+    "name": "worm",
+    "emoji": "🪱",
+    "file": "worm_3d.png"
+  },
+  {
+    "name": "zebra",
+    "emoji": "🦓",
+    "file": "zebra_3d.png"
+  }
+]

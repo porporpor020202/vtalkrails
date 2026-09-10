@@ -1,0 +1,682 @@
+[
+  {
+    "name": "amphora",
+    "emoji": "🏺",
+    "file": "amphora_3d.png"
+  },
+  {
+    "name": "avocado",
+    "emoji": "🥑",
+    "file": "avocado_3d.png"
+  },
+  {
+    "name": "baby bottle",
+    "emoji": "🍼",
+    "file": "baby_bottle_3d.png"
+  },
+  {
+    "name": "bacon",
+    "emoji": "🥓",
+    "file": "bacon_3d.png"
+  },
+  {
+    "name": "bagel",
+    "emoji": "🥯",
+    "file": "bagel_3d.png"
+  },
+  {
+    "name": "baguette bread",
+    "emoji": "🥖",
+    "file": "baguette_bread_3d.png"
+  },
+  {
+    "name": "banana",
+    "emoji": "🍌",
+    "file": "banana_3d.png"
+  },
+  {
+    "name": "beans",
+    "emoji": "🫘",
+    "file": "beans_3d.png"
+  },
+  {
+    "name": "beer mug",
+    "emoji": "🍺",
+    "file": "beer_mug_3d.png"
+  },
+  {
+    "name": "bell pepper",
+    "emoji": "🫑",
+    "file": "bell_pepper_3d.png"
+  },
+  {
+    "name": "bento box",
+    "emoji": "🍱",
+    "file": "bento_box_3d.png"
+  },
+  {
+    "name": "beverage box",
+    "emoji": "🧃",
+    "file": "beverage_box_3d.png"
+  },
+  {
+    "name": "birthday cake",
+    "emoji": "🎂",
+    "file": "birthday_cake_3d.png"
+  },
+  {
+    "name": "blueberries",
+    "emoji": "🫐",
+    "file": "blueberries_3d.png"
+  },
+  {
+    "name": "bottle with popping cork",
+    "emoji": "🍾",
+    "file": "bottle_with_popping_cork_3d.png"
+  },
+  {
+    "name": "bowl with spoon",
+    "emoji": "🥣",
+    "file": "bowl_with_spoon_3d.png"
+  },
+  {
+    "name": "bread",
+    "emoji": "🍞",
+    "file": "bread_3d.png"
+  },
+  {
+    "name": "broccoli",
+    "emoji": "🥦",
+    "file": "broccoli_3d.png"
+  },
+  {
+    "name": "brown mushroom",
+    "emoji": "🍄‍🟫",
+    "file": "brown_mushroom_3d.png"
+  },
+  {
+    "name": "bubble tea",
+    "emoji": "🧋",
+    "file": "bubble_tea_3d.png"
+  },
+  {
+    "name": "burrito",
+    "emoji": "🌯",
+    "file": "burrito_3d.png"
+  },
+  {
+    "name": "butter",
+    "emoji": "🧈",
+    "file": "butter_3d.png"
+  },
+  {
+    "name": "candy",
+    "emoji": "🍬",
+    "file": "candy_3d.png"
+  },
+  {
+    "name": "canned food",
+    "emoji": "🥫",
+    "file": "canned_food_3d.png"
+  },
+  {
+    "name": "carrot",
+    "emoji": "🥕",
+    "file": "carrot_3d.png"
+  },
+  {
+    "name": "cheese wedge",
+    "emoji": "🧀",
+    "file": "cheese_wedge_3d.png"
+  },
+  {
+    "name": "cherries",
+    "emoji": "🍒",
+    "file": "cherries_3d.png"
+  },
+  {
+    "name": "chestnut",
+    "emoji": "🌰",
+    "file": "chestnut_3d.png"
+  },
+  {
+    "name": "chocolate bar",
+    "emoji": "🍫",
+    "file": "chocolate_bar_3d.png"
+  },
+  {
+    "name": "chopsticks",
+    "emoji": "🥢",
+    "file": "chopsticks_3d.png"
+  },
+  {
+    "name": "clinking beer mugs",
+    "emoji": "🍻",
+    "file": "clinking_beer_mugs_3d.png"
+  },
+  {
+    "name": "clinking glasses",
+    "emoji": "🥂",
+    "file": "clinking_glasses_3d.png"
+  },
+  {
+    "name": "cocktail glass",
+    "emoji": "🍸",
+    "file": "cocktail_glass_3d.png"
+  },
+  {
+    "name": "coconut",
+    "emoji": "🥥",
+    "file": "coconut_3d.png"
+  },
+  {
+    "name": "cooked rice",
+    "emoji": "🍚",
+    "file": "cooked_rice_3d.png"
+  },
+  {
+    "name": "cookie",
+    "emoji": "🍪",
+    "file": "cookie_3d.png"
+  },
+  {
+    "name": "cooking",
+    "emoji": "🍳",
+    "file": "cooking_3d.png"
+  },
+  {
+    "name": "crab",
+    "emoji": "🦀",
+    "file": "crab_3d.png"
+  },
+  {
+    "name": "croissant",
+    "emoji": "🥐",
+    "file": "croissant_3d.png"
+  },
+  {
+    "name": "cucumber",
+    "emoji": "🥒",
+    "file": "cucumber_3d.png"
+  },
+  {
+    "name": "cup with straw",
+    "emoji": "🥤",
+    "file": "cup_with_straw_3d.png"
+  },
+  {
+    "name": "cupcake",
+    "emoji": "🧁",
+    "file": "cupcake_3d.png"
+  },
+  {
+    "name": "curry rice",
+    "emoji": "🍛",
+    "file": "curry_rice_3d.png"
+  },
+  {
+    "name": "custard",
+    "emoji": "🍮",
+    "file": "custard_3d.png"
+  },
+  {
+    "name": "cut of meat",
+    "emoji": "🥩",
+    "file": "cut_of_meat_3d.png"
+  },
+  {
+    "name": "dango",
+    "emoji": "🍡",
+    "file": "dango_3d.png"
+  },
+  {
+    "name": "doughnut",
+    "emoji": "🍩",
+    "file": "doughnut_3d.png"
+  },
+  {
+    "name": "dumpling",
+    "emoji": "🥟",
+    "file": "dumpling_3d.png"
+  },
+  {
+    "name": "ear of corn",
+    "emoji": "🌽",
+    "file": "ear_of_corn_3d.png"
+  },
+  {
+    "name": "egg",
+    "emoji": "🥚",
+    "file": "egg_3d.png"
+  },
+  {
+    "name": "eggplant",
+    "emoji": "🍆",
+    "file": "eggplant_3d.png"
+  },
+  {
+    "name": "falafel",
+    "emoji": "🧆",
+    "file": "falafel_3d.png"
+  },
+  {
+    "name": "fish cake with swirl",
+    "emoji": "🍥",
+    "file": "fish_cake_with_swirl_3d.png"
+  },
+  {
+    "name": "flatbread",
+    "emoji": "🫓",
+    "file": "flatbread_3d.png"
+  },
+  {
+    "name": "fondue",
+    "emoji": "🫕",
+    "file": "fondue_3d.png"
+  },
+  {
+    "name": "fork and knife with plate",
+    "emoji": "🍽️",
+    "file": "fork_and_knife_with_plate_3d.png"
+  },
+  {
+    "name": "fork and knife",
+    "emoji": "🍴",
+    "file": "fork_and_knife_3d.png"
+  },
+  {
+    "name": "fortune cookie",
+    "emoji": "🥠",
+    "file": "fortune_cookie_3d.png"
+  },
+  {
+    "name": "french fries",
+    "emoji": "🍟",
+    "file": "french_fries_3d.png"
+  },
+  {
+    "name": "fried shrimp",
+    "emoji": "🍤",
+    "file": "fried_shrimp_3d.png"
+  },
+  {
+    "name": "garlic",
+    "emoji": "🧄",
+    "file": "garlic_3d.png"
+  },
+  {
+    "name": "ginger root",
+    "emoji": "🫚",
+    "file": "ginger_root_3d.png"
+  },
+  {
+    "name": "glass of milk",
+    "emoji": "🥛",
+    "file": "glass_of_milk_3d.png"
+  },
+  {
+    "name": "grapes",
+    "emoji": "🍇",
+    "file": "grapes_3d.png"
+  },
+  {
+    "name": "green apple",
+    "emoji": "🍏",
+    "file": "green_apple_3d.png"
+  },
+  {
+    "name": "green salad",
+    "emoji": "🥗",
+    "file": "green_salad_3d.png"
+  },
+  {
+    "name": "hamburger",
+    "emoji": "🍔",
+    "file": "hamburger_3d.png"
+  },
+  {
+    "name": "honey pot",
+    "emoji": "🍯",
+    "file": "honey_pot_3d.png"
+  },
+  {
+    "name": "hot beverage",
+    "emoji": "☕",
+    "file": "hot_beverage_3d.png"
+  },
+  {
+    "name": "hot dog",
+    "emoji": "🌭",
+    "file": "hot_dog_3d.png"
+  },
+  {
+    "name": "hot pepper",
+    "emoji": "🌶️",
+    "file": "hot_pepper_3d.png"
+  },
+  {
+    "name": "ice cream",
+    "emoji": "🍨",
+    "file": "ice_cream_3d.png"
+  },
+  {
+    "name": "ice",
+    "emoji": "🧊",
+    "file": "ice_3d.png"
+  },
+  {
+    "name": "jar",
+    "emoji": "🫙",
+    "file": "jar_3d.png"
+  },
+  {
+    "name": "kitchen knife",
+    "emoji": "🔪",
+    "file": "kitchen_knife_3d.png"
+  },
+  {
+    "name": "kiwi fruit",
+    "emoji": "🥝",
+    "file": "kiwi_fruit_3d.png"
+  },
+  {
+    "name": "leafy green",
+    "emoji": "🥬",
+    "file": "leafy_green_3d.png"
+  },
+  {
+    "name": "lemon",
+    "emoji": "🍋",
+    "file": "lemon_3d.png"
+  },
+  {
+    "name": "lime",
+    "emoji": "🍋‍🟩",
+    "file": "lime_3d.png"
+  },
+  {
+    "name": "lobster",
+    "emoji": "🦞",
+    "file": "lobster_3d.png"
+  },
+  {
+    "name": "lollipop",
+    "emoji": "🍭",
+    "file": "lollipop_3d.png"
+  },
+  {
+    "name": "mango",
+    "emoji": "🥭",
+    "file": "mango_3d.png"
+  },
+  {
+    "name": "mate",
+    "emoji": "🧉",
+    "file": "mate_3d.png"
+  },
+  {
+    "name": "meat on bone",
+    "emoji": "🍖",
+    "file": "meat_on_bone_3d.png"
+  },
+  {
+    "name": "melon",
+    "emoji": "🍈",
+    "file": "melon_3d.png"
+  },
+  {
+    "name": "moon cake",
+    "emoji": "🥮",
+    "file": "moon_cake_3d.png"
+  },
+  {
+    "name": "mushroom",
+    "emoji": "🍄",
+    "file": "mushroom_3d.png"
+  },
+  {
+    "name": "oden",
+    "emoji": "🍢",
+    "file": "oden_3d.png"
+  },
+  {
+    "name": "olive",
+    "emoji": "🫒",
+    "file": "olive_3d.png"
+  },
+  {
+    "name": "onion",
+    "emoji": "🧅",
+    "file": "onion_3d.png"
+  },
+  {
+    "name": "oyster",
+    "emoji": "🦪",
+    "file": "oyster_3d.png"
+  },
+  {
+    "name": "pancakes",
+    "emoji": "🥞",
+    "file": "pancakes_3d.png"
+  },
+  {
+    "name": "pea pod",
+    "emoji": "🫛",
+    "file": "pea_pod_3d.png"
+  },
+  {
+    "name": "peach",
+    "emoji": "🍑",
+    "file": "peach_3d.png"
+  },
+  {
+    "name": "peanuts",
+    "emoji": "🥜",
+    "file": "peanuts_3d.png"
+  },
+  {
+    "name": "pear",
+    "emoji": "🍐",
+    "file": "pear_3d.png"
+  },
+  {
+    "name": "pie",
+    "emoji": "🥧",
+    "file": "pie_3d.png"
+  },
+  {
+    "name": "pineapple",
+    "emoji": "🍍",
+    "file": "pineapple_3d.png"
+  },
+  {
+    "name": "pizza",
+    "emoji": "🍕",
+    "file": "pizza_3d.png"
+  },
+  {
+    "name": "popcorn",
+    "emoji": "🍿",
+    "file": "popcorn_3d.png"
+  },
+  {
+    "name": "pot of food",
+    "emoji": "🍲",
+    "file": "pot_of_food_3d.png"
+  },
+  {
+    "name": "potato",
+    "emoji": "🥔",
+    "file": "potato_3d.png"
+  },
+  {
+    "name": "poultry leg",
+    "emoji": "🍗",
+    "file": "poultry_leg_3d.png"
+  },
+  {
+    "name": "pouring liquid",
+    "emoji": "🫗",
+    "file": "pouring_liquid_3d.png"
+  },
+  {
+    "name": "pretzel",
+    "emoji": "🥨",
+    "file": "pretzel_3d.png"
+  },
+  {
+    "name": "red apple",
+    "emoji": "🍎",
+    "file": "red_apple_3d.png"
+  },
+  {
+    "name": "rice ball",
+    "emoji": "🍙",
+    "file": "rice_ball_3d.png"
+  },
+  {
+    "name": "rice cracker",
+    "emoji": "🍘",
+    "file": "rice_cracker_3d.png"
+  },
+  {
+    "name": "roasted sweet potato",
+    "emoji": "🍠",
+    "file": "roasted_sweet_potato_3d.png"
+  },
+  {
+    "name": "sake",
+    "emoji": "🍶",
+    "file": "sake_3d.png"
+  },
+  {
+    "name": "salt",
+    "emoji": "🧂",
+    "file": "salt_3d.png"
+  },
+  {
+    "name": "sandwich",
+    "emoji": "🥪",
+    "file": "sandwich_3d.png"
+  },
+  {
+    "name": "shallow pan of food",
+    "emoji": "🥘",
+    "file": "shallow_pan_of_food_3d.png"
+  },
+  {
+    "name": "shaved ice",
+    "emoji": "🍧",
+    "file": "shaved_ice_3d.png"
+  },
+  {
+    "name": "shortcake",
+    "emoji": "🍰",
+    "file": "shortcake_3d.png"
+  },
+  {
+    "name": "shrimp",
+    "emoji": "🦐",
+    "file": "shrimp_3d.png"
+  },
+  {
+    "name": "soft ice cream",
+    "emoji": "🍦",
+    "file": "soft_ice_cream_3d.png"
+  },
+  {
+    "name": "spaghetti",
+    "emoji": "🍝",
+    "file": "spaghetti_3d.png"
+  },
+  {
+    "name": "spoon",
+    "emoji": "🥄",
+    "file": "spoon_3d.png"
+  },
+  {
+    "name": "squid",
+    "emoji": "🦑",
+    "file": "squid_3d.png"
+  },
+  {
+    "name": "steaming bowl",
+    "emoji": "🍜",
+    "file": "steaming_bowl_3d.png"
+  },
+  {
+    "name": "strawberry",
+    "emoji": "🍓",
+    "file": "strawberry_3d.png"
+  },
+  {
+    "name": "stuffed flatbread",
+    "emoji": "🥙",
+    "file": "stuffed_flatbread_3d.png"
+  },
+  {
+    "name": "sushi",
+    "emoji": "🍣",
+    "file": "sushi_3d.png"
+  },
+  {
+    "name": "taco",
+    "emoji": "🌮",
+    "file": "taco_3d.png"
+  },
+  {
+    "name": "takeout box",
+    "emoji": "🥡",
+    "file": "takeout_box_3d.png"
+  },
+  {
+    "name": "tamale",
+    "emoji": "🫔",
+    "file": "tamale_3d.png"
+  },
+  {
+    "name": "tangerine",
+    "emoji": "🍊",
+    "file": "tangerine_3d.png"
+  },
+  {
+    "name": "teacup without handle",
+    "emoji": "🍵",
+    "file": "teacup_without_handle_3d.png"
+  },
+  {
+    "name": "teapot",
+    "emoji": "🫖",
+    "file": "teapot_3d.png"
+  },
+  {
+    "name": "tomato",
+    "emoji": "🍅",
+    "file": "tomato_3d.png"
+  },
+  {
+    "name": "tropical drink",
+    "emoji": "🍹",
+    "file": "tropical_drink_3d.png"
+  },
+  {
+    "name": "tumbler glass",
+    "emoji": "🥃",
+    "file": "tumbler_glass_3d.png"
+  },
+  {
+    "name": "waffle",
+    "emoji": "🧇",
+    "file": "waffle_3d.png"
+  },
+  {
+    "name": "watermelon",
+    "emoji": "🍉",
+    "file": "watermelon_3d.png"
+  },
+  {
+    "name": "wine glass",
+    "emoji": "🍷",
+    "file": "wine_glass_3d.png"
+  }
+]

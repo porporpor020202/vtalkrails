@@ -8,7 +8,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
       </svg>
     <% end %>
-    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-xl"><%= @opponent.icon %></div>
+    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-xl"><%= profile_icon_tag(@opponent, size: 32) %></div>
     <div class="min-w-0">
       <h1 class="truncate text-[15px] font-extrabold text-slate-950"><%= @opponent.name %></h1>
       <p class="text-[11px] font-medium text-slate-400">Voice by voice</p>
@@ -45,7 +45,7 @@
       <% outgoing = message.sender_id == current_user.id %>
       <article class="flex max-w-[88%] items-end gap-2 <%= outgoing ? "ml-auto flex-row-reverse" : "" %>">
         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl <%= outgoing ? "bg-slate-900 text-[10px] font-black text-white" : "bg-indigo-50 text-base" %>">
-          <%= outgoing ? "ME" : @opponent.icon %>
+          <%= outgoing ? "ME" : profile_icon_tag(@opponent, size: 26) %>
         </div>
         <div class="min-w-0 <%= outgoing ? "text-right" : "" %>">
           <div class="rounded-3xl p-3 shadow-sm <%= outgoing ? "bg-gradient-to-br from-indigo-600 to-violet-600" : "border border-slate-200 bg-white" %>">

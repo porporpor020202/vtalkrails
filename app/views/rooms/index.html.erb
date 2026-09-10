@@ -10,7 +10,7 @@
         <% last_message = room.voice_messages.last %>
         <%= link_to room_path(room), class: "flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition active:scale-[0.99]" do %>
           <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-2xl" aria-hidden="true">
-            <%= opponent.icon.presence || "💬" %>
+            <%= profile_icon_tag(opponent) %>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-3">

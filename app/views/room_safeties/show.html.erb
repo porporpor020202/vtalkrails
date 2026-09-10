@@ -17,7 +17,7 @@
   <div class="space-y-5 px-5 py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
     <div class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
       <div class="flex items-center gap-4">
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-2xl" aria-hidden="true"><%= @opponent.icon %></div>
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-2xl" aria-hidden="true"><%= profile_icon_tag(@opponent) %></div>
         <div class="min-w-0">
           <p class="text-xs font-semibold text-slate-400">Conversation with</p>
           <p class="truncate text-base font-extrabold text-slate-950"><%= @opponent.name %></p>
