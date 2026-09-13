@@ -59,10 +59,9 @@ class User < ApplicationRecord
   private
 
   def assign_generated_name_and_icon
-    identity = UserDisplayNameGenerator.for_id(id)
     update_columns(
-      name: name.presence || identity.name,
-      icon: icon.presence || identity.icon
+      name: name.presence || UserDisplayNameGenerator.nickname_for(id),
+      icon: icon.presence || UserDisplayNameGenerator.icon_for(id)
     )
   end
 end

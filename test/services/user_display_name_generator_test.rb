@@ -1,49 +1,56 @@
 require "test_helper"
+require_relative "../test_helpers/nickname_test_helper"
 
 class UserDisplayNameGeneratorTest < ActiveSupport::TestCase
-  test "provides more than one million readable combinations" do
-    assert_operator UserDisplayNameGenerator.capacity, :>=, 1_000_000
-  end
+  include NicknameTestHelper
 
-  test "maps an id to a stable animal name and icon" do
-    first = UserDisplayNameGenerator.for_id(42)
-    second = UserDisplayNameGenerator.for_id(42)
+  test "01 형용사와 명사를 각각 랜덤 선택하여 닉네임을 만든다" do
+    [["Happy", "Raccoon"], ["Calm", "Polar Bear"]].each do |adjective, noun|
+      with_nickname_choices(adjective: adjective, noun: noun) do |calls|
+        user = create_nickname_user
 
-    assert_equal first.name, second.name
-    assert_equal first.icon, second.icon
-    assert_match(/\A\S+ \S+ .+\z/, first.name)
-    assert first.icon.present?
-  end
-
-  test "new users receive unique generated names" do
-    users = 12.times.map do |index|
-      User.create!(email_address: "generated-#{index}@example.com", password: "password")
-    end
-
-    assert_equal users.length, users.map(&:name).uniq.length
-    assert users.all? { |user| user.icon.present? }
-  end
-
-  test "every profile generates a bundled PNG instead of a Unicode icon" do
-    UserDisplayNameGenerator::PROFILE_ICONS.each_with_index do |(_, path), index|
-      assert_equal path, UserDisplayNameGenerator.for_id(index + 1).icon
-      assert Rails.root.join("app/assets/images", path).file?, "Missing #{path}"
+        assert_equal "#{adjective} #{noun}", user.reload.name
+        assert_operator calls[:ADJECTIVES], :>=, 1, "형용사를 랜덤 선택해야 한다"
+        assert_operator calls[:NOUNS], :>=, 1, "명사를 랜덤 선택해야 한다"
+      end
     end
   end
 
-  test "existing Unicode profiles resolve to matching images without rewriting accounts" do
-    assert_equal "emoji/animals_and_nature/raccoon_3d.png",
-      UserDisplayNameGenerator.image_path_for("🦝")
-    assert_equal "emoji/animals_and_nature/spider_3d.png",
-      UserDisplayNameGenerator.image_path_for("🕷️")
-    assert_equal "emoji/food_and_drink/lime_3d.png",
-      UserDisplayNameGenerator.image_path_for("🍋‍🟩")
+  test "02 처음 지급하는 조합에는 숫자를 붙이지 않는다" do
+    with_nickname_choices do
+      assert_equal "Happy Raccoon", create_nickname_user.reload.name
+    end
   end
 
-  test "unknown icon values use a bundled fallback rather than arbitrary URLs" do
-    [ nil, "", "https://example.com/tracking.png", "../../secret" ].each do |icon|
-      assert_equal UserDisplayNameGenerator::IMAGE_PATHS.first,
-        UserDisplayNameGenerator.image_path_for(icon)
+  test "03 같은 조합을 지급할 때마다 2부터 번호를 증가시킨다" do
+    with_nickname_choices do
+      names = 4.times.map { create_nickname_user.reload.name }
+
+      assert_equal ["Happy Raccoon", "Happy Raccoon 2", "Happy Raccoon 3", "Happy Raccoon 4"], names
+    end
+  end
+
+  test "04 중복 번호가 붙어도 처음 선택한 형용사와 명사를 유지한다" do
+    with_nickname_choices(adjective: "Calm", noun: "Polar Bear") do
+      create_nickname_user
+      assert_equal "Calm Polar Bear 2", create_nickname_user.reload.name
+      assert_equal "Calm Polar Bear 3", create_nickname_user.reload.name
+    end
+  end
+
+  test "05 탈퇴한 기본 이름과 중간 번호와 마지막 번호를 재사용하지 않는다" do
+    with_nickname_choices do
+      users = 3.times.map { create_nickname_user }
+      assert_equal ["Happy Raccoon", "Happy Raccoon 2", "Happy Raccoon 3"], users.map(&:name)
+      users[1].destroy!
+      users[2].destroy!
+
+      fourth = create_nickname_user
+      assert_equal "Happy Raccoon 4", fourth.reload.name
+
+      users.first.destroy!
+      fourth.destroy!
+      assert_equal "Happy Raccoon 5", create_nickname_user.reload.name
     end
   end
 end

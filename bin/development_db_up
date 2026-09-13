@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$script_dir/.."
+
 # Start Docker Desktop and wait for its engine before starting PostgreSQL.
 if ! docker info >/dev/null 2>&1; then
   echo "Starting Docker Desktop..."
@@ -8,15 +11,34 @@ if ! docker info >/dev/null 2>&1; then
   docker info >/dev/null
 fi
 
-# Reuse the shared PostgreSQL container without recreating it or its volume.
-docker start local-postgres
+# Use the same credentials as config/database.yml.
+# Compose updates an incorrectly configured container while retaining its volume.
+RAILS_ENV=development bin/rails runner '
+  user = Rails.application.credentials.dig(:postgres, :user)
+  password = Rails.application.credentials.dig(:postgres, :password)
+  abort "개발 DB 계정이 없습니다. Rails credentials의 postgres.user와 postgres.password를 설정하세요." if user.blank? || password.blank?
+
+  success = system(
+    { "POSTGRES_USER" => user.to_s, "POSTGRES_PASSWORD" => password.to_s },
+    "docker", "compose", "-f", Rails.root.join("bin/docker-compose.yml").to_s,
+    "up", "-d", "postgres"
+  )
+  exit(success ? 0 : 1)
+'
 
 for ((attempt = 0; attempt < 30; attempt++)); do
-  if docker exec local-postgres pg_isready -q; then
+  if [ "$(docker inspect --format '{{.State.Running}}' local-postgres)" != "true" ]; then
+    echo "PostgreSQL 컨테이너가 종료되었습니다. 원인 로그:" >&2
+    docker logs --tail 30 local-postgres >&2
+    exit 1
+  fi
+
+  if docker exec local-postgres sh -c 'exec pg_isready -q -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'; then
     exit 0
   fi
   sleep 2
 done
 
 echo "PostgreSQL did not become ready within 60 seconds." >&2
+docker logs --tail 30 local-postgres >&2
 exit 1
