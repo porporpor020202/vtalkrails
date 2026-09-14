@@ -24,8 +24,10 @@ servers:
 proxy:
   ssl: true
   hosts:
-    - vtalks.net
-    - www.vtalks.net
+#    - vtalks.net
+#    - www.vtalks.net
+    - sayonething.net
+    - www.sayonething.net
 
 # Where you keep your container images.
 registry:

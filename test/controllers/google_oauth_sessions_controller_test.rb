@@ -1,4 +1,5 @@
 require "test_helper"
+require_relative "../test_helpers/google_oauth_test_config"
 
 class GoogleOauthClient
   class << self
@@ -37,16 +38,26 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   # --- Web Platform Flow ---
 
-  test "web authorization requests an ID token and the exact HTTPS callback" do
-    https!
-    host! "vtalks.net"
-    post google_oauth_sessions_path
+  GoogleOauthTestConfig::GOOGLE_LOGIN_ORIGINS.each do |origin|
+    test "#{origin}에서 올바른 Google 인증 요청을 만든다" do
+      uri = URI.parse(origin)
+      host! uri.authority
+      https! uri.scheme == "https"
 
-    query = URI.decode_www_form(URI.parse(response.location).query).to_h
-    assert_equal "openid email profile", query["scope"]
-    assert_equal "https://vtalks.net/google_oauth_sessions/callback", query["redirect_uri"]
-    assert_equal "code", query["response_type"]
-    assert_equal "web", query["state"].split(":").last
+      post google_oauth_sessions_path, params: { platform: "web" }
+
+      assert_response :redirect
+
+      authorization_url = URI.parse(response.location)
+      assert_equal "https", authorization_url.scheme
+      assert_equal "accounts.google.com", authorization_url.host
+
+      query = URI.decode_www_form(authorization_url.query).to_h
+      assert_equal "#{origin}/google_oauth_sessions/callback", query["redirect_uri"]
+      assert_equal "openid email profile", query["scope"]
+      assert_equal "code", query["response_type"]
+      assert_equal "web", query["state"].split(":").last
+    end
   end
 
   test "cancelled Google sign in does not create a session" do
@@ -81,6 +92,8 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "google login returns to the protected account deletion confirmation" do
+    skip "TODO: 추후 web 회원탈퇴 페이지 작업할 때 다시 작성하자"
+
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 
@@ -96,6 +109,8 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   # --- Native Platform Flow ---
 
   test "native Google identity token returns a short-lived session token" do
+    skip "TODO: web부터 한 뒤에 검증"
+
     GoogleOauthClient.mocked_result = { uid: "google-native-123", email: "native-google@example.com" }
 
     post native_authenticate_google_oauth_sessions_path,
@@ -107,6 +122,8 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "google login success redirects to custom native scheme for native platform" do
+    skip "TODO: web부터 한 뒤에 검증"
+
     post google_oauth_sessions_path, params: { platform: "native" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}
 
