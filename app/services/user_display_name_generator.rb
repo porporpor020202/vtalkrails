@@ -346,7 +346,7 @@ module UserDisplayNameGenerator
 
     def icon_for(id)
       noun = NOUNS.fetch(ordinal_for(id) % NOUNS.length)
-      IMAGE_PATHS_BY_NOUN.fetch(noun)
+      EMOJI_IMAGE_PATHS_BY_NOUN.fetch(noun)
     end
 
     private

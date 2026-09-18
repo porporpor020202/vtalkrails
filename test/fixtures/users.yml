@@ -1,5 +1,3 @@
-<% password_digest = BCrypt::Password.create("password") %>
-
 one:
   email_address: one@example.com
 

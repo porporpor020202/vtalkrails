@@ -18,7 +18,8 @@ export default class extends Controller {
   }
 
   updateActiveTab() {
-    const currentPath = window.location.pathname
+    // The root route renders the Rooms index too.
+    const currentPath = window.location.pathname === "/" ? "/rooms" : window.location.pathname
     this.linkTargets.forEach(link => {
       const linkUrl = new URL(link.href, window.location.origin)
       const linkPath = linkUrl.pathname

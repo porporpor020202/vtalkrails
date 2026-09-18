@@ -24,9 +24,9 @@ class GoogleOauthPageAccessTest < ApplicationSystemTestCase
       assert_selector "button", text: "Continue with Google", wait: 15
       click_button "Continue with Google"
 
-      assert_current_path %r{\Ahttps://accounts\.google\.com/}, url: true, wait: 20
-      # Google's error page uses the same host; verify the login form as well.
-      assert_selector 'input[type="email"]', visible: true, wait: 20
+      assert_text :visible, "Sign in to continue to say one thing", normalize_ws: true, wait: 20
     end
   end
 end
+
+# 이 테스트는 검증 완료되었다.

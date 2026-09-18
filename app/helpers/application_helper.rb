@@ -9,7 +9,7 @@ module ApplicationHelper
   end
 
   def dev_mode?
-    request.host.start_with?("dev.") || request.host.include?("dev.vtalks") || Rails.env.development?
+    Rails.env.development?
   end
 
   def nav_tab_class(path)
