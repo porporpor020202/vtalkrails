@@ -44,11 +44,12 @@ class User < ApplicationRecord
 
   validates :display_name, presence: true, uniqueness: true
 
-  before_validation :assign_display_name
+  # TODO: 현재 이곳이 원인이 아니다. oauth 로그인부터 해결을 봐야한다.
+  # before_validation :assign_display_name, on: :create
 
   private
 
-  def assign_display_name
-    self.display_name = UserDisplayNameGenerator.display_name
-  end
+  # def assign_display_name
+  #   self.display_name = UserDisplayNameGenerator.display_name
+  # end
 end
