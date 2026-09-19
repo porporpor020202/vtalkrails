@@ -5,7 +5,7 @@ class GoogleOauthPageAccessTest < ApplicationSystemTestCase
   setup do
     @previous_run_server = Capybara.run_server
     @previous_always_include_port = Capybara.always_include_port
-    # Use each live site's own port, not Rails' temporary test server port.
+
     Capybara.run_server = false
     Capybara.always_include_port = false
   end

@@ -130,19 +130,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email_address"
-    t.boolean "guest", default: false, null: false
-    t.string "icon"
+    t.string "display_name", null: false
+    t.string "email_address", null: false
     t.datetime "last_active_at"
-    t.string "name"
-    t.string "oauth_provider"
-    t.string "oauth_uid"
-    t.string "password_digest"
+    t.string "oauth_provider", null: false
+    t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", where: "(email_address IS NOT NULL)"
     t.index ["last_active_at"], name: "index_users_on_last_active_at"
-    t.index ["name"], name: "index_users_on_name_unique", unique: true, where: "(name IS NOT NULL)"
-    t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true, where: "((oauth_provider IS NOT NULL) AND (oauth_uid IS NOT NULL))"
   end
 
   create_table "voice_messages", force: :cascade do |t|

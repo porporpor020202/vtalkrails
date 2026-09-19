@@ -38,30 +38,17 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
 
-  # Email addresses are provider metadata, not the account identity. A person
-  # may intentionally have separate Apple and Google accounts with the same
-  # email address, so account uniqueness is enforced by the database's
-  # provider + oauth_uid index instead.
-  validates :email_address, presence: true, unless: :guest?
-  validates :password, presence: true, on: :create, unless: -> { guest? || oauth_provider.present? }
-  validates_confirmation_of :password, allow_nil: true
-  validates :oauth_uid, presence: true, if: :oauth_provider?
-  validates :oauth_provider, presence: true, if: :oauth_uid?
-  validates :name, uniqueness: true, allow_nil: true
+  # TODO: OAUTH가입시에 레이스컨디션 발생 안하도록 코드 작성해야함. uid + provider 조합 unique 설정. 인덱스도 설정하라는데 뭔지모르겠음.
+  validates :oauth_uid, presence: true
+  validates :oauth_provider, presence: true
 
-  scope :guest, -> { where(guest: true) }
-  scope :registered, -> { where(guest: false) }
-  scope :oauth, -> { where.not(oauth_provider: nil) }
-  scope :active_since, ->(time) { where(last_active_at: time..) }
+  validates :display_name, presence: true, uniqueness: true
 
-  after_create :assign_generated_name_and_icon, if: -> { name.blank? || icon.blank? }
+  before_validation :assign_display_name
 
   private
 
-  def assign_generated_name_and_icon
-    update_columns(
-      name: name.presence || UserDisplayNameGenerator.nickname_for(id),
-      icon: icon.presence || UserDisplayNameGenerator.icon_for(id)
-    )
+  def assign_display_name
+    self.display_name = UserDisplayNameGenerator.display_name
   end
 end

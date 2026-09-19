@@ -1,18 +1,12 @@
 class CreateUsers < ActiveRecord::Migration[8.1]
   def change
     create_table :users do |t|
-      t.string :email_address
-      t.string :password_digest
-      t.string :oauth_provider
-      t.string :oauth_uid
-      t.boolean :guest, default: false, null: false
-      t.string :name
-      t.string :icon
+      t.string :oauth_provider, null: false
+      t.string :oauth_uid, null: false
+      t.string :email_address, null: false
+      t.string :display_name, null: false
 
-      t.timestamps
+      t.timestamps null: false
     end
-    add_index :users, :email_address, where: "email_address IS NOT NULL"
-    add_index :users, :name, unique: true, where: "name IS NOT NULL", name: :index_users_on_name_unique
-    add_index :users, [ :oauth_provider, :oauth_uid ], unique: true, where: "oauth_provider IS NOT NULL AND oauth_uid IS NOT NULL"
   end
 end

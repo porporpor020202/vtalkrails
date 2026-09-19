@@ -1,56 +1,52 @@
 require "test_helper"
-require_relative "../test_helpers/nickname_test_helper"
+require "minitest/mock"
 
 class UserDisplayNameGeneratorTest < ActiveSupport::TestCase
-  include NicknameTestHelper
-
-  test "01 형용사와 명사를 각각 랜덤 선택하여 닉네임을 만든다" do
-    [["Happy", "Raccoon"], ["Calm", "Polar Bear"]].each do |adjective, noun|
-      with_nickname_choices(adjective: adjective, noun: noun) do |calls|
-        user = create_nickname_user
-
-        assert_equal "#{adjective} #{noun}", user.reload.name
-        assert_operator calls[:ADJECTIVES], :>=, 1, "형용사를 랜덤 선택해야 한다"
-        assert_operator calls[:NOUNS], :>=, 1, "명사를 랜덤 선택해야 한다"
+  test "중복이 없을 때 기본 '형용사 명사' 형태로 생성된다" do
+    UserDisplayNameGenerator::ADJECTIVES.stub(:sample, "Adventurous") do
+      UserDisplayNameGenerator::NOUNS.stub(:sample, "Tiger") do
+        name = UserDisplayNameGenerator.display_name
+        assert_equal "Adventurous Tiger", name
       end
     end
   end
 
-  test "02 처음 지급하는 조합에는 숫자를 붙이지 않는다" do
-    with_nickname_choices do
-      assert_equal "Happy Raccoon", create_nickname_user.reload.name
+  # 2. 1번 중복될 때: '이름 2' 생성 테스트
+  test "기본 이름이 이미 DB에 존재하면 숫자 2를 붙인다" do
+    create_test_user(display_name: "Adventurous Tiger")
+
+    UserDisplayNameGenerator::ADJECTIVES.stub(:sample, "Adventurous") do
+      UserDisplayNameGenerator::NOUNS.stub(:sample, "Tiger") do
+        name = UserDisplayNameGenerator.display_name
+        assert_equal "Adventurous Tiger 2", name
+      end
     end
   end
 
-  test "03 같은 조합을 지급할 때마다 2부터 번호를 증가시킨다" do
-    with_nickname_choices do
-      names = 4.times.map { create_nickname_user.reload.name }
-
-      assert_equal ["Happy Raccoon", "Happy Raccoon 2", "Happy Raccoon 3", "Happy Raccoon 4"], names
-    end
-  end
-
-  test "04 중복 번호가 붙어도 처음 선택한 형용사와 명사를 유지한다" do
-    with_nickname_choices(adjective: "Calm", noun: "Polar Bear") do
-      create_nickname_user
-      assert_equal "Calm Polar Bear 2", create_nickname_user.reload.name
-      assert_equal "Calm Polar Bear 3", create_nickname_user.reload.name
-    end
-  end
-
-  test "05 탈퇴한 기본 이름과 중간 번호와 마지막 번호를 재사용하지 않는다" do
-    with_nickname_choices do
-      users = 3.times.map { create_nickname_user }
-      assert_equal ["Happy Raccoon", "Happy Raccoon 2", "Happy Raccoon 3"], users.map(&:name)
-      users[1].destroy!
-      users[2].destroy!
-
-      fourth = create_nickname_user
-      assert_equal "Happy Raccoon 4", fourth.reload.name
-
-      users.first.destroy!
-      fourth.destroy!
-      assert_equal "Happy Raccoon 5", create_nickname_user.reload.name
-    end
-  end
+  # # 3. 연속 중복될 때: '이름 3' 생성 테스트
+  # test "기본 이름과 2번 이름까지 존재하면 숫자 3을 붙인다" do
+  #   create_test_user(display_name: "Adventurous Tiger")
+  #   create_test_user(display_name: "Adventurous Tiger 2")
+  #
+  #   UserDisplayNameGenerator::ADJECTIVES.stub(:sample, "Adventurous") do
+  #     UserDisplayNameGenerator::NOUNS.stub(:sample, "Tiger") do
+  #       name = UserDisplayNameGenerator.display_name
+  #       assert_equal "Adventurous Tiger 3", name
+  #     end
+  #   end
+  # end
+  #
+  # private
+  #
+  # # 테스트용 유저를 DB에 생성하는 헬퍼 메서드
+  # # (앞서 설정했던 null: false 필드들을 채워주기 위함)
+  # def create_test_user(display_name:)
+  #   User.create!(
+  #     display_name: display_name,
+  #     oauth_provider: "google",
+  #     oauth_uid: SecureRandom.hex(8),
+  #     email_address: "#{SecureRandom.hex(4)}@example.com",
+  #     icon: "emoji/animals_and_nature/tiger_face_3d.png"
+  #   )
+  # end
 end

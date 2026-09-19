@@ -1,6 +1,24 @@
 module UserDisplayNameGenerator
   # https://fluentemoji.com/
 
+  ADJECTIVES = %w[
+    Adventurous Agile Amber Ancient Artful Astonishing Audacious Autumn Azure
+    Balanced Bashful Bold Bouncy Brave Bright Brilliant Calm Caring Cheerful Clever
+    Cloudy Cozy Curious Daring Dazzling Diligent Dreamy Eager Elegant Enchanted
+    Energetic Fair Fearless Festive Fierce Fluffy Fortunate Friendly Gentle
+    Glimmering Gleaming Graceful Grateful Happy Harmonious Heroic Honest Hopeful
+    Humble Jolly Joyful Kind Lively Lucky Luminous Magical Merry Mighty Mindful
+    Misty Modest Noble Optimistic Peaceful Playful Pleasant Polite Powerful Pristine
+    Proud Quick Quiet Radiant Ready Regal Relaxed Remarkable Resilient Respectful
+    Roaring Rosy Royal Sassy Serene Shimmering Shiny Silky Sincere Skillful Sleepy
+    Smart Snappy Sociable Soft Sparkling Spirited Splendid Steady Sunny Swift
+    Tender Thoughtful Tiny Tranquil Trusty Valiant Vibrant Victorious Warm Whimsical
+    Wise Witty Wonderful Zany Zealous Zesty Abundant Breezy Brisk Charming Colorful
+    Dapper Dewy Dynamic Enthusiastic Glorious Inspiring Inventive Loyal Mellow
+    Mysterious Nimble Plucky Quirky Rejoicing Shy Sleek Spunky Starlit Upbeat
+    Vivacious Wandering Watchful Welcoming Whistling Youthful
+  ]
+
   ANIMAL_AND_NATURE_IMAGE_PATHS_BY_NOUN = {
     "Raccoon" => "emoji/animals_and_nature/raccoon_3d.png",
     "Tiger" => "emoji/animals_and_nature/tiger_face_3d.png",
@@ -154,7 +172,7 @@ module UserDisplayNameGenerator
     "Wilted Flower" => "emoji/animals_and_nature/wilted_flower_3d.png",
     "Wing" => "emoji/animals_and_nature/wing_3d.png",
     "Worm" => "emoji/animals_and_nature/worm_3d.png"
-  }.freeze
+  }
 
   FOOD_AND_DRINK_IMAGE_PATHS_BY_NOUN = {
     "Crab" => "emoji/food_and_drink/crab_3d.png",
@@ -293,66 +311,28 @@ module UserDisplayNameGenerator
     "Waffle" => "emoji/food_and_drink/waffle_3d.png",
     "Watermelon" => "emoji/food_and_drink/watermelon_3d.png",
     "Wine Glass" => "emoji/food_and_drink/wine_glass_3d.png"
-  }.freeze
+  }
 
-  ADJECTIVES = %w[
-    Adventurous Agile Amber Ancient Artful Astonishing Audacious Autumn Azure
-    Balanced Bashful Bold Bouncy Brave Bright Brilliant Calm Caring Cheerful Clever
-    Cloudy Cozy Curious Daring Dazzling Diligent Dreamy Eager Elegant Enchanted
-    Energetic Fair Fearless Festive Fierce Fluffy Fortunate Friendly Gentle
-    Glimmering Gleaming Graceful Grateful Happy Harmonious Heroic Honest Hopeful
-    Humble Jolly Joyful Kind Lively Lucky Luminous Magical Merry Mighty Mindful
-    Misty Modest Noble Optimistic Peaceful Playful Pleasant Polite Powerful Pristine
-    Proud Quick Quiet Radiant Ready Regal Relaxed Remarkable Resilient Respectful
-    Roaring Rosy Royal Sassy Serene Shimmering Shiny Silky Sincere Skillful Sleepy
-    Smart Snappy Sociable Soft Sparkling Spirited Splendid Steady Sunny Swift
-    Tender Thoughtful Tiny Tranquil Trusty Valiant Vibrant Victorious Warm Whimsical
-    Wise Witty Wonderful Zany Zealous Zesty Abundant Breezy Brisk Charming Colorful
-    Dapper Dewy Dynamic Enthusiastic Glorious Inspiring Inventive Loyal Mellow
-    Mysterious Nimble Plucky Quirky Rejoicing Shy Sleek Spunky Starlit Upbeat
-    Vivacious Wandering Watchful Welcoming Whistling Youthful
-  ].freeze
-
-  EMOJI_IMAGE_PATHS_BY_NOUN = [
+  ALL_IMAGE_PATHS_BY_NOUN = [
     ANIMAL_AND_NATURE_IMAGE_PATHS_BY_NOUN,
     FOOD_AND_DRINK_IMAGE_PATHS_BY_NOUN
-  ].reduce({}, :merge).freeze
+  ].reduce({}, :merge)
 
-  NOUNS = EMOJI_IMAGE_PATHS_BY_NOUN.keys.freeze
-  IMAGE_PATHS = EMOJI_IMAGE_PATHS_BY_NOUN.values.freeze
-
-  # Read Unicode only as a compatibility lookup for profiles saved before PNG icons.
-  LEGACY_IMAGE_PATHS = %w[animals_and_nature food_and_drink].each_with_object({}) do |category, lookup|
-    manifest = Rails.root.join("app/assets/images/emoji", category, "manifest.json")
-    JSON.parse(manifest.read).each do |entry|
-      lookup[entry.fetch("emoji").delete("\uFE0F")] = "emoji/#{category}/#{entry.fetch("file")}"
-    end
-  end.freeze
+  NOUNS = ALL_IMAGE_PATHS_BY_NOUN.keys
+  IMAGE_PATHS = ALL_IMAGE_PATHS_BY_NOUN.values
 
   class << self
-    def image_path_for(icon)
-      return icon if IMAGE_PATHS.include?(icon)
+    def display_name
+      base_name = "#{ADJECTIVES.sample} #{NOUNS.sample}"
+      candidate_name = base_name
+      number = 2
 
-      LEGACY_IMAGE_PATHS.fetch(icon.to_s.delete("\uFE0F"), IMAGE_PATHS.first)
-    end
+      while User.exists?(display_name: candidate_name)
+        candidate_name = "#{base_name} #{number}"
+        number += 1
+      end
 
-    def nickname_for(id)
-      ordinal = ordinal_for(id)
-      number, combination_index = ordinal.divmod(ADJECTIVES.length * NOUNS.length)
-      adjective_index, noun_index = combination_index.divmod(NOUNS.length)
-
-      "#{ADJECTIVES.fetch(adjective_index)} #{NOUNS.fetch(noun_index)} #{number + 1}"
-    end
-
-    def icon_for(id)
-      noun = NOUNS.fetch(ordinal_for(id) % NOUNS.length)
-      EMOJI_IMAGE_PATHS_BY_NOUN.fetch(noun)
-    end
-
-    private
-
-    def ordinal_for(id)
-      [ id.to_i - 1, 0 ].max
+      candidate_name
     end
   end
 end
