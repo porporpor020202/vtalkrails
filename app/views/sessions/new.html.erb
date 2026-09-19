@@ -8,9 +8,7 @@
   <div class="relative z-10 mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
     <div class="mb-10 text-center">
       <img src="/say_one_thing_icon.png" alt="say one thing" class="mx-auto mb-7 h-24 w-24 rounded-[28px] shadow-[0_18px_50px_rgba(255,104,79,0.28)]" />
-      <p class="text-xs font-extrabold uppercase tracking-[0.28em] text-[#e6523d]">A tiny voice ritual</p>
-      <h1 class="mt-3 text-[2.7rem] font-black leading-[0.98] tracking-[-0.06em]">say one<br />thing.</h1>
-      <p class="mx-auto mt-5 max-w-[17rem] text-[15px] leading-6 text-slate-600">One short thought. One real person. A simple way to practice English out loud.</p>
+      <h1 class="mt-3 text-[2.7rem] font-black leading-[0.98] tracking-[-0.06em]">Say one thing</h1>
     </div>
 
     <% if notice.present? %>
@@ -35,11 +33,5 @@
       <%= render "shared/sign_in_with_google" %>
       <%= render "shared/sign_in_with_apple" %>
     </div>
-
-    <p class="mt-7 text-center text-xs leading-5 text-slate-500">Sign in to send and receive short voice messages.</p>
-  </div>
-
-  <div class="relative z-10 w-full pt-6 text-center">
-    <p class="text-[11px] font-semibold tracking-wide text-slate-400">&copy; <%= Time.current.year %> say one thing</p>
   </div>
 </div>
