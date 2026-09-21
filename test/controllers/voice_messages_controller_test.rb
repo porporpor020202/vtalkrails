@@ -5,7 +5,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     @sender = users(:one)
     @recipient = User.create!(
       email_address: "active-listener@example.com",
-      password: "password",
+      oauth_provider: :google, oauth_uid: SecureRandom.uuid,
       last_active_at: Time.current
     )
     sign_in_as @sender
@@ -59,7 +59,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "does not allow a stranger to post in a room" do
-    stranger = User.create!(email_address: "stranger@example.com", password: "password")
+    stranger = User.create!(email_address: "stranger@example.com", oauth_provider: :google, oauth_uid: SecureRandom.uuid)
     room = Room.create!(user: @recipient, opponent: stranger, last_sender: stranger)
 
     post room_voice_messages_path(room), params: {

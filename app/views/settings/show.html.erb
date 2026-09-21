@@ -19,10 +19,10 @@
 
     <div class="flex-1 min-w-0">
       <h2 class="font-semibold text-slate-800 truncate">
-        <%= current_user.guest? ? "Guest User" : "Account Owner" %>
+        <%= current_user.display_name %>
       </h2>
       <p class="text-xs text-slate-400 truncate">
-        <%= current_user.guest? ? "Temporary Account" : current_user.email_address %>
+        <%= current_user.email_address %>
       </p>
 
       <% if current_user.oauth_provider.present? %>

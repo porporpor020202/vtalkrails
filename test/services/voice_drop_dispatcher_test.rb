@@ -2,7 +2,7 @@ require "test_helper"
 
 class VoiceDropDispatcherTest < ActiveSupport::TestCase
   setup do
-    User.update_all(guest: true)
+    User.destroy_all
     @sender = create_user("sender@example.com", last_active_at: Time.current)
   end
 
@@ -69,7 +69,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   private
 
   def create_user(email, last_active_at:)
-    User.create!(email_address: email, password: "password", last_active_at:)
+    User.create!(email_address: email, oauth_provider: :google, oauth_uid: SecureRandom.uuid, last_active_at:)
   end
 
   def audio_upload

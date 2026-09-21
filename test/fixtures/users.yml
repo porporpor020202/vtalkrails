@@ -1,0 +1,11 @@
+one:
+  oauth_provider: google
+  oauth_uid: fixture-google-one
+  email_address: one@example.com
+  display_name: Calm Tiger
+
+two:
+  oauth_provider: apple
+  oauth_uid: fixture-apple-two
+  email_address: two@example.com
+  display_name: Bright Panda

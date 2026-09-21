@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,7 +136,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false
+    t.index ["display_name"], name: "index_users_on_display_name", unique: true
     t.index ["last_active_at"], name: "index_users_on_last_active_at"
+    t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
   end
 
   create_table "voice_messages", force: :cascade do |t|

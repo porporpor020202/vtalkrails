@@ -1,6 +1,4 @@
 class User < ApplicationRecord
-  has_secure_password validations: false
-
   has_many :sessions, dependent: :destroy
   has_many :rooms, dependent: :destroy
   has_many :opponent_rooms,
@@ -38,18 +36,16 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
 
-  # TODO: OAUTH가입시에 레이스컨디션 발생 안하도록 코드 작성해야함. uid + provider 조합 unique 설정. 인덱스도 설정하라는데 뭔지모르겠음.
-  validates :oauth_uid, presence: true
+  validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }
   validates :oauth_provider, presence: true
 
   validates :display_name, presence: true, uniqueness: true
 
-  # TODO: 현재 이곳이 원인이 아니다. oauth 로그인부터 해결을 봐야한다.
-  # before_validation :assign_display_name, on: :create
+  before_validation :assign_display_name, on: :create
 
   private
 
-  # def assign_display_name
-  #   self.display_name = UserDisplayNameGenerator.display_name
-  # end
+  def assign_display_name
+    self.display_name = UserDisplayNameGenerator.display_name if display_name.blank?
+  end
 end

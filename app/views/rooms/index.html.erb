@@ -14,13 +14,13 @@
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-3">
-              <h2 class="truncate text-[15px] font-bold text-slate-900"><%= opponent.name.presence || "Voice partner" %></h2>
+              <h2 class="truncate text-[15px] font-bold text-slate-900"><%= opponent.display_name.presence || "Voice partner" %></h2>
               <% if last_message %>
                 <time class="shrink-0 text-[10px] font-medium text-slate-400"><%= time_ago_in_words(last_message.created_at) %> ago</time>
               <% end %>
             </div>
             <p class="mt-1 text-xs font-medium <%= room.deleted? ? "text-rose-600" : (room.can_reply?(current_user) ? "text-indigo-600" : "text-slate-500") %>">
-              <%= room.deleted? ? "#{opponent.name} no longer wants to continue this conversation." : (room.can_reply?(current_user) ? "Your turn to reply" : "Waiting for a reply") %>
+              <%= room.deleted? ? "#{opponent.display_name} no longer wants to continue this conversation." : (room.can_reply?(current_user) ? "Your turn to reply" : "Waiting for a reply") %>
             </p>
           </div>
           <svg class="h-5 w-5 shrink-0 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">

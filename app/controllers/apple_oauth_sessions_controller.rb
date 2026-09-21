@@ -25,7 +25,6 @@ class AppleOauthSessionsController < ApplicationController
 
       user = OauthUserService.find_or_create(
         oauth_provider: :apple,
-        current_user: authenticated? ? current_user : nil,
         uid: uid,
         email: email
       )
@@ -126,7 +125,6 @@ class AppleOauthSessionsController < ApplicationController
   def create_user(user_info)
     OauthUserService.find_or_create(
       oauth_provider: :apple,
-      current_user: authenticated? ? current_user : nil,
       uid: user_info[:uid],
       email: user_info[:email]
     )

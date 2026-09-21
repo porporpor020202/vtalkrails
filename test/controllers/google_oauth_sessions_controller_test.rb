@@ -92,8 +92,6 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "google login returns to the protected account deletion confirmation" do
-    skip "TODO: 추후 web 회원탈퇴 페이지 작업할 때 다시 작성하자"
-
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 
@@ -109,7 +107,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   # --- Native Platform Flow ---
 
   test "native Google identity token returns a short-lived session token" do
-    skip "TODO: web부터 한 뒤에 검증"
+
 
     GoogleOauthClient.mocked_result = { uid: "google-native-123", email: "native-google@example.com" }
 
@@ -122,7 +120,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "google login success redirects to custom native scheme for native platform" do
-    skip "TODO: web부터 한 뒤에 검증"
+
 
     post google_oauth_sessions_path, params: { platform: "native" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}

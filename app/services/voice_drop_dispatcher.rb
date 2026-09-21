@@ -26,7 +26,7 @@ class VoiceDropDispatcher
   attr_reader :sender
 
   def ranked_candidates
-    User.registered
+    User.all
       # Store review: keep registered Apple and Google review accounts eligible
       # even when either account has not been active during the last 7 days.
       # Re-enable this scope after review if recent activity should be required:

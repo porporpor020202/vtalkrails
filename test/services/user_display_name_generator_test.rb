@@ -12,13 +12,7 @@ class UserDisplayNameGeneratorTest < ActiveSupport::TestCase
   end
 
   test "display_name이 이미 User에 존재하면 숫자 2를 붙인다" do
-    skip "Oauth부터 정리하고 여기 정리."
-    user = create_test_user(display_name: "Adventurous Tiger")
-
-    pp User.exists?(display_name: "Adventurous Tiger")
-
-    pp user.display_name
-    pp User.last.display_name
+    create_test_user(display_name: "Adventurous Tiger")
 
     UserDisplayNameGenerator::ADJECTIVES.stub(:sample, "Adventurous") do
       UserDisplayNameGenerator::NOUNS.stub(:sample, "Tiger") do

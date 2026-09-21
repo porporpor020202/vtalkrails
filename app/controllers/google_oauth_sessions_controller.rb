@@ -14,7 +14,6 @@ class GoogleOauthSessionsController < ApplicationController
     user_info = GoogleOauthClient.new.authenticate_id_token(identity_token, nonce: nonce)
     user = OauthUserService.find_or_create(
       oauth_provider: :google,
-      current_user: authenticated? ? current_user : nil,
       uid: user_info[:uid],
       email: user_info[:email]
     )
@@ -80,7 +79,6 @@ class GoogleOauthSessionsController < ApplicationController
     # Create or find the user
     @user = OauthUserService.find_or_create(
       oauth_provider: :google,
-      current_user: authenticated? ? current_user : nil,
       uid: user_info[:uid],
       email: user_info[:email]
     )

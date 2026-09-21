@@ -1,23 +1,11 @@
 class OauthUserService
-  def self.find_or_create(oauth_provider:, current_user: nil, uid:, email:)
-    user = User.find_by(oauth_provider: oauth_provider, oauth_uid: uid)
-    return user if user
-
-    if current_user&.guest?
-      current_user.update(
-        oauth_provider: oauth_provider,
-        oauth_uid: uid,
-        email_address: email,
-        guest: false
-      )
-      return current_user
+  def self.find_or_create(oauth_provider:, uid:, email:)
+    # Serialize nickname allocation and duplicate requests for one identity.
+    User.transaction do
+      User.connection.execute("SELECT pg_advisory_xact_lock(7951, 1)")
+      User.find_or_create_by!(oauth_provider: oauth_provider, oauth_uid: uid) do |user|
+        user.email_address = email
+      end
     end
-
-    User.create(
-      oauth_provider: oauth_provider,
-      oauth_uid: uid,
-      email_address: email,
-      guest: false
-    )
   end
 end

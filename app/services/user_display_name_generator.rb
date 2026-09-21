@@ -322,6 +322,11 @@ module UserDisplayNameGenerator
   IMAGE_PATHS = ALL_IMAGE_PATHS_BY_NOUN.values
 
   class << self
+    def image_path_for(display_name)
+      noun = display_name.split(" ", 2).last.sub(/ \d+\z/, "")
+      ALL_IMAGE_PATHS_BY_NOUN.fetch(noun)
+    end
+
     def display_name
       base_name = "#{ADJECTIVES.sample} #{NOUNS.sample}"
       candidate_name = base_name

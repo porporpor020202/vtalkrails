@@ -1,6 +1,6 @@
 module ApplicationHelper
   def profile_icon_tag(user, size: 40)
-    image_tag UserDisplayNameGenerator.image_path_for(user.icon),
+    image_tag UserDisplayNameGenerator.image_path_for(user.display_name),
       alt: "",
       width: size,
       height: size,

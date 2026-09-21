@@ -42,7 +42,7 @@ class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "nonparticipant cannot report a conversation" do
-    outsider = User.create!(email_address: "outsider@example.com", password: "password")
+    outsider = User.create!(email_address: "outsider@example.com", oauth_provider: :google, oauth_uid: SecureRandom.uuid)
     sign_out
     sign_in_as outsider
 

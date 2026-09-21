@@ -12,7 +12,7 @@
         <%= profile_icon_tag(current_user, size: 44) %>
       </div>
       <div class="min-w-0 flex-1">
-        <h2 class="truncate text-base font-bold text-slate-950"><%= current_user.name.presence || "say one thing member" %></h2>
+        <h2 class="truncate text-base font-bold text-slate-950"><%= current_user.display_name.presence || "say one thing member" %></h2>
         <p class="mt-1 truncate text-sm text-slate-500"><%= current_user.email_address %></p>
       </div>
     </div>

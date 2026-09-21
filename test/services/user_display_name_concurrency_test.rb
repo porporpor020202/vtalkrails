@@ -50,7 +50,7 @@ class UserDisplayNameConcurrencyTest < ActiveSupport::TestCase
         assert_equal worker_count, worker_count.times.map { connections.pop }.uniq.size
         assert_equal worker_count, results.size
 
-        names = User.where(id: worker_count.times.map { results.pop }).pluck(:name)
+        names = User.where(id: worker_count.times.map { results.pop }).pluck(:display_name)
         assert_equal ["Happy Raccoon", "Happy Raccoon 2", "Happy Raccoon 3"], names.sort
       ensure
         threads.each { |thread| thread.kill if thread.alive? }

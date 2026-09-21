@@ -16,15 +16,15 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
         end
 
         assert user.persisted?
-        assert_equal(index.zero? ? "Happy Raccoon" : "Happy Raccoon 2", user.reload.name)
-        assert_equal expected_nickname_icon("Raccoon"), user.icon
+        assert_equal(index.zero? ? "Happy Raccoon" : "Happy Raccoon 2", user.reload.display_name)
+        assert_equal expected_nickname_icon("Raccoon"), UserDisplayNameGenerator.image_path_for(user.reload.display_name)
       end
     end
   end
 
   test "08 재로그인과 새 요청 및 DB 재조회 후에도 닉네임과 이미지가 유지된다" do
     user = with_nickname_choices { create_nickname_user }
-    original = user.reload.attributes.slice("name", "icon")
+    original = user.reload.attributes.slice("display_name")
     assert original.values.all?(&:present?)
     login_nickname_user(user)
     get mypage_path
@@ -46,15 +46,15 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
       Current.reset
       get mypage_path
       assert_response :success
-      assert_select "h2", text: original.fetch("name")
-      assert_equal original, User.find(user.id).attributes.slice("name", "icon")
+      assert_select "h2", text: original.fetch("display_name")
+      assert_equal original, User.find(user.id).attributes.slice("display_name")
     end
   end
 
   test "09 닉네임과 같은 프로필 영역에 해당 명사의 이미지가 표시된다" do
     ["Raccoon", "Polar Bear"].each do |noun|
       user = with_nickname_choices(noun: noun) { create_nickname_user }
-      assert_equal "Happy #{noun}", user.name
+      assert_equal "Happy #{noun}", user.display_name
       assert_nickname_profile(user, noun)
       reset!
       Current.reset
@@ -67,7 +67,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
       create_nickname_user
     end
 
-    assert_equal "Happy Raccoon 4", user.reload.name
+    assert_equal "Happy Raccoon 4", user.reload.display_name
     assert_nickname_profile(user, "Raccoon")
   end
 
@@ -82,12 +82,12 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
 
   def assert_nickname_profile(user, noun)
     path = expected_nickname_icon(noun)
-    assert_equal path, user.reload.icon
+    assert_equal path, UserDisplayNameGenerator.image_path_for(user.reload.display_name)
     assert Rails.root.join("app/assets/images", path).file?, "이미지 파일이 없습니다: #{path}"
     login_nickname_user(user)
     get mypage_path
     assert_response :success
-    assert_select "h2", text: user.name, count: 1 do |headings|
+    assert_select "h2", text: user.display_name, count: 1 do |headings|
       profile = headings.first.parent.parent
       images = profile.css("img")
       assert_equal 1, images.length

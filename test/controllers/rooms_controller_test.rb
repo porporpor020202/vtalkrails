@@ -5,7 +5,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     @deleter = users(:one)
     @recipient = User.create!(
       email_address: "room-recipient@example.com",
-      password: "password"
+      oauth_provider: :google, oauth_uid: SecureRandom.uuid
     )
     @room = Room.create!(
       user: @deleter,
@@ -31,7 +31,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     assert_not User.find(@deleter.id).rooms.where(id: @room.id).where.not(status: :deleted).exists?
 
     get rooms_path
-    assert_no_match @recipient.name, response.body
+    assert_no_match @recipient.display_name, response.body
     get room_path(@room)
     assert_redirected_to rooms_path
   end
@@ -60,6 +60,6 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to rooms_path
     assert @room.reload.dismissed_by_id == @recipient.id
     get rooms_path
-    assert_no_match @deleter.name, response.body
+    assert_no_match @deleter.display_name, response.body
   end
 end
