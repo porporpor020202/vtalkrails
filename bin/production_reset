@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+echo "Stopping the production app..."
+bin/kamal app stop || true
+
+echo "Resetting production databases..."
+bin/kamal app exec \
+  --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 \
+  env SOLID_QUEUE_IN_PUMA=false bin/rails db:reset
+
+echo "Starting the production app..."
+bin/kamal app start
+
+echo "Production reset completed."
+
+# bin/rails db:migrate:reset은 마이그레이션 파일 기준으로 db 셋팅한다.
+# 근데 개발환경은 큐나, 케이블, 케시를 사용하지 않는다.
+# 물론 초기 프로젝트 생성과정에서 schema.rb 파일은 만들어지긴했다.
+# 운영환경은 저 3종을 기본적으로 쓰게 되어있다.
+# 그러나 마이그레이션 파일이 없으니 큐 케이블 케시가 뒤진다.
+# 그래서 실제 운영환경에선 저 3종을 위해 db:reset 명령어를 사용해야한다.
+# db:reset은 schema.rb 파일을 기준으로 db를 셋팅한다.

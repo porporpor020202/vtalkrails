@@ -1,0 +1,19 @@
+Kamal / Docker commands
+
+현재 운영 앱 컨테이너 상태 확인:
+  bin/kamal app details
+
+위 명령은 운영 서버(64.176.231.231)에서 아래 Docker 필터로 조회한다:
+  docker ps --filter label=service=vtalk --filter label=destination= --filter label=role=web
+
+서버의 모든 실행 중 컨테이너 보기:
+  ssh root@64.176.231.231 'docker ps'
+
+운영 앱 컨테이너 로그 보기:
+  bin/kamal app logs
+
+운영 앱 컨테이너 중지:
+  bin/kamal app stop
+
+운영 앱 컨테이너 시작:
+  bin/kamal app start
