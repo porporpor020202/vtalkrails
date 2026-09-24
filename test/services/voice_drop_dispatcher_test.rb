@@ -32,7 +32,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   test "does not create a second room for an existing pair" do
     existing = create_user("existing@example.com", last_active_at: 5.minutes.ago)
     available = create_user("available@example.com", last_active_at: 20.minutes.ago)
-    Room.create!(user: @sender, opponent: existing)
+    Room.create!(language: languages(:english), user: @sender, opponent: existing)
 
     room = VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: 4_000)
 
@@ -42,6 +42,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   test "can start a new voice drop after a previous room was deleted" do
     recipient = create_user("former-partner@example.com", last_active_at: 5.minutes.ago)
     Room.create!(
+      language: languages(:english),
       user: @sender,
       opponent: recipient,
       status: :deleted,

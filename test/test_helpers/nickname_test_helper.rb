@@ -1,7 +1,7 @@
 require "minitest/mock"
 
 module NicknameTestHelper
-  def with_nickname_choices(adjective: "Happy", noun: "Raccoon", &block)
+  def with_stubbed_display_name(adjective: "Happy", noun: "Raccoon", &block)
     UserDisplayNameGenerator::ADJECTIVES.stub(:sample, adjective) do
       UserDisplayNameGenerator::NOUNS.stub(:sample, noun, &block)
     end

@@ -6,8 +6,9 @@ class VoiceDropDispatcher
 
   class NoRecipientAvailable < StandardError; end
 
-  def initialize(sender)
+  def initialize(sender, language: Language.find_by!(code: "en"))
     @sender = sender
+    @language = language
   end
 
   def call(audio:, duration_ms:)
@@ -23,7 +24,7 @@ class VoiceDropDispatcher
 
   private
 
-  attr_reader :sender
+  attr_reader :sender, :language
 
   def ranked_candidates
     User.all
@@ -60,6 +61,7 @@ class VoiceDropDispatcher
       next if active_room_between?(recipient)
 
       room = Room.create!(
+        language: language,
         user: sender,
         opponent: recipient,
         status: :waiting,

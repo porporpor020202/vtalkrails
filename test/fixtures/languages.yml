@@ -1,0 +1,15 @@
+english:
+  name: English
+  code: en
+
+spanish:
+  name: Spanish
+  code: es
+
+french:
+  name: French
+  code: fr
+
+korean:
+  name: Korean
+  code: ko

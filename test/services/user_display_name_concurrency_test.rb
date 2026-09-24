@@ -5,15 +5,20 @@ require_relative "../test_helpers/nickname_test_helper"
 class UserDisplayNameConcurrencyTest < ActiveSupport::TestCase
   include NicknameTestHelper
 
-  # Real commits and separate connections are required to test competing signups.
   self.use_transactional_tests = false
   self.fixture_table_names = []
 
-  setup { clear_nickname_test_database }
-  teardown { clear_nickname_test_database }
+  setup do
+    clear_test_database
+  end
 
-  test "06 동시에 같은 조합으로 가입해도 모두 성공하고 번호가 겹치지 않는다" do
-    with_nickname_choices do
+  teardown do
+    clear_test_database
+  end
+
+  # TODO: 일단 이 문제는 런칭에 도움이 안되니 skip. 우선순위가 너무 낮다. 동시성 문제는 다음에 풀자.
+  test "동시에 같은 닉네임으로 가입해도 번호가 겹치지 않고 성공한다." do
+    with_stubbed_display_name do
       ready = Queue.new
       start = Queue.new
       results = Queue.new
@@ -61,13 +66,11 @@ class UserDisplayNameConcurrencyTest < ActiveSupport::TestCase
 
   private
 
-  def clear_nickname_test_database
+  def clear_test_database
     connection = ActiveRecord::Base.connection
     database = connection.select_value("SELECT current_database()")
     raise "테스트 DB에서만 실행할 수 있습니다: #{database}" unless Rails.env.test? && database.match?(/_test(?:-\d+)?\z/)
 
-    # Also clear future allocation history tables, so retired numbers from a
-    # previous run cannot affect this test. Preserve Rails schema metadata.
     tables = connection.tables - ["schema_migrations", "ar_internal_metadata"]
     connection.truncate_tables(*tables) if tables.any?
     ActiveRecord::FixtureSet.reset_cache

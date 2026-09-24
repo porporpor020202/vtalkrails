@@ -5,6 +5,7 @@ class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
     @reporter = users(:one)
     @reported_user = users(:two)
     @room = Room.create!(
+      language: languages(:english),
       user: @reporter,
       opponent: @reported_user,
       last_sender: @reported_user,

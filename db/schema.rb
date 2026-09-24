@@ -57,6 +57,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_020000) do
     t.index ["status"], name: "index_content_reports_on_status"
   end
 
+  create_table "languages", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_languages_on_code", unique: true
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.timestamp "created_at", precision: 6, null: false
     t.integer "notifications_count"
@@ -94,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_020000) do
     t.datetime "created_at", null: false
     t.bigint "deleted_by_id"
     t.bigint "dismissed_by_id"
+    t.bigint "language_id", null: false
     t.datetime "last_message_at"
     t.bigint "last_sender_id"
     t.bigint "opponent_id", null: false
@@ -102,6 +112,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_020000) do
     t.bigint "user_id", null: false
     t.index ["deleted_by_id"], name: "index_rooms_on_deleted_by_id"
     t.index ["dismissed_by_id"], name: "index_rooms_on_dismissed_by_id"
+    t.index ["language_id"], name: "index_rooms_on_language_id"
     t.index ["last_message_at"], name: "index_rooms_on_last_message_at"
     t.index ["last_sender_id"], name: "index_rooms_on_last_sender_id"
     t.index ["opponent_id"], name: "index_rooms_on_opponent_id"
@@ -157,6 +168,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_020000) do
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
   add_foreign_key "notification_tokens", "users"
+  add_foreign_key "rooms", "languages"
   add_foreign_key "rooms", "users"
   add_foreign_key "rooms", "users", column: "deleted_by_id"
   add_foreign_key "rooms", "users", column: "dismissed_by_id"

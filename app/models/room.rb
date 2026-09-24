@@ -1,4 +1,5 @@
 class Room < ApplicationRecord
+  belongs_to :language
   belongs_to :user
   belongs_to :opponent, class_name: "User"
   belongs_to :last_sender, class_name: "User", optional: true

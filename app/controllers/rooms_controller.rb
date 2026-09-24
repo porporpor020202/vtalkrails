@@ -1,6 +1,13 @@
 class RoomsController < ApplicationController
+  include SayLanguageSelection
+
   def index
+    @languages = Language.order(:name)
+    @selected_language = selected_say_language
+    session[:say_language_id] = @selected_language.id
+
     @rooms = Room.visible_to(current_user)
+      .where(language: @selected_language)
       .includes(:user, :opponent, :last_sender, voice_messages: { audio_attachment: :blob })
       .order(Arel.sql("COALESCE(last_message_at, rooms.updated_at) DESC"))
       .to_a

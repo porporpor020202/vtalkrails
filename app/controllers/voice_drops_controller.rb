@@ -1,6 +1,8 @@
 class VoiceDropsController < ApplicationController
+  include SayLanguageSelection
+
   def create
-    room = VoiceDropDispatcher.new(current_user).call(
+    room = VoiceDropDispatcher.new(current_user, language: selected_say_language).call(
       audio: voice_message_params.fetch(:audio),
       duration_ms: voice_message_params.fetch(:duration_ms)
     )

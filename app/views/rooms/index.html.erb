@@ -3,6 +3,13 @@
     <span data-pull-to-refresh-target="label">Pull to refresh</span>
   </div>
 
+  <%= form_with url: rooms_path, method: :get, class: "mb-5", data: { controller: "language-selection" } do |form| %>
+    <%= form.label :language_id, "Language", class: "mb-2 block text-sm font-bold text-slate-700" %>
+    <%= form.collection_select :language_id, @languages, :id, :name,
+          { selected: @selected_language.id },
+          { class: "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900", data: { action: "change->language-selection#submit" } } %>
+  <% end %>
+
   <% if @rooms.any? %>
     <div class="space-y-3">
       <% @rooms.each do |room| %>
@@ -39,5 +46,5 @@
 </section>
 
 <%= render "voice_recorder",
-      endpoint: voice_drop_path,
+      endpoint: voice_drop_path(language_id: @selected_language.id),
       trigger_classes: "fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 to-red-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-rose-500/30 ring-4 ring-white transition active:scale-95" %>

@@ -28,6 +28,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "allows only the participant whose turn it is to reply" do
     room = Room.create!(
+      language: languages(:english),
       user: @sender,
       opponent: @recipient,
       last_sender: @recipient,
@@ -58,9 +59,40 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "creates a voice drop in the language selected on Say" do
+    korean = languages(:korean)
+    get rooms_path(language_id: korean.id)
+
+    assert_difference "Room.count", 1 do
+      post voice_drop_path, params: {
+        voice_message: {
+          audio: fixture_file_upload("sample.webm", "audio/webm"),
+          duration_ms: 2_000
+        }
+      }, as: :multipart
+    end
+
+    assert_response :created
+    assert_equal korean, Room.order(:id).last.language
+  end
+
+  test "uses the recording page language even if another tab changes the selection" do
+    get rooms_path(language_id: languages(:korean).id)
+
+    post voice_drop_path(language_id: languages(:spanish).id), params: {
+      voice_message: {
+        audio: fixture_file_upload("sample.webm", "audio/webm"),
+        duration_ms: 2_000
+      }
+    }, as: :multipart
+
+    assert_response :created
+    assert_equal languages(:spanish), Room.order(:id).last.language
+  end
+
   test "does not allow a stranger to post in a room" do
     stranger = User.create!(email_address: "stranger@example.com", oauth_provider: :google, oauth_uid: SecureRandom.uuid)
-    room = Room.create!(user: @recipient, opponent: stranger, last_sender: stranger)
+    room = Room.create!(language: languages(:english), user: @recipient, opponent: stranger, last_sender: stranger)
 
     post room_voice_messages_path(room), params: {
       voice_message: {
@@ -74,6 +106,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "renders the rooms list and a voice conversation" do
     room = Room.create!(
+      language: languages(:english),
       user: @sender,
       opponent: @recipient,
       last_sender: @recipient,

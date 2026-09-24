@@ -8,6 +8,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
       oauth_provider: :google, oauth_uid: SecureRandom.uuid
     )
     @room = Room.create!(
+      language: languages(:english),
       user: @deleter,
       opponent: @recipient,
       last_sender: @recipient,
@@ -34,6 +35,25 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match @recipient.display_name, response.body
     get room_path(@room)
     assert_redirected_to rooms_path
+  end
+
+  test "language filtering still excludes rooms belonging to other users" do
+    stranger = User.create!(email_address: "language-stranger@example.com",
+      oauth_provider: :google, oauth_uid: SecureRandom.uuid)
+    private_room = Room.create!(user: @recipient, opponent: stranger,
+      language: languages(:english))
+
+    get rooms_path(language_id: languages(:english).id)
+
+    assert_response :success
+    assert_select "a[href='#{room_path(@room)}']"
+    assert_select "a[href='#{room_path(private_room)}']", count: 0
+  end
+
+  test "an unknown language does not return an unfiltered list" do
+    get rooms_path(language_id: -1)
+
+    assert_response :not_found
   end
 
   test "the other participant sees the conversation-ended notice" do

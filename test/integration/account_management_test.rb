@@ -21,7 +21,7 @@ class AccountManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "delete account removes the user and associated rooms" do
-    Room.create!(user: users(:one), opponent: @user)
+    Room.create!(language: languages(:english), user: users(:one), opponent: @user)
     get authenticate_by_token_google_oauth_sessions_path, params: { token: @token }
 
     assert_difference("User.count", -1) do

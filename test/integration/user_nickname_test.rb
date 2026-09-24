@@ -7,7 +7,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
   teardown { Current.reset }
 
   test "07 처음 가입하면 닉네임과 명사에 맞는 이미지가 자동 저장된다" do
-    with_nickname_choices do
+    with_stubbed_display_name do
       [:google, :apple].each_with_index do |provider, index|
         token = SecureRandom.uuid
         user = nil
@@ -23,7 +23,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
   end
 
   test "08 재로그인과 새 요청 및 DB 재조회 후에도 닉네임과 이미지가 유지된다" do
-    user = with_nickname_choices { create_nickname_user }
+    user = with_stubbed_display_name { create_nickname_user }
     original = user.reload.attributes.slice("display_name")
     assert original.values.all?(&:present?)
     login_nickname_user(user)
@@ -35,7 +35,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
     Current.reset
 
     # A different random choice must not change an existing account's identity.
-    with_nickname_choices(adjective: "Calm", noun: "Tiger") do
+    with_stubbed_display_name(adjective: "Calm", noun: "Tiger") do
       returning_user = nil
       assert_no_difference("User.count") do
         returning_user = OauthUserService.find_or_create(
@@ -53,7 +53,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
 
   test "09 닉네임과 같은 프로필 영역에 해당 명사의 이미지가 표시된다" do
     ["Raccoon", "Polar Bear"].each do |noun|
-      user = with_nickname_choices(noun: noun) { create_nickname_user }
+      user = with_stubbed_display_name(noun: noun) { create_nickname_user }
       assert_equal "Happy #{noun}", user.display_name
       assert_nickname_profile(user, noun)
       reset!
@@ -62,7 +62,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
   end
 
   test "10 번호가 붙은 닉네임에도 같은 명사의 이미지가 표시된다" do
-    user = with_nickname_choices do
+    user = with_stubbed_display_name do
       3.times { create_nickname_user }
       create_nickname_user
     end
