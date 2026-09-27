@@ -6,8 +6,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test "redirects to new_session_path when accessing mypage_path while unauthenticated" do
-    get mypage_path
+  test "redirects to new_session_path when accessing profile_path while unauthenticated" do
+    get profile_path
     assert_redirected_to new_session_path
   end
 

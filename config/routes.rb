@@ -31,7 +31,7 @@ Rails.application.routes.draw do
 
   resource :settings, only: [ :show ], controller: "settings"
 
-  resource :mypage, only: [ :show ], controller: "mypages"
+  resource :profile, only: [ :show ], controller: "profile"
   resource :account, only: [ :destroy ]
   resource :map, only: [ :show ]
 

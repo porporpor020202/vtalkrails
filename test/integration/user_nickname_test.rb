@@ -27,7 +27,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
     original = user.reload.attributes.slice("display_name")
     assert original.values.all?(&:present?)
     login_nickname_user(user)
-    get mypage_path
+    get profile_path
     assert_response :success
     delete session_path
     assert_redirected_to new_session_path
@@ -44,7 +44,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
       end
       login_nickname_user(returning_user)
       Current.reset
-      get mypage_path
+      get profile_path
       assert_response :success
       assert_select "h2", text: original.fetch("display_name")
       assert_equal original, User.find(user.id).attributes.slice("display_name")
@@ -85,7 +85,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
     assert_equal path, UserDisplayNameGenerator.image_path_for(user.reload.display_name)
     assert Rails.root.join("app/assets/images", path).file?, "이미지 파일이 없습니다: #{path}"
     login_nickname_user(user)
-    get mypage_path
+    get profile_path
     assert_response :success
     assert_select "h2", text: user.display_name, count: 1 do |headings|
       profile = headings.first.parent.parent

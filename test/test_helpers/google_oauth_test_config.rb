@@ -4,5 +4,5 @@ module GoogleOauthTestConfig
     "https://dev.sayonething.net",
     "https://www.sayonething.net",
     "https://sayonething.net"
-  ].map(&:freeze).freeze
+  ]
 end

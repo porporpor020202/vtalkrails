@@ -3,43 +3,47 @@ require_relative "../test_helpers/google_oauth_test_config"
 
 class GoogleOauthClient
   class << self
-    attr_accessor :mocked_result
+    attr_accessor :mocked_mode_enabled
   end
 
   alias_method :original_authenticate, :authenticate
   alias_method :original_authenticate_id_token, :authenticate_id_token
 
   def authenticate(code:, redirect_uri:)
-    if GoogleOauthClient.mocked_result
-      GoogleOauthClient.mocked_result
-    else
-      original_authenticate(code: code, redirect_uri: redirect_uri)
-    end
+    return mocked_result if self.class.mocked_mode_enabled
+
+    original_authenticate(code: code, redirect_uri: redirect_uri)
   end
 
   def authenticate_id_token(id_token, nonce:)
-    if GoogleOauthClient.mocked_result
-      GoogleOauthClient.mocked_result
-    else
-      original_authenticate_id_token(id_token, nonce: nonce)
-    end
+    return mocked_result if self.class.mocked_mode_enabled
+
+    original_authenticate_id_token(id_token, nonce: nonce)
+  end
+
+  private
+
+  def mocked_result
+    {
+      uid: "google-test-user",
+      email: "google-test@example.com"
+    }
   end
 end
 
 class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
-    GoogleOauthClient.mocked_result = nil
+    GoogleOauthClient.mocked_mode_enabled = false
   end
 
   teardown do
-    GoogleOauthClient.mocked_result = nil
+    GoogleOauthClient.mocked_mode_enabled = false
   end
 
   # --- Web Platform Flow ---
 
   GoogleOauthTestConfig::GOOGLE_LOGIN_ORIGINS.each do |origin|
-    test "#{origin}에서 올바른 Google 인증 요청을 만든다" do
+    test "r_#{origin}에 따른 올바른 Google 인증 요청을 만든다" do
       uri = URI.parse(origin)
       host! uri.authority
       https! uri.scheme == "https"
@@ -60,7 +64,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "cancelled Google sign in does not create a session" do
+  test "r_cancelled Google sign in does not create a session" do
     post google_oauth_sessions_path, params: { platform: "web" }
     state = session[:google_oauth_state]
     assert_no_difference "Session.count" do
@@ -70,20 +74,20 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil session[:google_oauth_state]
   end
 
-  test "callback without a saved state is rejected" do
+  test "r_callback without a saved state is rejected" do
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: "unsolicited" }
     assert_redirected_to new_session_path
     assert_nil cookies[:session_id]
   end
 
-  test "google login success redirects to root_path for web" do
+  test "r_google sign_in success redirects to root_path for web" do
     post google_oauth_sessions_path, params: { platform: "web" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}
 
     state = session[:google_oauth_state]
     assert_not_nil state
 
-    GoogleOauthClient.mocked_result = { uid: "google-12345", email: @user.email_address }
+    GoogleOauthClient.mocked_mode_enabled = true
 
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
 
@@ -91,13 +95,13 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id].present?
   end
 
-  test "google login returns to the protected account deletion confirmation" do
+  test "r_비로그인 상태에서 보호된 페이지 접근 후 Google 로그인 성공 시 원래 요청 페이지로 리다이렉트된다" do
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 
     post google_oauth_sessions_path, params: { platform: "web" }
     state = session[:google_oauth_state]
-    GoogleOauthClient.mocked_result = { uid: "google-12345", email: @user.email_address }
+    GoogleOauthClient.mocked_mode_enabled = true
 
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
 
@@ -107,9 +111,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   # --- Native Platform Flow ---
 
   test "native Google identity token returns a short-lived session token" do
-
-
-    GoogleOauthClient.mocked_result = { uid: "google-native-123", email: "native-google@example.com" }
+    GoogleOauthClient.mocked_mode_enabled = true
 
     post native_authenticate_google_oauth_sessions_path,
       params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
@@ -120,8 +122,6 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "google login success redirects to custom native scheme for native platform" do
-
-
     post google_oauth_sessions_path, params: { platform: "native" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}
 
@@ -129,7 +129,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil state
     assert_equal "native", state.split(":").last
 
-    GoogleOauthClient.mocked_result = { uid: "google-12345", email: @user.email_address }
+    GoogleOauthClient.mocked_mode_enabled = true
 
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
 

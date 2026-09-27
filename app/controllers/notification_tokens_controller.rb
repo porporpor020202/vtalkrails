@@ -17,7 +17,7 @@ class NotificationTokensController < ApplicationController
     else
       # Notifier를 통한 실제 APNs 및 FCM 전송 (모든 플랫폼)
       begin
-        TestPushNotifier.with(message: "🔔 This is a test notification.", path: mypage_path).deliver(current_user)
+        TestPushNotifier.with(message: "🔔 This is a test notification.", path: profile_path).deliver(current_user)
         platforms = tokens.pluck(:platform).uniq.map(&:upcase).join(", ")
         redirect_to rooms_path, notice: "The notification was sent to: #{platforms}."
       rescue => e

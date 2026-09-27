@@ -13,7 +13,7 @@ class SignInNavigationTest < ApplicationSystemTestCase
     within "nav[aria-label='Primary navigation']" do
       assert_selector "a[href='#{rooms_path}'][aria-current='page'].text-indigo-600", text: "Say"
       assert_selector "a[aria-current='page']", count: 1
-      assert_selector "a[href='#{mypage_path}']:not([aria-current]).text-slate-400", text: "My Page"
+      assert_selector "a[href='#{profile_path}']:not([aria-current]).text-slate-400", text: "Profile"
     end
   end
 end
