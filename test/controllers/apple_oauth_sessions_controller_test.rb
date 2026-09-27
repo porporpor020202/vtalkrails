@@ -1,50 +1,82 @@
 require "test_helper"
+require_relative "../test_helpers/apple_oauth_test_config"
 
-# Apple의 실제 JWT 검증을 우회하기 위해 네이티브 토큰 검증을 목(mock)으로 교체
 class AppleOauthClient
   class << self
-    attr_accessor :mocked_user_info
+    attr_accessor :mocked_mode_enabled
   end
 
   alias_method :original_decode_native_id_token, :decode_native_id_token
   alias_method :original_authenticate, :authenticate
 
+  def authenticate(code:, redirect_uri:, nonce:)
+    return mocked_result if self.class.mocked_mode_enabled
+
+    original_authenticate(code: code, redirect_uri: redirect_uri, nonce: nonce)
+  end
+
   def decode_native_id_token(id_token, nonce:)
-    if AppleOauthClient.mocked_user_info
-      AppleOauthClient.mocked_user_info
-    else
-      original_decode_native_id_token(id_token, nonce: nonce)
+    if self.class.mocked_mode_enabled
+      return { "sub" => mocked_result[:uid], "email" => mocked_result[:email] }
     end
+
+    original_decode_native_id_token(id_token, nonce: nonce)
+  end
+
+  private
+
+  def mocked_result
+    {
+      uid: "apple-test-user",
+      email: "apple-test@example.com"
+    }
   end
 end
 
 class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
-    AppleOauthClient.mocked_user_info = nil
+    AppleOauthClient.mocked_mode_enabled = false
   end
 
   teardown do
-    AppleOauthClient.mocked_user_info = nil
-    AppleOauthClient.alias_method :authenticate, :original_authenticate
+    AppleOauthClient.mocked_mode_enabled = false
   end
 
-  test "Apple browser authorization defaults to web and uses an HTTPS form POST callback" do
-    https!
-    host! "vtalks.net"
-    post apple_oauth_sessions_path
+  # --- Web Platform Flow ---
 
-    query = URI.decode_www_form(URI.parse(response.location).query).to_h
-    assert_equal "web", query["state"].split(":").last
-    assert_equal "https://vtalks.net/apple_oauth_sessions/callback", query["redirect_uri"]
-    assert_equal "form_post", query["response_mode"]
-    assert query["nonce"].present?
-    oauth_cookies = response.headers["Set-Cookie"].to_s
-    assert_match(/samesite=none/i, oauth_cookies)
-    assert_match(/secure/i, oauth_cookies)
+  AppleOauthTestConfig::APPLE_LOGIN_ORIGINS.each do |origin|
+    test "r_#{origin}에 따른 올바른 Apple 인증 요청을 만든다" do
+      uri = URI.parse(origin)
+      host! uri.authority
+      https! uri.scheme == "https"
+
+      post apple_oauth_sessions_path, params: { platform: "web" }
+
+      assert_response :redirect
+
+      authorization_url = URI.parse(response.location)
+      assert_equal "https", authorization_url.scheme
+      assert_equal "appleid.apple.com", authorization_url.host
+      assert_equal "/auth/authorize", authorization_url.path
+
+      query = URI.decode_www_form(authorization_url.query).to_h
+      assert_equal "#{origin}/apple_oauth_sessions/callback", query["redirect_uri"]
+      assert_equal "email name", query["scope"]
+      assert_equal "code", query["response_type"]
+      assert_equal "form_post", query["response_mode"]
+      assert_equal "web", query["state"].split(":").last
+      stored_nonce = request.cookie_jar.encrypted[:apple_oauth_nonce]
+      assert stored_nonce.present?
+      assert_equal stored_nonce, query["nonce"]
+
+      oauth_cookies = response.headers["Set-Cookie"].to_s
+      assert_match(/samesite=none/i, oauth_cookies)
+      assert_match(/secure/i, oauth_cookies)
+    end
   end
 
-  test "cancelled Apple sign in does not create a session" do
+  test "r_cancelled Apple sign in does not create a session" do
     post apple_oauth_sessions_path, params: { platform: "web" }
     state = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
     assert_no_difference "Session.count" do
@@ -54,18 +86,58 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil cookies[:session_id]
   end
 
+  test "r_callback without a saved state is rejected" do
+    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: "unsolicited" }
+
+    assert_redirected_to new_session_path
+    assert_nil cookies[:session_id]
+  end
+
+  test "r_apple sign_in success redirects to root_path for web" do
+    post apple_oauth_sessions_path, params: { platform: "web" }
+    assert_redirected_to %r{https://appleid.apple.com/auth/authorize}
+
+    authorization_url = URI.parse(response.location)
+    query = URI.decode_www_form(authorization_url.query).to_h
+    state = query["state"]
+    assert_not_nil state
+
+    AppleOauthClient.mocked_mode_enabled = true
+
+    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state }
+
+    assert_redirected_to root_path
+    assert cookies[:session_id].present?
+  end
+
+  test "r_비로그인 상태에서 보호된 페이지 접근 후 Apple 로그인 성공 시 원래 요청 페이지로 리다이렉트된다" do
+    get confirm_account_deletion_path
+    assert_redirected_to new_session_path
+
+    post apple_oauth_sessions_path, params: { platform: "web" }
+    authorization_url = URI.parse(response.location)
+    state = URI.decode_www_form(authorization_url.query).to_h["state"]
+    AppleOauthClient.mocked_mode_enabled = true
+
+    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state }
+
+    assert_redirected_to confirm_account_deletion_path
+  end
+
   # -------------------------------------------------
   # 1. iOS 네이티브 흐름 (identity_token -> token 발급)
   # -------------------------------------------------
 
   test "native_authenticate: 유효한 identity_token으로 기존 유저를 찾아 token을 발급한다" do
-    @user.update!(oauth_provider: :apple, oauth_uid: "apple-uid-123")
+    @user.update!(oauth_provider: :apple, oauth_uid: "apple-test-user", email_address: "apple-test@example.com")
 
-    AppleOauthClient.mocked_user_info = { "sub" => "apple-uid-123", "email" => @user.email_address }
+    AppleOauthClient.mocked_mode_enabled = true
 
-    post native_authenticate_apple_oauth_sessions_path,
-      params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
-      headers: { "Content-Type" => "application/json" }
+    assert_no_difference "User.count" do
+      post native_authenticate_apple_oauth_sessions_path,
+        params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
+        headers: { "Content-Type" => "application/json" }
+    end
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -73,16 +145,18 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "native_authenticate: 유효한 identity_token으로 새 유저를 생성하고 token을 발급한다" do
-    AppleOauthClient.mocked_user_info = { "sub" => "apple-new-uid-999", "email" => "newapple@example.com" }
+    AppleOauthClient.mocked_mode_enabled = true
 
-    post native_authenticate_apple_oauth_sessions_path,
-      params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
-      headers: { "Content-Type" => "application/json" }
+    assert_difference "User.count", 1 do
+      post native_authenticate_apple_oauth_sessions_path,
+        params: { identity_token: "dummy.jwt.token", nonce: "test-nonce" }.to_json,
+        headers: { "Content-Type" => "application/json" }
+    end
 
     assert_response :success
     json = JSON.parse(response.body)
     assert json["token"].present?, "token이 응답에 포함되어야 한다"
-    assert User.find_by(oauth_uid: "apple-new-uid-999").present?, "새 유저가 DB에 생성되어야 한다"
+    assert User.find_by(oauth_provider: :apple, oauth_uid: "apple-test-user").present?, "새 유저가 DB에 생성되어야 한다"
   end
 
   test "native_authenticate: identity_token이 없으면 bad_request를 반환한다" do
@@ -113,67 +187,16 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert response.location.include?("state="), "리다이렉트 URL에 state 파라미터가 있어야 한다"
   end
 
-  test "callback: 웹 플랫폼 로그인 성공 시 root로 리다이렉트된다" do
-    @user.update!(oauth_provider: :apple, oauth_uid: "apple-web-uid-456")
-    user_uid   = "apple-web-uid-456"
-    user_email = @user.email_address
-
-    # create로 session에 state/nonce 세팅 및 리다이렉트 URL에서 state 추출
-    post apple_oauth_sessions_path, params: { platform: "web" }
-    state_from_url = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
-
-    # Apple 서버 인증을 목(mock)으로 교체 (로카로 변수로 uid/email 캐시)
-    AppleOauthClient.define_method(:authenticate) do |code:, redirect_uri:, nonce:|
-      { uid: user_uid, email: user_email }
-    end
-
-    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state_from_url }
-
-    assert_redirected_to root_path
-    assert cookies[:session_id].present?, "세션 쿠키가 설정되어야 한다"
-  ensure
-    AppleOauthClient.remove_method(:authenticate) rescue nil
-  end
-
-  test "callback: 계정 삭제 인증 후 확인 화면으로 돌아간다" do
-    @user.update!(oauth_provider: :apple, oauth_uid: "apple-deletion-uid")
-    user_uid = "apple-deletion-uid"
-    user_email = @user.email_address
-
-    get confirm_account_deletion_path
-    assert_redirected_to new_session_path
-    post apple_oauth_sessions_path, params: { platform: "web" }
-    state_from_url = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
-
-    AppleOauthClient.define_method(:authenticate) do |code:, redirect_uri:, nonce:|
-      { uid: user_uid, email: user_email }
-    end
-
-    post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state_from_url }
-
-    assert_redirected_to confirm_account_deletion_path
-  ensure
-    AppleOauthClient.remove_method(:authenticate) rescue nil
-  end
-
   test "callback: 네이티브 플랫폼 로그인 성공 시 커스텀 스킴으로 리다이렉트된다" do
-    @user.update!(oauth_provider: :apple, oauth_uid: "apple-native-uid-789")
-    user_uid   = "apple-native-uid-789"
-    user_email = @user.email_address
-
     post apple_oauth_sessions_path, params: { platform: "native" }
     state_from_url = URI.decode_www_form(URI.parse(response.location).query).to_h["state"]
 
-    AppleOauthClient.define_method(:authenticate) do |code:, redirect_uri:, nonce:|
-      { uid: user_uid, email: user_email }
-    end
+    AppleOauthClient.mocked_mode_enabled = true
 
     post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state_from_url }
 
     assert_response :redirect
     assert_redirected_to %r{vtalk://auth-callback\?token=.+&platform=native}
-  ensure
-    AppleOauthClient.remove_method(:authenticate) rescue nil
   end
 
   test "callback: 잘못된 state로 요청 시 로그인 페이지로 리다이렉트된다" do

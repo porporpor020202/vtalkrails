@@ -1,4 +1,4 @@
-# https://developers.google.com/identity/protocols/oauth2/javascript-implicit-flow
+# https://developers.google.com/identity/openid-connect/openid-connect
 class GoogleOauthSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
@@ -42,14 +42,17 @@ class GoogleOauthSessionsController < ApplicationController
 
     platform = params[:platform] == "native" ? "native" : "web"
     state = SecureRandom.hex(24) + ":" + platform
+    nonce = SecureRandom.urlsafe_base64(16)
     session[:google_oauth_state] = state
+    session[:google_oauth_nonce] = nonce
 
     query = {
       client_id: client_id,
       redirect_uri: callback_uri,
       response_type: "code",
       scope: "openid email profile",
-      state: state
+      state: state,
+      nonce: nonce
     }.to_query
     redirect_url = "https://accounts.google.com/o/oauth2/v2/auth?#{query}"
     redirect_to redirect_url, allow_other_host: true
@@ -57,8 +60,8 @@ class GoogleOauthSessionsController < ApplicationController
 
   def callback
     request_state = params[:state]
-    session_state = session[:google_oauth_state]
-    session.delete(:google_oauth_state)
+    session_state = session.delete(:google_oauth_state)
+    session_nonce = session.delete(:google_oauth_nonce)
     unless request_state.present? && session_state.present? && ActiveSupport::SecurityUtils.secure_compare(request_state, session_state)
       redirect_to new_session_path, alert: "Invalid request. Please try again."
       return
@@ -69,11 +72,17 @@ class GoogleOauthSessionsController < ApplicationController
       return
     end
 
+    if session_nonce.blank?
+      redirect_to new_session_path, alert: "Invalid request. Please try again."
+      return
+    end
+
     # Exchange code for tokens and decode ID token
     oauth_client = GoogleOauthClient.new
     user_info = oauth_client.authenticate(
       code: params[:code],
-      redirect_uri: callback_google_oauth_sessions_url
+      redirect_uri: callback_google_oauth_sessions_url,
+      nonce: session_nonce
     )
 
     # Create or find the user

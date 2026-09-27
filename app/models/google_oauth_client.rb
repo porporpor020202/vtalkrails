@@ -4,17 +4,13 @@ class GoogleOauthClient
   TOKEN_URL = "https://oauth2.googleapis.com/token"
   KEYS_URL = "https://www.googleapis.com/oauth2/v3/certs"
 
-  def authenticate(code:, redirect_uri:)
+  def authenticate(code:, redirect_uri:, nonce:)
+    raise AuthenticationError, "Missing nonce" if nonce.blank?
+
     tokens = exchange_code_for_tokens(code, redirect_uri)
     raise AuthenticationError, "Failed to exchange code for tokens" unless tokens && tokens["id_token"]
 
-    user_info = decode_id_token(tokens["id_token"])
-    raise AuthenticationError, "Email not verified" unless user_info["email_verified"] == true
-
-    {
-      uid: user_info["sub"],
-      email: user_info["email"]
-    }
+    authenticate_id_token(tokens["id_token"], nonce: nonce)
   end
 
   def authenticate_id_token(id_token, nonce:)

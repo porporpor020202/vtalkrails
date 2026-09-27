@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 require_relative "../test_helpers/google_oauth_test_config"
 
 class GoogleOauthClient
@@ -9,10 +10,10 @@ class GoogleOauthClient
   alias_method :original_authenticate, :authenticate
   alias_method :original_authenticate_id_token, :authenticate_id_token
 
-  def authenticate(code:, redirect_uri:)
+  def authenticate(code:, redirect_uri:, nonce:)
     return mocked_result if self.class.mocked_mode_enabled
 
-    original_authenticate(code: code, redirect_uri: redirect_uri)
+    original_authenticate(code: code, redirect_uri: redirect_uri, nonce: nonce)
   end
 
   def authenticate_id_token(id_token, nonce:)
@@ -61,6 +62,8 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
       assert_equal "openid email profile", query["scope"]
       assert_equal "code", query["response_type"]
       assert_equal "web", query["state"].split(":").last
+      assert query["nonce"].present?
+      assert_equal session[:google_oauth_nonce], query["nonce"]
     end
   end
 
@@ -72,10 +75,12 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to new_session_path
     assert_nil session[:google_oauth_state]
+    assert_nil session[:google_oauth_nonce]
   end
 
   test "r_callback without a saved state is rejected" do
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: "unsolicited" }
+
     assert_redirected_to new_session_path
     assert_nil cookies[:session_id]
   end
@@ -106,6 +111,80 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
 
     assert_redirected_to confirm_account_deletion_path
+  end
+
+  test "web login generates a fresh nonce for each request" do
+    post google_oauth_sessions_path, params: { platform: "web" }
+    first_nonce = session[:google_oauth_nonce]
+    assert first_nonce.present?
+
+    post google_oauth_sessions_path, params: { platform: "web" }
+    assert session[:google_oauth_nonce].present?
+    assert_not_equal first_nonce, session[:google_oauth_nonce]
+  end
+
+  test "web callback passes the saved nonce to the client and consumes it" do
+    post google_oauth_sessions_path, params: { platform: "web" }
+    state = session[:google_oauth_state]
+    nonce = session[:google_oauth_nonce]
+    assert nonce.present?
+
+    verifier = Minitest::Mock.new
+    verifier.expect(:authenticate, { uid: "nonce-user", email: "nonce@example.com" }) do |**arguments|
+      arguments == { code: "dummy_code", redirect_uri: callback_google_oauth_sessions_url, nonce: nonce }
+    end
+
+    GoogleOauthClient.stub(:new, verifier) do
+      get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
+    end
+
+    verifier.verify
+    assert_redirected_to root_path
+    assert cookies[:session_id].present?
+    assert_nil session[:google_oauth_nonce]
+    assert_nil session[:google_oauth_state]
+
+    assert_no_difference "Session.count" do
+      get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
+    end
+    assert_redirected_to new_session_path
+  end
+
+  test "web callback rejects a missing saved nonce" do
+    SecureRandom.stub(:urlsafe_base64, nil) do
+      post google_oauth_sessions_path, params: { platform: "web" }
+    end
+    state = session[:google_oauth_state]
+    GoogleOauthClient.mocked_mode_enabled = true
+
+    assert_no_difference [ "User.count", "Session.count" ] do
+      get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
+    end
+
+    assert_redirected_to new_session_path
+    assert_nil cookies[:session_id]
+    assert_nil session[:google_oauth_state]
+    assert_nil session[:google_oauth_nonce]
+  end
+
+  test "web callback consumes nonce when token authentication fails" do
+    post google_oauth_sessions_path, params: { platform: "web" }
+    state = session[:google_oauth_state]
+    verifier = Object.new
+    verifier.define_singleton_method(:authenticate) do |**|
+      raise GoogleOauthClient::AuthenticationError, "Nonce verification failed"
+    end
+
+    GoogleOauthClient.stub(:new, verifier) do
+      assert_no_difference "Session.count" do
+        get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
+      end
+    end
+
+    assert_redirected_to new_session_path
+    assert_nil session[:google_oauth_nonce]
+    assert_nil session[:google_oauth_state]
+    assert_nil cookies[:session_id]
   end
 
   # --- Native Platform Flow ---
@@ -148,5 +227,6 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
     # This should fail. Let's see where it redirects or if it throws NameError.
     assert_redirected_to new_session_path
+    assert_nil session[:google_oauth_nonce]
   end
 end
