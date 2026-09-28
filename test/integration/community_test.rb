@@ -4,8 +4,8 @@ class CommunityTest < ActionDispatch::IntegrationTest
   setup do
     @english = languages(:english)
     @korean = languages(:korean)
-    @author = users(:one)
-    @reader = users(:two)
+    @author = users(:english_speaker)
+    @reader = users(:korean_learner)
     @post = Post.create!(user: @author, language: @english, body: "English community post")
     sign_in_as @author
   end

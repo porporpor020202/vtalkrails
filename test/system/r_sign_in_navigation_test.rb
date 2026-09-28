@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class SignInNavigationTest < ApplicationSystemTestCase
   test "r_sign-in 후 루트 화면에서 Learning Language 탭이 선택된다" do
-    token = users(:one).signed_id(purpose: :native_auth, expires_in: 5.minutes)
+    token = users(:english_speaker).signed_id(purpose: :native_auth, expires_in: 5.minutes)
     visit authenticate_by_token_google_oauth_sessions_path(token: token)
 
     assert_current_path root_path

@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class LanguageNavigationSystemTest < ApplicationSystemTestCase
   test "onboarding requires different languages and tabs have independent active states" do
-    user = users(:one)
+    user = users(:english_speaker)
     user.update!(mother_language: nil, learning_language: nil)
     token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
     visit authenticate_by_token_google_oauth_sessions_path(token: token)

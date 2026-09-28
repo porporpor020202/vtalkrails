@@ -2,7 +2,7 @@ require "test_helper"
 
 class RecipientSelectorTest < ActiveSupport::TestCase
   test "weight rewards activity replies and availability while penalizing load" do
-    selector = VoiceMatching::RecipientSelector.new(sender: users(:one), language: languages(:english))
+    selector = VoiceMatching::RecipientSelector.new(sender: users(:english_speaker), language: languages(:english))
     baseline = { hours_since_active: 1, matured_deliveries: 20, replied_within_24h: 10,
       availability: 0.5, pending_conversations: 0, deliveries_last_24h: 0 }
     base = selector.weight(baseline)
@@ -19,14 +19,14 @@ class RecipientSelectorTest < ActiveSupport::TestCase
       User.create!(email_address: "sample#{i}@example.com", oauth_provider: :google, oauth_uid: "sample#{i}",
         mother_language: languages(:korean), learning_language: languages(:english))
     end
-    sample = ->(seed) { VoiceMatching::RecipientSelector.new(sender: users(:one), language: languages(:english), random: Random.new(seed)).call(limit: 3).map(&:id) }
+    sample = ->(seed) { VoiceMatching::RecipientSelector.new(sender: users(:english_speaker), language: languages(:english), random: Random.new(seed)).call(limit: 3).map(&:id) }
     assert_equal sample.call(12), sample.call(12)
     assert_equal 3, sample.call(12).uniq.size
     assert_operator (1..6).map { |seed| sample.call(seed) }.uniq.size, :>, 1
   end
 
   test "activity is throttled and browser timezone is validated" do
-    user = users(:one)
+    user = users(:english_speaker)
     user.update_columns(last_active_at: nil)
     now = Time.current
     VoiceMatching::ActivityTracker.call(user, time_zone: "Asia/Seoul", now: now)
@@ -39,8 +39,8 @@ class RecipientSelectorTest < ActiveSupport::TestCase
   end
 
   test "reply statistics exclude deliveries still inside the response window and count both room sides" do
-    user = users(:two)
-    sender = users(:one)
+    user = users(:korean_learner)
+    sender = users(:english_speaker)
     now = Time.current
     drop = VoiceDrop.create!(sender: sender, language: languages(:english), request_key: SecureRandom.uuid)
     drop.voice_deliveries.create!(recipient: user, created_at: now - 2.days, first_replied_at: now - 2.days + 1.hour)

@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class VoiceFanoutSystemTest < ApplicationSystemTestCase
   test "retrying a recording after a lost response keeps one delivery and returns to its tab" do
-    user = users(:one)
+    user = users(:english_speaker)
     visit authenticate_by_token_google_oauth_sessions_path(token: user.signed_id(purpose: :native_auth, expires_in: 5.minutes))
     within "#bottom-tab-bar" do
       click_link "Mother Language"

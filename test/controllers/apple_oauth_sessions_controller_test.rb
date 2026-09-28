@@ -35,7 +35,7 @@ end
 
 class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = users(:english_speaker)
     AppleOauthClient.mocked_mode_enabled = false
   end
 

@@ -20,7 +20,7 @@ class AccountDeletionPageTest < ActionDispatch::IntegrationTest
   end
 
   test "authenticated user can review the account before deleting it" do
-    user = users(:one)
+    user = users(:english_speaker)
     sign_in_as user
 
     get confirm_account_deletion_path

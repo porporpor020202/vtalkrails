@@ -2,7 +2,7 @@ require "test_helper"
 
 class LanguageNavigationTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = users(:english_speaker)
     @english = languages(:english)
     @korean = languages(:korean)
   end
@@ -70,10 +70,10 @@ class LanguageNavigationTest < ActionDispatch::IntegrationTest
   end
 
   test "each tab filters by the current user language and preserves the tab through a room" do
-    english_room = Room.create!(user: @user, opponent: users(:two), language: @english)
-    korean_room = Room.create!(user: @user, opponent: users(:two), language: @korean)
+    english_room = Room.create!(user: @user, opponent: users(:korean_learner), language: @english)
+    korean_room = Room.create!(user: @user, opponent: users(:korean_learner), language: @korean)
     outsider = User.create!(email_address: "outsider@example.com", oauth_provider: :google, oauth_uid: "outsider")
-    private_room = Room.create!(user: outsider, opponent: users(:two), language: @english)
+    private_room = Room.create!(user: outsider, opponent: users(:korean_learner), language: @english)
     sign_in_as @user
 
     { "learning" => [english_room, korean_room], "mother" => [korean_room, english_room] }.each do |tab, (visible, hidden)|

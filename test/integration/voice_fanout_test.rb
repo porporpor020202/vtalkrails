@@ -2,8 +2,8 @@ require "test_helper"
 
 class VoiceFanoutTest < ActionDispatch::IntegrationTest
   test "both tabs deliver to the matching recipient language and retries keep the same count" do
-    sender = users(:one)
-    recipient = users(:two)
+    sender = users(:english_speaker)
+    recipient = users(:korean_learner)
     sign_in_as sender
     { "mother" => languages(:korean), "learning" => languages(:english) }.each do |tab, language|
       key = SecureRandom.uuid
@@ -35,7 +35,7 @@ class VoiceFanoutTest < ActionDispatch::IntegrationTest
   end
 
   test "missing request key cannot create a transmission" do
-    sign_in_as users(:one)
+    sign_in_as users(:english_speaker)
     assert_no_difference("VoiceDrop.count") do
       post voice_drop_path(tab: "learning"), params: { voice_message: {
         audio: fixture_file_upload("sample.webm", "audio/webm"), duration_ms: 1000
@@ -45,7 +45,7 @@ class VoiceFanoutTest < ActionDispatch::IntegrationTest
   end
 
   test "deleting a broadcast room keeps audio in another recipients room" do
-    sender = users(:one)
+    sender = users(:english_speaker)
     extra = User.create!(oauth_provider: :google, oauth_uid: "fanout-extra", email_address: "extra@example.com",
       mother_language: languages(:korean), learning_language: languages(:english))
     sign_in_as sender

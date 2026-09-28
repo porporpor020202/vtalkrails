@@ -2,7 +2,7 @@ require "test_helper"
 
 class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @sender = users(:one)
+    @sender = users(:english_speaker)
     @recipient = User.create!(
       email_address: "active-listener@example.com",
       oauth_provider: :google, oauth_uid: SecureRandom.uuid,

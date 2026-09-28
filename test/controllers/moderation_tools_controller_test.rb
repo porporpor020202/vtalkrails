@@ -2,8 +2,8 @@ require "test_helper"
 
 class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @reporter = users(:one)
-    @reported_user = users(:two)
+    @reporter = users(:english_speaker)
+    @reported_user = users(:korean_learner)
     @room = Room.create!(
       language: languages(:english),
       user: @reporter,

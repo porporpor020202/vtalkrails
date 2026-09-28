@@ -7,8 +7,8 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "language settings persist and display the saved selections" do
-    user = users(:one)
-    other_user = users(:two)
+    user = users(:english_speaker)
+    other_user = users(:korean_learner)
     other_languages = other_user.attributes.slice("mother_language_id", "learning_language_id")
     original_email = user.email_address
     sign_in_as user
@@ -33,7 +33,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "invalid languages show errors without partially saving either preference" do
-    user = users(:one)
+    user = users(:english_speaker)
     user.update!(mother_language: @korean, learning_language: @english)
     sign_in_as user
     missing_id = Language.maximum(:id) + 1
@@ -50,7 +50,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "language preferences cannot be cleared" do
-    user = users(:one)
+    user = users(:english_speaker)
     user.update!(mother_language: @korean, learning_language: @english)
     sign_in_as user
 
@@ -62,7 +62,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "language updates require sign in" do
-    user = users(:one)
+    user = users(:english_speaker)
     original_languages = user.attributes.slice("mother_language_id", "learning_language_id")
 
     patch settings_path, params: { user: { mother_language_id: @korean.id, learning_language_id: @english.id } }
@@ -83,7 +83,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "signed in user can access child safety reporting and standards" do
-    sign_in_as users(:one)
+    sign_in_as users(:english_speaker)
 
     get settings_path
 

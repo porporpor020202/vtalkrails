@@ -2,7 +2,7 @@ require "test_helper"
 
 class RoomsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @deleter = users(:one)
+    @deleter = users(:english_speaker)
     @recipient = User.create!(
       email_address: "room-recipient@example.com",
       oauth_provider: :google, oauth_uid: SecureRandom.uuid,

@@ -5,7 +5,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
-    @sender = users(:one)
+    @sender = users(:english_speaker)
     @english = languages(:english)
     @korean = languages(:korean)
   end
@@ -65,7 +65,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   end
 
   test "no recipients creates no batch or blob" do
-    UserBlock.create!(blocker: @sender, blocked: users(:two))
+    UserBlock.create!(blocker: @sender, blocked: users(:korean_learner))
     assert_no_difference(["VoiceDrop.count", "Room.count", "ActiveStorage::Blob.count"]) do
       assert_raises(VoiceDropDispatcher::NoRecipientAvailable) { send_drop }
     end
