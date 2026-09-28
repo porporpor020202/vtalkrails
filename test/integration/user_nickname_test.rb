@@ -27,7 +27,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
     original = user.reload.attributes.slice("display_name")
     assert original.values.all?(&:present?)
     login_nickname_user(user)
-    get profile_path
+    get settings_path
     assert_response :success
     delete session_path
     assert_redirected_to new_session_path
@@ -44,7 +44,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
       end
       login_nickname_user(returning_user)
       Current.reset
-      get profile_path
+      get settings_path
       assert_response :success
       assert_select "h2", text: original.fetch("display_name")
       assert_equal original, User.find(user.id).attributes.slice("display_name")
@@ -74,6 +74,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
   private
 
   def login_nickname_user(user)
+    user.update!(mother_language: languages(:korean), learning_language: languages(:english))
     Current.reset
     get authenticate_by_token_google_oauth_sessions_path,
       params: { token: user.signed_id(purpose: :native_auth, expires_in: 5.minutes) }
@@ -85,7 +86,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
     assert_equal path, UserDisplayNameGenerator.image_path_for(user.reload.display_name)
     assert Rails.root.join("app/assets/images", path).file?, "이미지 파일이 없습니다: #{path}"
     login_nickname_user(user)
-    get profile_path
+    get settings_path
     assert_response :success
     assert_select "h2", text: user.display_name, count: 1 do |headings|
       profile = headings.first.parent.parent

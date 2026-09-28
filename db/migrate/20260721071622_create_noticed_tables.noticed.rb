@@ -4,6 +4,7 @@ class CreateNoticedTables < ActiveRecord::Migration[6.1]
     primary_key_type, foreign_key_type = primary_and_foreign_key_types
     create_table :noticed_events, id: primary_key_type do |t|
       t.string :type
+      t.integer :notifications_count
       t.belongs_to :record, polymorphic: true, type: foreign_key_type
       if t.respond_to?(:jsonb)
         t.jsonb :params

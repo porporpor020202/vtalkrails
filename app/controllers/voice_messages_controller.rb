@@ -21,7 +21,7 @@ class VoiceMessagesController < ApplicationController
       @room.update!(last_sender: current_user, last_message_at: Time.current)
     end
 
-    render json: { redirect_url: room_path(@room) }, status: :created
+    render json: { redirect_url: room_path(@room, tab: selected_language_tab) }, status: :created
   rescue ActionController::ParameterMissing, KeyError
     render json: { error: "A recorded voice message is required" }, status: :bad_request
   rescue ActiveRecord::RecordInvalid => e

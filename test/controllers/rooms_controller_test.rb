@@ -5,7 +5,8 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     @deleter = users(:one)
     @recipient = User.create!(
       email_address: "room-recipient@example.com",
-      oauth_provider: :google, oauth_uid: SecureRandom.uuid
+      oauth_provider: :google, oauth_uid: SecureRandom.uuid,
+      mother_language: languages(:korean), learning_language: languages(:english)
     )
     @room = Room.create!(
       language: languages(:english),
@@ -22,10 +23,10 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
 
   test "deleting a room removes its voice and hides it from the deleter" do
     assert_difference [ "VoiceMessage.count", "ActiveStorage::Blob.count" ], -1 do
-      delete room_path(@room)
+      perform_enqueued_jobs { delete room_path(@room) }
     end
 
-    assert_redirected_to rooms_path
+    assert_redirected_to rooms_path(tab: "learning")
     assert @room.reload.deleted?
     assert_equal @deleter.id, @room.deleted_by_id
     assert_not ActiveStorage::Attachment.exists?(record: @message)
@@ -34,7 +35,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     get rooms_path
     assert_no_match @recipient.display_name, response.body
     get room_path(@room)
-    assert_redirected_to rooms_path
+    assert_redirected_to rooms_path(tab: "learning")
   end
 
   test "language filtering still excludes rooms belonging to other users" do
@@ -43,15 +44,15 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     private_room = Room.create!(user: @recipient, opponent: stranger,
       language: languages(:english))
 
-    get rooms_path(language_id: languages(:english).id)
+    get rooms_path(tab: "learning")
 
     assert_response :success
-    assert_select "a[href='#{room_path(@room)}']"
-    assert_select "a[href='#{room_path(private_room)}']", count: 0
+    assert_select "a[href='#{room_path(@room, tab: "learning")}']"
+    assert_select "a[href='#{room_path(private_room, tab: "learning")}']", count: 0
   end
 
-  test "an unknown language does not return an unfiltered list" do
-    get rooms_path(language_id: -1)
+  test "an unknown tab does not return an unfiltered list" do
+    get rooms_path(tab: "unknown")
 
     assert_response :not_found
   end
@@ -63,7 +64,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
 
     get rooms_path
     assert_response :success
-    assert_select "a[href='#{room_path(@room)}']"
+    assert_select "a[href='#{room_path(@room, tab: "learning")}']"
     assert_select "p", text: /no longer wants to continue this conversation/
 
     get room_path(@room)
@@ -77,7 +78,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-confirmation-modal-target='confirmButton']", text: "Delete", count: 1
 
     delete room_path(@room)
-    assert_redirected_to rooms_path
+    assert_redirected_to rooms_path(tab: "learning")
     assert @room.reload.dismissed_by_id == @recipient.id
     get rooms_path
     assert_no_match @deleter.display_name, response.body

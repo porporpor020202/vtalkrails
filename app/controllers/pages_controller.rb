@@ -1,4 +1,5 @@
 class PagesController < ApplicationController
+  skip_before_action :require_language_setup
   allow_unauthenticated_access
   before_action :set_privacy_contact, only: %i[privacy child_safety delete_account]
   before_action :set_support_contact, only: :support

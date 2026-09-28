@@ -4,6 +4,7 @@ class UserBlocksController < ApplicationController
     blocked_user = room.opponent_for(current_user)
 
     ApplicationRecord.transaction do
+      User.where(id: [current_user.id, blocked_user.id]).order(:id).lock.load
       UserBlock.find_or_create_by!(blocker: current_user, blocked: blocked_user)
 
       Room.between(current_user, blocked_user).where.not(status: :deleted).find_each do |active_room|

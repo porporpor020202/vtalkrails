@@ -1,0 +1,45 @@
+<% content_for :title, "#{@language.name} Community" %>
+<section class="flex min-h-full flex-1 flex-col bg-slate-50 px-5 pb-8 pt-[max(1.5rem,env(safe-area-inset-top))]">
+  <%= render "shared/language_header", language: @language, mode: :community %>
+  <%= link_to "← All posts", language_posts_path(@language, tab: selected_language_tab), class: "mb-4 text-sm font-semibold text-slate-500" %>
+  <%= render "posts/post", post: @post %>
+
+  <h2 class="mb-3 mt-6 px-1 text-sm font-extrabold text-slate-800">Comments (<%= @post.comments_count %>)</h2>
+  <% if params[:after].present? %>
+    <%= link_to "First comments", language_post_path(@language, @post, tab: selected_language_tab), class: "mb-3 text-sm font-semibold text-indigo-600" %>
+  <% end %>
+  <div class="space-y-3">
+    <% @comments.each do |comment| %>
+      <article id="comment_<%= comment.id %>" class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="flex items-center gap-2">
+          <div class="shrink-0" aria-hidden="true"><%= profile_icon_tag(comment.user, size: 28) %></div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-xs font-bold text-slate-950"><%= comment.user.display_name %></p>
+            <time datetime="<%= comment.created_at.iso8601 %>" class="text-[10px] text-slate-400"><%= time_ago_in_words(comment.created_at) %> ago</time>
+          </div>
+          <% if comment.user_id == current_user.id %>
+            <%= button_to "Delete", language_post_comment_path(@language, @post, comment, tab: selected_language_tab), method: :delete,
+                  form: { data: { turbo_confirm: "Delete this comment?" } }, class: "px-2 py-2 text-xs font-semibold text-rose-600", aria: { label: "Delete comment" } %>
+          <% end %>
+        </div>
+        <p class="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-slate-800"><%= comment.body %></p>
+      </article>
+    <% end %>
+    <% if @comments.empty? %>
+      <p class="px-1 text-sm text-slate-500">No comments yet. Be the first to reply.</p>
+    <% end %>
+  </div>
+  <% if @more_comments %>
+    <%= link_to "More comments", language_post_path(@language, @post, tab: selected_language_tab, after: @comments.last.id), class: "mt-4 py-2 text-sm font-bold text-indigo-600" %>
+  <% end %>
+
+  <%= form_with model: @comment, url: language_post_comments_path(@language, @post, tab: selected_language_tab), class: "mt-6 rounded-3xl border border-slate-200 bg-white p-5" do |form| %>
+    <%= form.label :body, "Write a comment", class: "mb-3 block text-sm font-bold text-slate-950" %>
+    <% if @comment.errors.any? %>
+      <p role="alert" class="mb-3 text-sm text-rose-600"><%= @comment.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form.text_area :body, rows: 3, maxlength: 500, required: true, placeholder: "Join the conversation…",
+          class: "w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+    <%= form.submit "Comment", class: "mt-3 w-full cursor-pointer rounded-xl bg-slate-900 py-3 text-sm font-bold text-white", data: { turbo_submits_with: "Posting…" } %>
+  <% end %>
+</section>

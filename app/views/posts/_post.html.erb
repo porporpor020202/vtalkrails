@@ -1,0 +1,19 @@
+<article id="post_<%= post.id %>" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="flex items-center gap-3">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50" aria-hidden="true"><%= profile_icon_tag(post.user, size: 32) %></div>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-sm font-bold text-slate-950"><%= post.user.display_name %></p>
+      <time datetime="<%= post.created_at.iso8601 %>" class="text-xs text-slate-400"><%= time_ago_in_words(post.created_at) %> ago</time>
+    </div>
+    <% if post.user_id == current_user.id %>
+      <%= button_to "Delete", language_post_path(@language, post, tab: selected_language_tab), method: :delete,
+            form: { data: { turbo_confirm: "Delete this post and its comments?" } },
+            class: "rounded-lg px-2 py-2 text-xs font-semibold text-rose-600", aria: { label: "Delete post" } %>
+    <% end %>
+  </div>
+  <p class="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-slate-800"><%= post.body %></p>
+  <% if local_assigns.fetch(:preview, false) %>
+    <%= link_to "Comments (#{post.comments_count})", language_post_path(@language, post, tab: selected_language_tab),
+          class: "mt-4 inline-flex py-1 text-sm font-bold text-indigo-600" %>
+  <% end %>
+</article>

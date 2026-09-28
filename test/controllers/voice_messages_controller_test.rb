@@ -14,6 +14,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
   test "creates a random voice drop and room" do
     assert_difference [ "Room.count", "VoiceMessage.count" ], 1 do
       post voice_drop_path, params: {
+        request_key: SecureRandom.uuid,
         voice_message: {
           audio: fixture_file_upload("sample.webm", "audio/webm"),
           duration_ms: 3_500
@@ -37,6 +38,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference "VoiceMessage.count", 1 do
       post room_voice_messages_path(room), params: {
+        request_key: SecureRandom.uuid,
         voice_message: {
           audio: fixture_file_upload("sample.webm", "audio/webm"),
           duration_ms: 2_000
@@ -49,6 +51,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_difference "VoiceMessage.count" do
       post room_voice_messages_path(room), params: {
+        request_key: SecureRandom.uuid,
         voice_message: {
           audio: fixture_file_upload("sample.webm", "audio/webm"),
           duration_ms: 2_000
@@ -61,10 +64,11 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "creates a voice drop in the language selected on Say" do
     korean = languages(:korean)
-    get rooms_path(language_id: korean.id)
+    get rooms_path(tab: "mother")
 
     assert_difference "Room.count", 1 do
       post voice_drop_path, params: {
+        request_key: SecureRandom.uuid,
         voice_message: {
           audio: fixture_file_upload("sample.webm", "audio/webm"),
           duration_ms: 2_000
@@ -77,9 +81,10 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "uses the recording page language even if another tab changes the selection" do
-    get rooms_path(language_id: languages(:korean).id)
+    get rooms_path(tab: "mother")
 
-    post voice_drop_path(language_id: languages(:spanish).id), params: {
+    post voice_drop_path(tab: "learning"), params: {
+      request_key: SecureRandom.uuid,
       voice_message: {
         audio: fixture_file_upload("sample.webm", "audio/webm"),
         duration_ms: 2_000
@@ -87,7 +92,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     }, as: :multipart
 
     assert_response :created
-    assert_equal languages(:spanish), Room.order(:id).last.language
+    assert_equal languages(:english), Room.order(:id).last.language
   end
 
   test "does not allow a stranger to post in a room" do
@@ -95,6 +100,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     room = Room.create!(language: languages(:english), user: @recipient, opponent: stranger, last_sender: stranger)
 
     post room_voice_messages_path(room), params: {
+      request_key: SecureRandom.uuid,
       voice_message: {
         audio: fixture_file_upload("sample.webm", "audio/webm"),
         duration_ms: 2_000
@@ -120,7 +126,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "button", text: /Drop a voice/
-    assert_select "a[href='#{room_path(room)}']"
+    assert_select "a[href='#{room_path(room, tab: "learning")}']"
 
     get room_path(room)
 

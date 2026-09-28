@@ -1,4 +1,5 @@
 class AppleOauthSessionsController < ApplicationController
+  skip_before_action :require_language_setup
   skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
   before_action :verify_oauth_state, only: [ :callback ]
@@ -155,7 +156,7 @@ class AppleOauthSessionsController < ApplicationController
     cookies.delete(:apple_oauth_return_to, same_site: :none, secure: secure_cookie)
 
     session.delete(:return_to_after_authenticating)
-    return_url.presence || root_url
+    current_user.language_setup_complete? ? (return_url.presence || root_url) : language_setup_url
   end
 
   def stored_nonce

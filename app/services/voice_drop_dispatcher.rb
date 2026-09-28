@@ -1,82 +1,77 @@
 class VoiceDropDispatcher
-  ACTIVE_WINDOW = 7.days
-  RECENT_WINDOW = 24.hours
-  MAX_PENDING_ROOMS = 3
-  CANDIDATE_LIMIT = 100
-
   class NoRecipientAvailable < StandardError; end
+  class RequestConflict < StandardError; end
 
-  def initialize(sender, language: Language.find_by!(code: "en"))
-    @sender = sender
-    @language = language
+  def initialize(sender, language:)
+    @sender, @language = sender, language
+    @config = Rails.application.config_for(:voice_matching)
   end
 
-  def call(audio:, duration_ms:)
-    ranked_candidates.each do |recipient|
-      room = create_room_with_message(recipient, audio:, duration_ms:)
-      return room if room
-    end
+  def call(audio:, duration_ms:, request_key:)
+    existing = VoiceDrop.find_by(sender: @sender, request_key: request_key)
+    return replay(existing) if existing
 
-    # Previous production message while the active-user filter was enabled:
-    # raise NoRecipientAvailable, "No active listener is available right now"
-    raise NoRecipientAvailable, "No listener account is available right now"
+    candidate_drop = VoiceDrop.new(sender: @sender, language: @language, request_key: request_key)
+    candidate_drop.validate!
+    selector = VoiceMatching::RecipientSelector.new(sender: @sender, language: @language)
+    candidates = selector.call(limit: @config.fetch(:recipient_limit) * @config.fetch(:reserve_multiplier))
+    raise NoRecipientAvailable, "No available listeners for this language right now." if candidates.empty?
+
+    blob = upload_validated_audio(audio, duration_ms, candidates.first)
+    ApplicationRecord.transaction do
+      # Global ID ordering prevents deadlocks between simultaneous senders.
+      users = User.where(id: [@sender.id, *candidates.map(&:id)]).order(:id).lock.to_a
+      @sender.reload
+      unless @sender.language_setup_complete? && [@sender.mother_language_id, @sender.learning_language_id].include?(@language.id)
+        raise RequestConflict, "Your language settings changed. Please record again."
+      end
+      existing = VoiceDrop.find_by(sender: @sender, request_key: request_key)
+      next replay(existing) if existing
+
+      allowed = VoiceMatching::CandidateQuery.new(sender: @sender, language: @language).call
+        .where(id: candidates.map(&:id)).pluck(:id)
+      stats = VoiceMatching::RecipientStats.new(users, config: @config).call
+      recipients = candidates.select do |user|
+        allowed.include?(user.id) && stats.fetch(user.id)[:pending_conversations] < @config.fetch(:max_pending_conversations)
+      end.take(@config.fetch(:recipient_limit))
+      raise NoRecipientAvailable, "No available listeners for this language right now." if recipients.empty?
+
+      drop = VoiceDrop.create!(sender: @sender, language: @language, request_key: request_key, recipient_count: recipients.size)
+      recipients.each do |recipient|
+        room = Room.create!(language: @language, user: @sender, opponent: recipient,
+          status: :waiting, last_sender: @sender, last_message_at: Time.current)
+        drop.voice_deliveries.create!(recipient: recipient, room: room)
+        message = room.voice_messages.build(sender: @sender, duration_ms: duration_ms)
+        message.audio.attach(blob)
+        message.save!
+      end
+      drop
+    end
+  ensure
+    # A failed transaction or a concurrent retry must not leave an uploaded orphan.
+    blob.purge if blob&.persisted? && !blob.attachments.exists?
   end
 
   private
 
-  attr_reader :sender, :language
-
-  def ranked_candidates
-    User.all
-      # Store review: keep registered Apple and Google review accounts eligible
-      # even when either account has not been active during the last 7 days.
-      # Re-enable this scope after review if recent activity should be required:
-      # .active_since(ACTIVE_WINDOW.ago)
-      .where.not(id: sender.id)
-      .where.not(id: UserBlock.where(blocker: sender).select(:blocked_id))
-      .where.not(id: UserBlock.where(blocked: sender).select(:blocker_id))
-      .order(last_active_at: :desc)
-      .limit(CANDIDATE_LIMIT)
-      # A deleted conversation should not block a new voice drop between the
-      # same users. Only an active room means this pair is already engaged.
-      .reject { |candidate| active_room_between?(candidate) }
-      .map { |candidate| [ candidate, pending_room_count(candidate), candidate.last_active_at ] }
-      .select { |_, pending_count, _| pending_count < MAX_PENDING_ROOMS }
-      .sort_by { |_, pending_count, last_active_at| [ last_active_at.nil? || last_active_at < RECENT_WINDOW.ago ? 1 : 0, pending_count, rand ] }
-      .map(&:first)
+  def replay(drop)
+    raise RequestConflict, "This recording was already sent in another language." if drop.language_id != @language.id
+    drop
   end
 
-  def pending_room_count(candidate)
-    Room.involving(candidate)
-      .where.not(last_sender_id: nil)
-      .where.not(last_sender_id: candidate.id)
-      .count
-  end
-
-  def create_room_with_message(recipient, audio:, duration_ms:)
-    room = nil
-
-    ApplicationRecord.transaction do
-      User.where(id: [ sender.id, recipient.id ]).order(:id).lock.load
-      next if active_room_between?(recipient)
-
-      room = Room.create!(
-        language: language,
-        user: sender,
-        opponent: recipient,
-        status: :waiting,
-        last_sender: sender,
-        last_message_at: Time.current
-      )
-      message = room.voice_messages.build(sender:, duration_ms:)
-      message.audio.attach(audio)
-      message.save!
-    end
-
-    room
-  end
-
-  def active_room_between?(recipient)
-    Room.between(sender, recipient).where.not(status: :deleted).exists?
+  def upload_validated_audio(audio, duration_ms, recipient)
+    probe = VoiceMessage.new(sender: @sender, duration_ms: duration_ms,
+      room: Room.new(user: @sender, opponent: recipient, language: @language))
+    probe.audio.attach(audio)
+    probe.validate!
+    blob = probe.audio.blob
+    blob.save!
+    io = audio.respond_to?(:tempfile) ? audio.tempfile : audio.fetch(:io)
+    io.rewind
+    blob.upload_without_unfurling(io)
+    blob
+  rescue
+    blob&.purge if blob&.persisted?
+    raise
   end
 end

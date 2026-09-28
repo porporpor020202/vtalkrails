@@ -1,8 +1,10 @@
 class RoomsController < ApplicationController
-  include SayLanguageSelection
-
   def index
+    session[:conversation_mode] = "voice"
+    session[:language_tab] = selected_language_tab
+    @language = selected_say_language
     @rooms = Room.visible_to(current_user)
+      .where(language_id: @language.id)
       .includes(:user, :opponent, :last_sender, voice_messages: { audio_attachment: :blob })
       .order(Arel.sql("COALESCE(last_message_at, rooms.updated_at) DESC"))
       .to_a
@@ -15,7 +17,7 @@ class RoomsController < ApplicationController
       .find(params[:id])
 
     if @room.hidden_for?(current_user)
-      redirect_to rooms_path, status: :see_other
+      redirect_to rooms_path(tab: selected_language_tab), status: :see_other
       return
     end
 
@@ -32,7 +34,6 @@ class RoomsController < ApplicationController
         @room.update!(dismissed_by: current_user) unless @room.deleted_by?(current_user)
       else
         @room.voice_messages.find_each do |message|
-          message.audio.purge if message.audio.attached?
           message.destroy!
         end
 
@@ -45,6 +46,6 @@ class RoomsController < ApplicationController
       end
     end
 
-    redirect_to rooms_path, status: :see_other
+    redirect_to rooms_path(tab: selected_language_tab), status: :see_other
   end
 end

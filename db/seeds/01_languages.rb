@@ -1,8 +1,7 @@
 [
-  { name: "English", code: "en", enabled: true },
-  { name: "Korean", code: "ko", enabled: true },
-  { name: "French", code: "fr", enabled: false },
-  { name: "Spanish", code: "es", enabled: false }
+  { name: "English", code: "en" },
+  { name: "Korean", code: "ko" }
 ].each do |attributes|
-  Language.find_or_create_by!(attributes)
+  language = Language.find_or_initialize_by(code: attributes[:code])
+  language.update!(name: attributes[:name])
 end

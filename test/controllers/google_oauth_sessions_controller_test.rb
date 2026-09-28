@@ -1,6 +1,6 @@
 require "test_helper"
 require "minitest/mock"
-require_relative "../test_helpers/google_oauth_test_config"
+require_relative "../test_helpers/oauth_test_config"
 
 class GoogleOauthClient
   class << self
@@ -43,7 +43,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   # --- Web Platform Flow ---
 
-  GoogleOauthTestConfig::GOOGLE_LOGIN_ORIGINS.each do |origin|
+  OAuthTestConfig::LOGIN_ORIGINS.each do |origin|
     test "r_#{origin}에 따른 올바른 Google 인증 요청을 만든다" do
       uri = URI.parse(origin)
       host! uri.authority
@@ -85,7 +85,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil cookies[:session_id]
   end
 
-  test "r_google sign_in success redirects to root_path for web" do
+  test "r_google first sign in redirects to language setup for web" do
     post google_oauth_sessions_path, params: { platform: "web" }
     assert_redirected_to %r{https://accounts.google.com/o/oauth2/v2/auth}
 
@@ -96,11 +96,14 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
     get callback_google_oauth_sessions_path, params: { code: "dummy_code", state: state }
 
-    assert_redirected_to root_path
+    assert_redirected_to language_setup_path
     assert cookies[:session_id].present?
   end
 
   test "r_비로그인 상태에서 보호된 페이지 접근 후 Google 로그인 성공 시 원래 요청 페이지로 리다이렉트된다" do
+    User.create!(oauth_provider: :google, oauth_uid: "google-test-user",
+      email_address: "google-test@example.com",
+      mother_language: languages(:korean), learning_language: languages(:english))
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 
@@ -139,7 +142,7 @@ class GoogleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     verifier.verify
-    assert_redirected_to root_path
+    assert_redirected_to language_setup_path
     assert cookies[:session_id].present?
     assert_nil session[:google_oauth_nonce]
     assert_nil session[:google_oauth_state]

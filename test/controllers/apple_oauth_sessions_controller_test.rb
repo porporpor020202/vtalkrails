@@ -1,5 +1,5 @@
 require "test_helper"
-require_relative "../test_helpers/apple_oauth_test_config"
+require_relative "../test_helpers/oauth_test_config"
 
 class AppleOauthClient
   class << self
@@ -45,7 +45,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   # --- Web Platform Flow ---
 
-  AppleOauthTestConfig::APPLE_LOGIN_ORIGINS.each do |origin|
+  OAuthTestConfig::LOGIN_ORIGINS.each do |origin|
     test "r_#{origin}에 따른 올바른 Apple 인증 요청을 만든다" do
       uri = URI.parse(origin)
       host! uri.authority
@@ -93,7 +93,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil cookies[:session_id]
   end
 
-  test "r_apple sign_in success redirects to root_path for web" do
+  test "r_apple first sign in redirects to language setup for web" do
     post apple_oauth_sessions_path, params: { platform: "web" }
     assert_redirected_to %r{https://appleid.apple.com/auth/authorize}
 
@@ -106,11 +106,14 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
     post callback_apple_oauth_sessions_path, params: { code: "dummy_code", state: state }
 
-    assert_redirected_to root_path
+    assert_redirected_to language_setup_path
     assert cookies[:session_id].present?
   end
 
   test "r_비로그인 상태에서 보호된 페이지 접근 후 Apple 로그인 성공 시 원래 요청 페이지로 리다이렉트된다" do
+    User.create!(oauth_provider: :apple, oauth_uid: "apple-test-user",
+      email_address: "apple-test@example.com",
+      mother_language: languages(:korean), learning_language: languages(:english))
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 

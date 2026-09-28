@@ -10,7 +10,7 @@ class NativeGoogleVoiceConversationTest < ActionDispatch::IntegrationTest
     recipient_user = google_sign_in(recipient, "voice-recipient")
     original_name = sender_user.display_name
 
-    sender.post voice_drop_path, params: { voice_message: voice_upload }, as: :multipart
+    sender.post voice_drop_path, params: { request_key: SecureRandom.uuid, voice_message: voice_upload }, as: :multipart
     assert_equal 201, sender.response.status
     room = Room.last
     assert_equal recipient_user, room.opponent_for(sender_user)
@@ -20,7 +20,7 @@ class NativeGoogleVoiceConversationTest < ActionDispatch::IntegrationTest
     assert_includes recipient.response.body, sender_user.display_name
     assert room.voice_messages.first.audio.download.present?
 
-    recipient.post room_voice_messages_path(room), params: { voice_message: voice_upload }, as: :multipart
+    recipient.post room_voice_messages_path(room), params: { request_key: SecureRandom.uuid, voice_message: voice_upload }, as: :multipart
     assert_equal 201, recipient.response.status
     assert_equal recipient_user, room.reload.last_sender
     assert_equal 2, room.voice_messages.count
@@ -53,6 +53,11 @@ class NativeGoogleVoiceConversationTest < ActionDispatch::IntegrationTest
     token = browser.response.parsed_body.fetch("token")
     browser.get authenticate_by_token_google_oauth_sessions_path, params: { token: token }
     assert_equal 302, browser.response.status
+    user = User.find_by!(oauth_provider: :google, oauth_uid: uid)
+    unless user.language_setup_complete?
+      browser.patch language_setup_path, params: { user: { mother_language_id: languages(:korean).id, learning_language_id: languages(:english).id } }
+      assert_equal 303, browser.response.status
+    end
     browser.follow_redirect!
     assert_equal 200, browser.response.status
     User.find_by!(oauth_provider: :google, oauth_uid: uid)

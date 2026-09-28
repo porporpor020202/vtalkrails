@@ -16,6 +16,8 @@ class VoiceMessage < ApplicationRecord
 
   has_one_attached :audio
 
+  after_create :record_first_reply
+
   validates :duration_ms,
     numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: MAX_DURATION_MS }
   validate :sender_must_belong_to_room
@@ -26,6 +28,11 @@ class VoiceMessage < ApplicationRecord
   end
 
   private
+
+  def record_first_reply
+    VoiceDelivery.where(room_id: room_id, recipient_id: sender_id, first_replied_at: nil)
+      .update_all(first_replied_at: created_at)
+  end
 
   def sender_must_belong_to_room
     return if room.blank? || sender.blank?

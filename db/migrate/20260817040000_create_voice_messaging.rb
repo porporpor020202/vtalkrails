@@ -1,12 +1,23 @@
 class CreateVoiceMessaging < ActiveRecord::Migration[8.1]
   def change
-    add_column :users, :last_active_at, :datetime
-    add_index :users, :last_active_at
+    create_table :voice_drops do |t|
+      t.references :sender, null: false, foreign_key: { to_table: :users }
+      t.references :language, null: false, foreign_key: true
+      t.string :request_key, null: false
+      t.integer :recipient_count, null: false, default: 0
+      t.timestamps
+      t.index [:sender_id, :request_key], unique: true
+    end
 
-    add_reference :rooms, :last_sender, foreign_key: { to_table: :users }
-    add_column :rooms, :last_message_at, :datetime
-    add_index :rooms, [ :user_id, :opponent_id ]
-    add_index :rooms, :last_message_at
+    create_table :voice_deliveries do |t|
+      t.references :voice_drop, null: false, foreign_key: true
+      t.references :recipient, null: false, foreign_key: { to_table: :users }
+      t.references :room, foreign_key: true, index: { unique: true }
+      t.datetime :first_replied_at
+      t.timestamps
+      t.index [:voice_drop_id, :recipient_id], unique: true
+      t.index [:recipient_id, :created_at]
+    end
 
     create_table :voice_messages do |t|
       t.references :room, null: false, foreign_key: true

@@ -97,9 +97,10 @@ export default class extends Controller {
 
     this.sendButtonTarget.disabled = true
     this.sendButtonTarget.textContent = "Sending…"
-    this.statusTarget.textContent = "Finding an active listener…"
+    this.statusTarget.textContent = "Sending your voice…"
 
     const formData = new FormData()
+    formData.append("request_key", this.requestKey)
     formData.append("voice_message[audio]", this.audioBlob, `voice-message.${this.fileExtension(this.audioBlob.type)}`)
     formData.append("voice_message[duration_ms]", String(this.durationMs))
 
@@ -114,6 +115,10 @@ export default class extends Controller {
         credentials: "same-origin"
       })
       const payload = await response.json()
+      if (response.status === 403 && payload.redirect_url) {
+        window.Turbo.visit(payload.redirect_url)
+        return
+      }
       if (!response.ok) throw new Error(payload.error || "Unable to send this voice message.")
 
       this.releaseMedia()
@@ -138,6 +143,7 @@ export default class extends Controller {
     this.tick()
     const type = this.recorder?.mimeType || this.chunks[0]?.type || "audio/webm"
     this.audioBlob = new Blob(this.chunks, { type })
+    this.requestKey = crypto.randomUUID()
     this.releaseStream()
 
     if (this.audioBlob.size === 0) {
@@ -188,6 +194,7 @@ export default class extends Controller {
   reset() {
     this.chunks = []
     this.audioBlob = null
+    this.requestKey = null
     this.durationMs = 0
     this.recorder = null
     this.timerTarget.textContent = "00:00"

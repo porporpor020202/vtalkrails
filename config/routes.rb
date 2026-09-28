@@ -29,7 +29,15 @@ Rails.application.routes.draw do
   end
   resource :voice_drop, only: :create
 
-  resource :settings, only: [ :show ], controller: "settings"
+  resources :languages, only: [] do
+    resources :posts, only: %i[index show create destroy] do
+      resources :comments, only: %i[create destroy]
+    end
+  end
+
+  resource :language_setup, only: %i[show update]
+
+  resource :settings, only: %i[show update], controller: "settings"
 
   resource :profile, only: [ :show ], controller: "profile"
   resource :account, only: [ :destroy ]

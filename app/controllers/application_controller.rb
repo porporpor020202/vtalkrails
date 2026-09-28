@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include SayLanguageSelection
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   # allow_browser versions: :modern
 
@@ -7,6 +8,7 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  before_action :require_language_setup
   before_action :track_user_activity
 
   helper_method :native_app?, :android_app?, :ios_app?
@@ -27,10 +29,20 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def track_user_activity
-    return unless Current.user
-    return if Current.user.last_active_at && Current.user.last_active_at > 5.minutes.ago
+  def require_language_setup
+    return unless current_user
+    return if current_user.language_setup_complete?
 
-    Current.user.update_column(:last_active_at, Time.current)
+    if request.format.json?
+      render json: { error: "Choose your languages before continuing.", redirect_url: language_setup_path }, status: :forbidden
+    else
+      redirect_to language_setup_path, status: :see_other
+    end
+  end
+
+  def track_user_activity
+    return unless Current.user&.language_setup_complete?
+
+    VoiceMatching::ActivityTracker.call(Current.user, time_zone: cookies[:time_zone])
   end
 end

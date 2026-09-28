@@ -6,6 +6,7 @@ class Room < ApplicationRecord
   belongs_to :deleted_by, class_name: "User", optional: true
   belongs_to :dismissed_by, class_name: "User", optional: true
 
+  has_one :voice_delivery, dependent: :nullify
   has_many :voice_messages, dependent: :destroy
   has_many :content_reports, dependent: :destroy
 

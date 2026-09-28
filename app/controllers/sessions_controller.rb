@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_language_setup
   allow_unauthenticated_access only: :new
 
   def new

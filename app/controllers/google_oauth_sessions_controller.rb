@@ -1,5 +1,6 @@
 # https://developers.google.com/identity/openid-connect/openid-connect
 class GoogleOauthSessionsController < ApplicationController
+  skip_before_action :require_language_setup
   skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
 
