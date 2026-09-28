@@ -17,8 +17,6 @@ class GoogleOauthPageAccessTest < ApplicationSystemTestCase
 
   OAuthTestConfig::LOGIN_ORIGINS.each do |origin|
     test "r_#{origin}에서 Google OAuth 로그인 페이지에 접속할 수 있다" do
-      skip "CI 환경에서는 실제 사이트의 Google OAuth 페이지 접속 테스트를 실행하지 않습니다." if ENV["CI"]
-
       visit "#{origin}/session/new"
       assert_current_path "#{origin}/session/new", url: true, wait: 4
       assert_selector "button", text: "Continue with Google", wait: 4
