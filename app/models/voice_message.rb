@@ -15,6 +15,7 @@ class VoiceMessage < ApplicationRecord
   belongs_to :sender, class_name: "User", inverse_of: :voice_messages
 
   has_one_attached :audio
+  has_many :ai_assistances, foreign_key: :source_message_id, dependent: :destroy
 
   after_create :record_first_reply
 

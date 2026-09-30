@@ -17,7 +17,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
 
         assert user.persisted?
         assert_equal(index.zero? ? "Happy Raccoon" : "Happy Raccoon 2", user.reload.display_name)
-        assert_equal expected_nickname_icon("Raccoon"), UserDisplayNameGenerator.image_path_for(user.reload.display_name)
+        assert_equal expected_nickname_icon("Raccoon"), user.reload.profile_image_path_for
       end
     end
   end
@@ -74,7 +74,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
   private
 
   def login_nickname_user(user)
-    user.update!(mother_language: languages(:korean), learning_language: languages(:english))
+    user.update!(native_language: languages(:korean))
     Current.reset
     get authenticate_by_token_google_oauth_sessions_path,
       params: { token: user.signed_id(purpose: :native_auth, expires_in: 5.minutes) }
@@ -83,7 +83,7 @@ class UserNicknameTest < ActionDispatch::IntegrationTest
 
   def assert_nickname_profile(user, noun)
     path = expected_nickname_icon(noun)
-    assert_equal path, UserDisplayNameGenerator.image_path_for(user.reload.display_name)
+    assert_equal path, user.reload.profile_image_path_for
     assert Rails.root.join("app/assets/images", path).file?, "이미지 파일이 없습니다: #{path}"
     login_nickname_user(user)
     get settings_path

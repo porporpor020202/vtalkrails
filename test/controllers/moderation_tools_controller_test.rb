@@ -2,10 +2,9 @@ require "test_helper"
 
 class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @reporter = users(:english_speaker)
-    @reported_user = users(:korean_learner)
+    @reporter = users(:korean_native)
+    @reported_user = users(:english_native)
     @room = Room.create!(
-      language: languages(:english),
       user: @reporter,
       opponent: @reported_user,
       last_sender: @reported_user,
@@ -44,7 +43,7 @@ class ModerationToolsControllerTest < ActionDispatch::IntegrationTest
 
   test "nonparticipant cannot report a conversation" do
     outsider = User.create!(email_address: "outsider@example.com", oauth_provider: :google, oauth_uid: SecureRandom.uuid,
-      mother_language: languages(:korean), learning_language: languages(:english))
+      native_language: languages(:korean))
     sign_out
     sign_in_as outsider
 

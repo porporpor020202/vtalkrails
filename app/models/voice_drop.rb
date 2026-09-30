@@ -1,6 +1,5 @@
 class VoiceDrop < ApplicationRecord
   belongs_to :sender, class_name: "User"
-  belongs_to :language
   has_many :voice_deliveries, dependent: :destroy
   has_many :rooms, through: :voice_deliveries
 

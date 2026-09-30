@@ -1,48 +1,27 @@
 class ApplicationController < ActionController::Base
   include Authentication
-  include SayLanguageSelection
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   # allow_browser versions: :modern
-
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  before_action :require_language_setup
-  before_action :track_user_activity
-
   helper_method :native_app?, :android_app?, :ios_app?
 
-  protected
+  private
 
   def native_app?
     android_app? || ios_app?
   end
 
+  # TODO:앱스토어, 플레이스토어 업데이트 승인후에 레거시 제거할것.
   def android_app?
-    request.user_agent.to_s.include?("VtalkAndroid/")
+    agent = request.user_agent.to_s
+    agent.include?("vtalk/android/") || agent.include?("VtalkAndroid/")
   end
 
   def ios_app?
-    request.user_agent.to_s.include?("VtalkiOS/")
-  end
-
-  private
-
-  def require_language_setup
-    return unless current_user
-    return if current_user.language_setup_complete?
-
-    if request.format.json?
-      render json: { error: "Choose your languages before continuing.", redirect_url: language_setup_path }, status: :forbidden
-    else
-      redirect_to language_setup_path, status: :see_other
-    end
-  end
-
-  def track_user_activity
-    return unless Current.user&.language_setup_complete?
-
-    VoiceMatching::ActivityTracker.call(Current.user, time_zone: cookies[:time_zone])
+    agent = request.user_agent.to_s
+    agent.include?("vtalk/ios/") || agent.include?("VtalkiOS/")
   end
 end

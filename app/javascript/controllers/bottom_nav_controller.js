@@ -3,7 +3,6 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="bottom-nav"
 export default class extends Controller {
   static targets = [ "link" ]
-  static values = { tab: String }
 
   connect() {
     this.updateActiveTab()
@@ -25,10 +24,9 @@ export default class extends Controller {
       const linkUrl = new URL(link.href, window.location.origin)
       const linkPath = linkUrl.pathname
 
-      const tab = this.tabValue || "learning"
-      const languagePage = currentPath === "/rooms" || currentPath.startsWith("/rooms/") || /^\/languages\/[^/]+\/posts(?:\/|$)/.test(currentPath)
+      const sayPage = currentPath === "/rooms" || currentPath.startsWith("/rooms/")
       const isActive = link.dataset.bottomNavTab
-        ? languagePage && link.dataset.bottomNavTab === tab
+        ? sayPage
         : currentPath === linkPath || currentPath === "/profile"
 
       if (isActive) {

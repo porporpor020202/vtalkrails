@@ -1,15 +1,1 @@
 @import "tailwindcss";
-
-@theme {
-    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-}
-
-html {
-    background: #f1f5f9;
-}
-
-html,
-body {
-    min-height: 100%;
-    overscroll-behavior: none;
-}

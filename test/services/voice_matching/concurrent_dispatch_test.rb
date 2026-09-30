@@ -19,7 +19,7 @@ class ConcurrentDispatchTest < ActiveSupport::TestCase
     create_user("recipient")
     key = SecureRandom.uuid
     ids = concurrently(2) do
-      VoiceDropDispatcher.new(User.find(sender.id), language: @language).call(
+      VoiceDropDispatcher.new(User.find(sender.id)).call(
         audio: audio_upload, duration_ms: 1000, request_key: key).id
     end
     assert_equal 1, ids.uniq.size
@@ -34,7 +34,7 @@ class ConcurrentDispatchTest < ActiveSupport::TestCase
     create_user("recipient")
     outcomes = concurrently(2) do
       begin
-        VoiceDropDispatcher.new(User.find(sender.id), language: @language).call(
+        VoiceDropDispatcher.new(User.find(sender.id)).call(
           audio: audio_upload, duration_ms: 1000, request_key: SecureRandom.uuid)
         :sent
       rescue VoiceDropDispatcher::NoRecipientAvailable
@@ -42,7 +42,7 @@ class ConcurrentDispatchTest < ActiveSupport::TestCase
       end
     end
     assert_includes outcomes, :sent
-    assert Room.where(user: sender, language: @language).group(:opponent_id).count.values.all? { |count| count == 1 }
+    assert Room.where(user: sender).group(:opponent_id).count.values.all? { |count| count == 1 }
   end
 
   test "concurrent senders cannot overload a recipient past the pending limit" do
@@ -53,7 +53,7 @@ class ConcurrentDispatchTest < ActiveSupport::TestCase
     concurrently(4) do
       sender = User.find(queue.pop)
       begin
-        VoiceDropDispatcher.new(sender, language: @language).call(
+        VoiceDropDispatcher.new(sender).call(
           audio: audio_upload, duration_ms: 1000, request_key: SecureRandom.uuid)
       rescue VoiceDropDispatcher::NoRecipientAvailable
         nil
@@ -84,7 +84,7 @@ class ConcurrentDispatchTest < ActiveSupport::TestCase
 
   def create_user(role)
     user = User.create!(oauth_provider: :google, oauth_uid: "#{@tag}-#{role}", email_address: "#{@tag}-#{role}@example.com",
-      mother_language: @other, learning_language: @language, last_active_at: Time.current)
+      native_language: @other, last_active_at: Time.current)
     @users << user
     user
   end

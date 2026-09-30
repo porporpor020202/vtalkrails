@@ -1,0 +1,68 @@
+<% content_for :title, "VIP" %>
+<section class="flex min-h-full flex-1 flex-col bg-slate-50 px-5 py-8"
+         data-controller="vip"
+         data-vip-provider-value="<%= @provider %>"
+         data-vip-product-value="<%= @product_id %>"
+         data-vip-base-plan-value="<%= ENV["GOOGLE_VIP_BASE_PLAN_ID"] %>"
+         data-vip-account-value="<%= current_user.billing_account_token %>"
+         data-vip-active-value="<%= current_user.vip? %>"
+         data-vip-paddle-token-value="<%= @provider == "paddle" ? ENV["PADDLE_CLIENT_TOKEN"] : "" %>"
+         data-vip-sandbox-value="<%= Billing::Config.paddle_sandbox? %>">
+  <%= link_to "← Setting", settings_path, class: "mb-6 text-sm text-slate-500" %>
+  <h1 class="text-3xl font-black text-slate-950">English help, whenever you need it.</h1>
+  <p class="mt-3 text-sm leading-6 text-slate-600">Keep talking for free. VIP helps you find the words.</p>
+  <div class="mt-6 rounded-3xl border border-indigo-100 bg-white p-5">
+    <h2 class="text-lg font-bold text-indigo-700">VIP · AI help</h2>
+    <ul class="mt-4 space-y-3 text-sm text-slate-700">
+      <li>Reply ideas that fit your conversation</li>
+      <li>Your words translated into natural English</li>
+      <li>Voice message transcripts and meanings</li>
+      <li>Pronunciation audio, IPA, and reading guides</li>
+    </ul>
+    <% if current_user.vip? %>
+      <p class="mt-6 font-bold text-emerald-700">VIP is active</p>
+    <% else %>
+      <p class="mt-6 text-lg font-bold" data-vip-target="price">
+        <% if @price %>
+          <%= number_to_currency(@price.dig("unit_price", "amount").to_i / 100.0, unit: "$") %> USD / month
+        <% else %>
+          <%= @provider == "paddle" ? "Subscriptions are not available yet." : "Loading store price…" %>
+        <% end %>
+      </p>
+      <button type="button" class="mt-4 w-full rounded-2xl bg-indigo-600 px-5 py-4 font-bold text-white disabled:opacity-50"
+              data-vip-target="subscribe" data-action="vip#subscribe" disabled>Subscribe to VIP</button>
+      <% if @provider == "paddle" && @price %>
+        <span hidden data-vip-target="webReady"></span>
+      <% end %>
+      <p class="mt-3 text-xs leading-5 text-slate-500">
+        Monthly subscription. Renews automatically until canceled. Final price and applicable taxes are shown before payment.
+        Cancel through the service where you subscribed. No gifts or payment required to continue a conversation.
+      </p>
+    <% end %>
+    <p class="mt-4 text-sm text-slate-600" data-vip-target="status" aria-live="polite"></p>
+    <% if @provider != "paddle" %>
+      <button type="button" class="mt-3 text-sm font-bold text-indigo-600" data-action="vip#restore">Restore purchases</button>
+    <% end %>
+  </div>
+  <% @subscriptions.each do |subscription| %>
+    <div class="mt-4 rounded-2xl bg-white p-4 text-sm">
+      <p class="font-bold"><%= { "paddle" => "Web", "apple" => "App Store", "google" => "Google Play" }.fetch(subscription.provider) %> subscription · <%= subscription.status.humanize %></p>
+      <% if subscription.expires_at %>
+        <p class="mt-1 text-slate-500"><%= subscription.auto_renew ? "Current period ends" : "Access until" %> <%= subscription.expires_at.to_date %></p>
+      <% end %>
+      <% if subscription.provider == "paddle" && !native_app? %>
+        <%= button_to "Manage subscription", manage_vip_path(subscription_id: subscription.id), class: "mt-3 font-bold text-indigo-600", data: { turbo: false } %>
+      <% elsif subscription.provider == "apple" %>
+        <%= link_to "Manage App Store subscription", "https://apps.apple.com/account/subscriptions", class: "mt-3 block font-bold text-indigo-600", data: { turbo: false } %>
+      <% elsif subscription.provider == "google" %>
+        <%= link_to "Manage Google Play subscription", "https://play.google.com/store/account/subscriptions", class: "mt-3 block font-bold text-indigo-600", data: { turbo: false } %>
+      <% else %>
+        <p class="mt-2 text-slate-500">Manage cancellation using your subscription confirmation email.</p>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="mt-6 flex gap-5 text-xs text-slate-500">
+    <%= link_to "Privacy", privacy_path %>
+    <%= link_to "Subscription terms", vip_terms_path %>
+  </div>
+</section>

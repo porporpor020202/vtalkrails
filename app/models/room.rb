@@ -1,5 +1,4 @@
 class Room < ApplicationRecord
-  belongs_to :language
   belongs_to :user
   belongs_to :opponent, class_name: "User"
   belongs_to :last_sender, class_name: "User", optional: true
@@ -7,6 +6,7 @@ class Room < ApplicationRecord
   belongs_to :dismissed_by, class_name: "User", optional: true
 
   has_one :voice_delivery, dependent: :nullify
+  has_many :ai_assistances, dependent: :destroy
   has_many :voice_messages, dependent: :destroy
   has_many :content_reports, dependent: :destroy
 

@@ -1,13 +1,13 @@
 class VoiceDropsController < ApplicationController
   def create
-    drop = VoiceDropDispatcher.new(current_user, language: selected_say_language).call(
+    drop = VoiceDropDispatcher.new(current_user).call(
       audio: voice_message_params.fetch(:audio),
       duration_ms: voice_message_params.fetch(:duration_ms),
       request_key: params.require(:request_key)
     )
 
     flash[:notice] = "Sent to #{drop.recipient_count} #{'listener'.pluralize(drop.recipient_count)}."
-    render json: { redirect_url: rooms_path(tab: selected_language_tab), recipient_count: drop.recipient_count, drop_id: drop.id }, status: :created
+    render json: { redirect_url: rooms_path, recipient_count: drop.recipient_count, drop_id: drop.id }, status: :created
   rescue VoiceDropDispatcher::RequestConflict => e
     render json: { error: e.message }, status: :conflict
   rescue VoiceDropDispatcher::NoRecipientAvailable => e

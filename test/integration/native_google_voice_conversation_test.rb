@@ -55,7 +55,7 @@ class NativeGoogleVoiceConversationTest < ActionDispatch::IntegrationTest
     assert_equal 302, browser.response.status
     user = User.find_by!(oauth_provider: :google, oauth_uid: uid)
     unless user.language_setup_complete?
-      browser.patch language_setup_path, params: { user: { mother_language_id: languages(:korean).id, learning_language_id: languages(:english).id } }
+      browser.patch language_setup_path, params: { user: { native_language_id: languages(:korean).id } }
       assert_equal 303, browser.response.status
     end
     browser.follow_redirect!

@@ -1,12 +1,14 @@
 class User < ApplicationRecord
   # 1. Associations
-  has_many :posts, dependent: :destroy
-  has_many :comments, dependent: :destroy
-  belongs_to :mother_language, class_name: "Language", optional: true
-  belongs_to :learning_language, class_name: "Language", optional: true
+  belongs_to :native_language, class_name: "Language", optional: true
+  has_many :vip_subscriptions, dependent: :destroy
+
+  def vip?
+    vip_subscriptions.entitled.exists?
+  end
+  has_many :ai_assistances, dependent: :destroy
   has_many :voice_drops, foreign_key: :sender_id, dependent: :destroy
   has_many :voice_deliveries, foreign_key: :recipient_id, dependent: :destroy
-  has_many :user_activity_hours, dependent: :destroy
   has_many :sessions, dependent: :destroy
   has_many :rooms, dependent: :destroy
   has_many :opponent_rooms, class_name: "Room", foreign_key: :opponent_id, inverse_of: :opponent, dependent: :destroy
@@ -23,15 +25,13 @@ class User < ApplicationRecord
   # 3. Scopes
 
   # 4. Validations
-  validates :mother_language, presence: true, if: -> { mother_language_id.present? }
-  validates :learning_language, presence: true, if: -> { learning_language_id.present? }
+  validates :native_language, presence: true, if: -> { native_language_id.present? }
   validates :oauth_provider, presence: true
   validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }
   validates :email_address, presence: true
   validates :display_name, presence: true, uniqueness: true
 
-  validates :mother_language, :learning_language, presence: true, on: :language_setup
-  validate :languages_must_differ
+  validates :native_language, presence: true, on: :language_setup
 
   # 5. Callbacks
   before_validation :assign_display_name, on: :create, if: -> { display_name.blank? }
@@ -40,21 +40,14 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
 
   # 7. Public Methods / Custom Logic
-  def language_setup_complete?
-    mother_language.present? && learning_language.present? &&
-      mother_language_id != learning_language_id
+  def profile_image_path_for
+    noun = display_name.split(" ", 2).last.sub(/ \d+\z/, "")
+    UserDisplayNameGenerator::ALL_IMAGE_PATHS_BY_NOUN.fetch(noun)
   end
 
   private
 
   # 8. Private Methods
-  def languages_must_differ
-    return if mother_language_id.blank? || learning_language_id.blank?
-    return unless mother_language_id == learning_language_id
-
-    errors.add(:learning_language, "must be different from your mother language")
-  end
-
   def assign_display_name
     self.display_name = UserDisplayNameGenerator.display_name
   end

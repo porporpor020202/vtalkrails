@@ -1,15 +1,13 @@
 module VoiceMatching
   class CandidateQuery
-    def initialize(sender:, language:)
-      @sender, @language = sender, language
+    def initialize(sender:)
+      @sender = sender
     end
 
     def call
-      engaged = Room.involving(@sender).where(language: @language).where.not(status: :deleted)
-      User.where(mother_language: @language).or(User.where(learning_language: @language))
+      engaged = Room.involving(@sender).where.not(status: :deleted)
+      User.where.not(native_language_id: nil)
         .where.not(id: @sender.id)
-        .where.not(mother_language_id: nil).where.not(learning_language_id: nil)
-        .where("mother_language_id <> learning_language_id")
         .where.not(id: UserBlock.where(blocker: @sender).select(:blocked_id))
         .where.not(id: UserBlock.where(blocked: @sender).select(:blocker_id))
         .where.not(id: engaged.where(user: @sender).select(:opponent_id))

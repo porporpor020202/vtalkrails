@@ -12,10 +12,6 @@ default: &default
   exposure_penalty_scale: 10
   recency_floor: 0.15
   response_floor: 0.25
-  availability_floor: 0.5
-  activity_min_samples: 12
-  awake_hour_start: 8
-  awake_hour_end: 23
 
 development:
   <<: *default

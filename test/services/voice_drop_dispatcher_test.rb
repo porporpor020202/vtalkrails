@@ -5,13 +5,13 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
-    @sender = users(:english_speaker)
+    @sender = users(:korean_native)
     @english = languages(:english)
     @korean = languages(:korean)
   end
 
-  test "sends to twenty distinct listeners sharing the language with a single audio blob" do
-    24.times { |i| listener("listener-#{i}", mother_language: i.even? ? @english : @korean) }
+  test "sends to twenty distinct listeners regardless of native language with a single audio blob" do
+    24.times { |i| listener("listener-#{i}", native_language: i.even? ? @english : @korean) }
     assert_difference("ActiveStorage::Blob.count", 1) do
       assert_difference(["Room.count", "VoiceMessage.count", "VoiceDelivery.count"], 20) do
         @drop = send_drop
@@ -19,10 +19,8 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
     end
     assert_equal 20, @drop.recipient_count
     assert_equal 20, @drop.voice_deliveries.distinct.count(:recipient_id)
-    assert_equal [@english.id], @drop.rooms.distinct.pluck(:language_id)
     blob_ids = ActiveStorage::Attachment.where(record: VoiceMessage.where(room: @drop.rooms)).pluck(:blob_id)
     assert_equal 1, blob_ids.uniq.size
-    assert @drop.rooms.all? { |room| room.opponent.mother_language_id == @english.id || room.opponent.learning_language_id == @english.id }
   end
 
   test "retries do not send another batch even after rooms are deleted" do
@@ -32,29 +30,28 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
     assert_no_difference(["VoiceDrop.count", "Room.count", "ActiveStorage::Blob.count"]) do
       assert_equal drop.id, send_drop(request_key: key).id
     end
-    assert_raises(VoiceDropDispatcher::RequestConflict) { send_drop(request_key: key, language: @korean) }
   end
 
-  test "filters blocks incomplete users busy recipients and existing same-language conversations" do
+  test "filters blocks incomplete users busy recipients and existing conversations" do
     blocked = listener("blocked")
     reverse = listener("reverse")
     UserBlock.create!(blocker: @sender, blocked: blocked)
     UserBlock.create!(blocker: reverse, blocked: @sender)
     incomplete = listener("incomplete")
-    incomplete.update!(learning_language: nil)
+    incomplete.update!(native_language: nil)
     unrelated_language = Language.create!(code: "fr", name: "French")
     unrelated = listener("unrelated")
-    unrelated.update!(mother_language: unrelated_language, learning_language: @korean)
+    unrelated.update!(native_language: unrelated_language)
     existing = listener("existing")
-    Room.create!(user: @sender, opponent: existing, language: @english)
+    Room.create!(user: @sender, opponent: existing)
     busy = listener("busy")
-    3.times { Room.create!(user: @sender, opponent: busy, language: @korean, last_sender: @sender) }
+    3.times { Room.create!(user: @sender, opponent: busy, last_sender: @sender) }
     other_language = listener("other-language")
-    Room.create!(user: @sender, opponent: other_language, language: @korean)
+    Room.create!(user: @sender, opponent: other_language)
     drop = send_drop
     ids = drop.voice_deliveries.pluck(:recipient_id)
-    assert_includes ids, other_language.id
-    [@sender, blocked, reverse, incomplete, unrelated, existing, busy].each { |user| assert_not_includes ids, user.id }
+    assert_includes ids, unrelated.id
+    [@sender, blocked, reverse, incomplete, existing, busy, other_language].each { |user| assert_not_includes ids, user.id }
     assert_equal 2, drop.recipient_count
   end
 
@@ -65,7 +62,7 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
   end
 
   test "no recipients creates no batch or blob" do
-    UserBlock.create!(blocker: @sender, blocked: users(:korean_learner))
+    UserBlock.create!(blocker: @sender, blocked: users(:english_native))
     assert_no_difference(["VoiceDrop.count", "Room.count", "ActiveStorage::Blob.count"]) do
       assert_raises(VoiceDropDispatcher::NoRecipientAvailable) { send_drop }
     end
@@ -116,14 +113,14 @@ class VoiceDropDispatcherTest < ActiveSupport::TestCase
 
   private
 
-  def listener(name, mother_language: @korean)
+  def listener(name, native_language: @korean)
     User.create!(email_address: "#{name}@example.com", oauth_provider: :google, oauth_uid: name,
-      mother_language: mother_language, learning_language: mother_language == @english ? @korean : @english,
+      native_language: native_language,
       last_active_at: Time.current)
   end
 
-  def send_drop(language: @english, request_key: SecureRandom.uuid, duration_ms: 1000)
-    VoiceDropDispatcher.new(@sender, language: language).call(audio: audio_upload, duration_ms: duration_ms, request_key: request_key)
+  def send_drop(request_key: SecureRandom.uuid, duration_ms: 1000)
+    VoiceDropDispatcher.new(@sender).call(audio: audio_upload, duration_ms: duration_ms, request_key: request_key)
   end
 
   def audio_upload

@@ -1,5 +1,5 @@
 require "test_helper"
-require_relative "../test_helpers/oauth_test_config"
+require_relative "../test_helpers/origins"
 
 class AppleOauthClient
   class << self
@@ -35,7 +35,7 @@ end
 
 class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:english_speaker)
+    @user = users(:korean_native)
     AppleOauthClient.mocked_mode_enabled = false
   end
 
@@ -45,7 +45,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
 
   # --- Web Platform Flow ---
 
-  OAuthTestConfig::LOGIN_ORIGINS.each do |origin|
+  ORIGINS::SIGN_IN_ORIGINS.each do |origin|
     test "r_#{origin}에 따른 올바른 Apple 인증 요청을 만든다" do
       uri = URI.parse(origin)
       host! uri.authority
@@ -113,7 +113,7 @@ class AppleOauthSessionsControllerTest < ActionDispatch::IntegrationTest
   test "r_비로그인 상태에서 보호된 페이지 접근 후 Apple 로그인 성공 시 원래 요청 페이지로 리다이렉트된다" do
     User.create!(oauth_provider: :apple, oauth_uid: "apple-test-user",
       email_address: "apple-test@example.com",
-      mother_language: languages(:korean), learning_language: languages(:english))
+      native_language: languages(:korean))
     get confirm_account_deletion_path
     assert_redirected_to new_session_path
 

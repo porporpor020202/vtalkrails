@@ -1,8 +1,0 @@
-<nav class="inline-flex shrink-0 rounded-xl bg-slate-200 p-1" aria-label="Conversation mode">
-  <%= link_to "Voice", rooms_path(tab: selected_language_tab),
-        class: "rounded-lg px-2.5 py-2 text-xs font-bold transition #{mode == :voice ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-950'}",
-        aria: { current: mode == :voice ? "page" : nil } %>
-  <%= link_to "Community", language_posts_path(language, tab: selected_language_tab),
-        class: "rounded-lg px-2.5 py-2 text-xs font-bold transition #{mode == :community ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-950'}",
-        aria: { current: mode == :community ? "page" : nil } %>
-</nav>

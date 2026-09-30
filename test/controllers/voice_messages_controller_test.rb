@@ -2,7 +2,7 @@ require "test_helper"
 
 class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @sender = users(:english_speaker)
+    @sender = users(:korean_native)
     @recipient = User.create!(
       email_address: "active-listener@example.com",
       oauth_provider: :google, oauth_uid: SecureRandom.uuid,
@@ -29,7 +29,6 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "allows only the participant whose turn it is to reply" do
     room = Room.create!(
-      language: languages(:english),
       user: @sender,
       opponent: @recipient,
       last_sender: @recipient,
@@ -62,9 +61,8 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "creates a voice drop in the language selected on Say" do
-    korean = languages(:korean)
-    get rooms_path(tab: "mother")
+  test "creates a voice drop from Say" do
+    get rooms_path
 
     assert_difference "Room.count", 1 do
       post voice_drop_path, params: {
@@ -77,13 +75,14 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    assert_equal korean, Room.order(:id).last.language
+    assert_equal rooms_path, response.parsed_body.fetch("redirect_url")
   end
 
-  test "uses the recording page language even if another tab changes the selection" do
-    get rooms_path(tab: "mother")
+  test "native language changes do not restrict Say recipients" do
+    @sender.update!(native_language: Language.create!(code: "fr", name: "French"))
+    get rooms_path
 
-    post voice_drop_path(tab: "learning"), params: {
+    post voice_drop_path, params: {
       request_key: SecureRandom.uuid,
       voice_message: {
         audio: fixture_file_upload("sample.webm", "audio/webm"),
@@ -92,12 +91,12 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
     }, as: :multipart
 
     assert_response :created
-    assert_equal languages(:english), Room.order(:id).last.language
+    assert_equal @sender, Room.order(:id).last.user
   end
 
   test "does not allow a stranger to post in a room" do
     stranger = User.create!(email_address: "stranger@example.com", oauth_provider: :google, oauth_uid: SecureRandom.uuid)
-    room = Room.create!(language: languages(:english), user: @recipient, opponent: stranger, last_sender: stranger)
+    room = Room.create!(user: @recipient, opponent: stranger, last_sender: stranger)
 
     post room_voice_messages_path(room), params: {
       request_key: SecureRandom.uuid,
@@ -112,7 +111,6 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
   test "renders the rooms list and a voice conversation" do
     room = Room.create!(
-      language: languages(:english),
       user: @sender,
       opponent: @recipient,
       last_sender: @recipient,
@@ -126,7 +124,7 @@ class VoiceMessagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "button", text: /Drop a voice/
-    assert_select "a[href='#{room_path(room, tab: "learning")}']"
+    assert_select "a[href='#{room_path(room)}']"
 
     get room_path(room)
 

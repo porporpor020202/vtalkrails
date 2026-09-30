@@ -19,13 +19,15 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "#bottom-tab-bar", count: 0
   end
 
-  test "native app user agents receive native sign-in links" do
-    get new_session_path, headers: { "User-Agent" => "Mozilla/5.0 VtalkiOS/1.0" }
+  [ "vtalk/ios/1.0", "vtalk/android/1.0", "VtalkiOS/1.0", "VtalkAndroid/1.0" ].each do |agent|
+    test "#{agent} receives native sign-in links" do
+      get new_session_path, headers: { "User-Agent" => "Mozilla/5.0 #{agent}" }
 
-    assert_response :success
-    assert_select "a[href='vtalk://sign-in?provider=google']", text: /Continue with Google/
-    assert_select "a[href='vtalk://sign-in?provider=apple']", text: /Continue with Apple/
-    assert_select "form[action='#{google_oauth_sessions_path}']", count: 0
-    assert_select "form[action='#{apple_oauth_sessions_path}']", count: 0
+      assert_response :success
+      assert_select "a[href='vtalk://sign-in?provider=google']", text: /Continue with Google/
+      assert_select "a[href='vtalk://sign-in?provider=apple']", text: /Continue with Apple/
+      assert_select "form[action='#{google_oauth_sessions_path}']", count: 0
+      assert_select "form[action='#{apple_oauth_sessions_path}']", count: 0
+    end
   end
 end

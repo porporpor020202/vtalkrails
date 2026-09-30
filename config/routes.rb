@@ -20,20 +20,25 @@ Rails.application.routes.draw do
 
 
   root "rooms#index"
+  get "vip/terms", to: "vips#terms"
+  resource :vip, only: :show do
+    post :checkout
+    post :verify
+    post :manage
+    get :status
+  end
+  post "billing/webhooks/paddle", to: "billing_webhooks#paddle"
+  post "billing/webhooks/apple", to: "billing_webhooks#apple"
+  post "billing/webhooks/google", to: "billing_webhooks#google"
 
   resources :rooms, only: %i[index show destroy] do
+    resources :ai_assistances, only: %i[create show]
     resources :voice_messages, only: :create
     resource :safety, only: :show, controller: "room_safeties"
     resource :report, only: :create, controller: "content_reports"
     resource :block, only: :create, controller: "user_blocks"
   end
   resource :voice_drop, only: :create
-
-  resources :languages, only: [] do
-    resources :posts, only: %i[index show create destroy] do
-      resources :comments, only: %i[create destroy]
-    end
-  end
 
   resource :language_setup, only: %i[show update]
 

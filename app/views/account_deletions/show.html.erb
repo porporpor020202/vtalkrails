@@ -31,6 +31,12 @@
     </div>
 
     <div class="mt-auto space-y-3 pt-10">
+      <% if current_user.vip_subscriptions.where(auto_renew: true).exists? %>
+        <p class="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800">
+          Deleting your account does not cancel your subscription.
+          <%= link_to "Manage VIP before deleting your account.", vip_path, class: "font-bold underline" %>
+        </p>
+      <% end %>
       <%= button_to account_path,
             method: :delete,
             form: { data: { turbo_confirm: "Permanently delete this account and its associated data? This action cannot be undone." } },

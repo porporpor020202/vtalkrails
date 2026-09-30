@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html lang="<%= content_for?(:html_lang) ? yield(:html_lang) : "en" %>">
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "say one thing" %></title>
+    <title><%= content_for(:title) || "Say One Thing" %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="say one thing">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -22,29 +19,19 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="activity" class="min-h-dvh bg-slate-100 font-sans text-slate-950 antialiased">
-    <div class="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-white shadow-xl">
-      <% if dev_mode? %>
-        <div class="absolute top-4 right-3 z-[9999] pointer-events-none">
-          <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
-        </div>
-      <% end %>
+  <body class="h-dvh flex flex-col overflow-hidden select-none max-w-[430px] mx-auto bg-[#FFF7F2]">
+    <% if dev_mode? %>
+      <div class="fixed top-4 hidden right-3 z-[9999] pointer-events-none max-w-[430px] mx-auto">
+        <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
+      </div>
+    <% end %>
 
-      <main class="flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <% unless controller_name == "sessions" %>
-          <% if notice.present? %>
-            <div class="mx-4 mt-[max(0.75rem,env(safe-area-inset-top))] rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" role="status"><%= notice %></div>
-          <% end %>
-          <% if alert.present? %>
-            <div class="mx-4 mt-[max(0.75rem,env(safe-area-inset-top))] rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" role="alert"><%= alert %></div>
-          <% end %>
-        <% end %>
-        <%= yield %>
-      </main>
+    <main class="flex-1 min-h-0 overflow-y-auto flex flex-col">
+      <%= yield %>
+    </main>
 
-      <% if authenticated? && !content_for?(:hide_bottom_nav) && !@hide_bottom_nav %>
-        <%= render "shared/bottom_nav" %>
-      <% end %>
-    </div>
+    <% unless content_for?(:hide_bottom_nav) %>
+      <%= render "shared/bottom_nav" %>
+    <% end %>
   </body>
 </html>

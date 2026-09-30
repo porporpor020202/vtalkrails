@@ -1,7 +1,7 @@
 <div class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
   <div class="flex items-center gap-4">
     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-700 text-2xl shadow-lg shadow-indigo-200" aria-hidden="true">
-      <%= profile_icon_tag(user, size: 44) %>
+      <%= image_tag user.profile_image_path_for, alt: "", width: 44, height: 44, class: "shrink-0 object-contain", aria: { hidden: true } %>
     </div>
 
     <div class="min-w-0 flex-1">

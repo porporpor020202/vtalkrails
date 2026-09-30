@@ -1,12 +1,12 @@
 # Voice matching
 
-A voice drop sends one recording to at most 20 distinct eligible users. Each gets a separate room with the recording's `language_id`. That language can be either recipient preference; the tab name never affects ranking. Fewer eligible listeners means a smaller batch, with its actual count returned to the sender. No eligible listeners produces a retryable error.
+A voice drop sends one recording to at most 20 distinct eligible users. Say is for English conversations. Each listener gets a separate room, regardless of native language. Fewer eligible listeners means a smaller batch, with its actual count returned to the sender. No eligible listeners produces a retryable error.
 
 ## Where to change behavior
 
-- `config/voice_matching.yml`: recipient limit, time windows, smoothing priors, load penalties, and availability defaults. Read on each selection; no schema changes are required for tuning.
-- `app/services/voice_matching/candidate_query.rb`: hard exclusions (self, incomplete language setup, wrong language, blocking in either direction, active same-language conversation).
-- `app/services/voice_matching/recipient_stats.rb`: batch SQL aggregation of pending conversations, deliveries, 24-hour replies, and activity hours.
+- `config/voice_matching.yml`: recipient limit, time windows, smoothing priors, load penalties, and recency defaults. Read on each selection; no schema changes are required for tuning.
+- `app/services/voice_matching/candidate_query.rb`: hard exclusions (self, incomplete language setup, blocking in either direction, active conversation).
+- `app/services/voice_matching/recipient_stats.rb`: batch SQL aggregation of pending conversations, deliveries, 24-hour replies, and last activity timestamps.
 - `app/services/voice_matching/recipient_selector.rb`: scoring and weighted sampling without replacement. Inject a seeded `Random` in tests.
 - `app/services/voice_drop_dispatcher.rb`: idempotency, rechecking eligibility under locks, shared upload, and transactional creation. Keep ranking policy out of this file.
 
@@ -16,13 +16,13 @@ A voice drop sends one recording to at most 20 distinct eligible users. Each get
 
 `reply_rate = (on_time_replies + prior_successes) / (mature_deliveries + prior_successes + prior_failures)`
 
-`weight = blend(recency) * blend(reply_rate) * blend(availability) / ((1 + pending)^pending_penalty_exponent * (1 + deliveries_last_24h / exposure_penalty_scale))`
+`weight = blend(recency) * blend(reply_rate) / ((1 + pending)^pending_penalty_exponent * (1 + deliveries_last_24h / exposure_penalty_scale))`
 
 Each blend is `floor + (1 - floor) * value`. Draw an independent uniform U for each candidate and keep the smallest `-log(1-U) / weight` keys. The selector scans eligible users in batches, retaining a bounded weighted reservoir. It does not restrict selection to the most recently active users. Reserve candidates allow replacement if eligibility changes before the transaction.
 
 These are initial heuristics, not calibrated response probabilities or a claim of optimality. Evaluate delivered recordings answered within 24 hours before tuning. Only deliveries older than that window enter the denominator. Metrics persist after a conversation is deleted, but are removed on the associated account deletion. Pending conversation counts exclude ended conversations and cover both participant roles. The configured limit is rechecked under participant locks. Concurrent changes can produce fewer than 20 deliveries.
 
-Browser IANA timezones are optional and validated. With little history, normal local waking hours get a mild boost; a missing timezone is neutral. With enough activity history, actual observed UTC activity hours replace the clock heuristic, supporting night-shift users without inferring geography from language. Activity is sampled at most once per five minutes and uses at most 24 aggregate rows per user; stale buckets expire according to `history_days`.
+Authenticated requests update `users.last_active_at` at most once every five minutes across web and app sessions. Matching uses this timestamp for recency; it does not collect timezones or hourly activity aggregates. `users.country_code` stores an optional two-letter country code for a future signup selection and is not used to infer local time or rank recipients.
 
 Keep window lengths, priors, scales and batch sizes positive; floors within 0..1; and recipient limits and pending limits positive integers.
 
@@ -32,7 +32,7 @@ The client creates a request UUID for each recording and keeps it on retry. `(se
 
 One validated blob is uploaded and attached to each message. The whole batch commits or rolls back together; failed or redundant uploads are purged. Room deletion destroys attachments through Active Storage's normal lifecycle; it must not explicitly purge the shared blob. Active Storage's foreign key prevents purging a blob while other attachments use it. Final attachment cleanup runs through the application's configured Active Job adapter.
 
-The API returns `drop_id`, `recipient_count`, and the sender's language-list URL. Replies still remain one-to-one. Inbox delivery is implemented here; this code does not introduce a new push notification channel.
+The API returns `drop_id`, `recipient_count`, and the Say URL. Replies still remain one-to-one. Inbox delivery is implemented here; this code does not introduce a new push notification channel.
 
 ## Database setup
 

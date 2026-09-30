@@ -1,17 +1,17 @@
 module VoiceMatching
-  # The only ranking policy. Both language tabs pass the same language-based inputs.
+  # Shared ranking policy for all Say listeners.
   # Weights are heuristics, not calibrated probabilities; tune against 24-hour reply rates.
   class RecipientSelector
     attr_reader :config
 
-    def initialize(sender:, language:, random: Random.new, now: Time.current,
+    def initialize(sender:, random: Random.new, now: Time.current,
       config: Rails.application.config_for(:voice_matching))
-      @sender, @language, @random, @now, @config = sender, language, random, now, config
+      @sender, @random, @now, @config = sender, random, now, config
     end
 
     def call(limit: config.fetch(:recipient_limit))
       selected = []
-      CandidateQuery.new(sender: @sender, language: @language).call
+      CandidateQuery.new(sender: @sender).call
         .find_in_batches(batch_size: config.fetch(:candidate_batch_size)) do |users|
         stats = RecipientStats.new(users, now: @now, config: config).call
         users.each do |user|
@@ -32,8 +32,7 @@ module VoiceMatching
       successes = config.fetch(:response_prior_successes).to_f
       failures = config.fetch(:response_prior_failures).to_f
       response = (values[:replied_within_24h] + successes) / (values[:matured_deliveries] + successes + failures)
-      score = blend(recency, :recency_floor) * blend(response, :response_floor) *
-        blend(values[:availability], :availability_floor)
+      score = blend(recency, :recency_floor) * blend(response, :response_floor)
       load = (1.0 + values[:pending_conversations])**config.fetch(:pending_penalty_exponent)
       exposure = 1.0 + values[:deliveries_last_24h] / config.fetch(:exposure_penalty_scale).to_f
       [score / (load * exposure), 0.0001].max

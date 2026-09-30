@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,15 +42,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "comments", force: :cascade do |t|
-    t.text "body", null: false
+  create_table "ai_assistances", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "post_id", null: false
+    t.text "input_text"
+    t.string "kind", null: false
+    t.string "native_language", null: false
+    t.string "request_key", null: false
+    t.jsonb "result", default: {}, null: false
+    t.bigint "room_id", null: false
+    t.bigint "source_message_id", null: false
+    t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["post_id", "created_at", "id"], name: "index_comments_on_post_id_and_created_at_and_id"
-    t.index ["post_id"], name: "index_comments_on_post_id"
-    t.index ["user_id"], name: "index_comments_on_user_id"
+    t.index ["request_key"], name: "index_ai_assistances_on_request_key", unique: true
+    t.index ["room_id"], name: "index_ai_assistances_on_room_id"
+    t.index ["source_message_id"], name: "index_ai_assistances_on_source_message_id"
+    t.index ["user_id"], name: "index_ai_assistances_on_user_id"
+  end
+
+  create_table "ai_transcripts", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.text "text"
+    t.datetime "updated_at", null: false
+    t.index ["blob_id"], name: "index_ai_transcripts_on_blob_id", unique: true
+  end
+
+  create_table "billing_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_id", null: false
+    t.datetime "processed_at"
+    t.string "provider", null: false
+    t.text "reference", null: false
+    t.datetime "updated_at", null: false
+    t.index ["processed_at"], name: "index_billing_events_on_processed_at"
+    t.index ["provider", "event_id"], name: "index_billing_events_on_provider_and_event_id", unique: true
   end
 
   create_table "content_reports", force: :cascade do |t|
@@ -109,23 +135,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
     t.index ["user_id"], name: "index_notification_tokens_on_user_id"
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.text "body", null: false
-    t.integer "comments_count", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.bigint "language_id", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["language_id", "created_at", "id"], name: "index_posts_on_language_id_and_created_at_and_id"
-    t.index ["language_id"], name: "index_posts_on_language_id"
-    t.index ["user_id"], name: "index_posts_on_user_id"
-  end
-
   create_table "rooms", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "deleted_by_id"
     t.bigint "dismissed_by_id"
-    t.bigint "language_id"
     t.datetime "last_message_at"
     t.bigint "last_sender_id"
     t.bigint "opponent_id", null: false
@@ -134,7 +147,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
     t.bigint "user_id", null: false
     t.index ["deleted_by_id"], name: "index_rooms_on_deleted_by_id"
     t.index ["dismissed_by_id"], name: "index_rooms_on_dismissed_by_id"
-    t.index ["language_id"], name: "index_rooms_on_language_id"
     t.index ["last_message_at"], name: "index_rooms_on_last_message_at"
     t.index ["last_sender_id"], name: "index_rooms_on_last_sender_id"
     t.index ["opponent_id"], name: "index_rooms_on_opponent_id"
@@ -151,17 +163,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "user_activity_hours", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "hour", null: false
-    t.integer "samples", default: 0, null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id", "hour"], name: "index_user_activity_hours_on_user_id_and_hour", unique: true
-    t.index ["user_id"], name: "index_user_activity_hours_on_user_id"
-    t.check_constraint "hour >= 0 AND hour <= 23", name: "user_activity_hour_range"
-  end
-
   create_table "user_blocks", force: :cascade do |t|
     t.bigint "blocked_id", null: false
     t.bigint "blocker_id", null: false
@@ -173,22 +174,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "country_code", limit: 2
+    t.uuid "billing_account_token", default: -> { "gen_random_uuid()" }, null: false
     t.datetime "created_at", null: false
     t.string "display_name", null: false
     t.string "email_address", null: false
     t.datetime "last_active_at"
-    t.bigint "learning_language_id"
-    t.bigint "mother_language_id"
+    t.bigint "native_language_id"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
-    t.string "time_zone"
+    t.string "paddle_checkout_id"
     t.datetime "updated_at", null: false
+    t.index ["billing_account_token"], name: "index_users_on_billing_account_token", unique: true
     t.index ["display_name"], name: "index_users_on_display_name", unique: true
     t.index ["last_active_at"], name: "index_users_on_last_active_at"
-    t.index ["learning_language_id"], name: "index_users_on_learning_language_id"
-    t.index ["mother_language_id"], name: "index_users_on_mother_language_id"
+    t.index ["native_language_id"], name: "index_users_on_native_language_id"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
-    t.check_constraint "mother_language_id <> learning_language_id", name: "users_languages_must_differ"
+  end
+
+  create_table "vip_subscriptions", force: :cascade do |t|
+    t.boolean "auto_renew", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "customer_id"
+    t.datetime "expires_at"
+    t.text "external_id", null: false
+    t.string "external_key", null: false
+    t.string "product_id", null: false
+    t.string "provider", null: false
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.datetime "verified_at", null: false
+    t.index ["provider", "external_key"], name: "index_vip_subscriptions_on_provider_and_external_key", unique: true
+    t.index ["user_id"], name: "index_vip_subscriptions_on_user_id"
   end
 
   create_table "voice_deliveries", force: :cascade do |t|
@@ -207,12 +225,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
 
   create_table "voice_drops", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "language_id", null: false
     t.integer "recipient_count", default: 0, null: false
     t.string "request_key", null: false
     t.bigint "sender_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["language_id"], name: "index_voice_drops_on_language_id"
     t.index ["sender_id", "request_key"], name: "index_voice_drops_on_sender_id_and_request_key", unique: true
     t.index ["sender_id"], name: "index_voice_drops_on_sender_id"
   end
@@ -229,30 +245,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_030000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "comments", "posts"
-  add_foreign_key "comments", "users"
+  add_foreign_key "ai_assistances", "rooms"
+  add_foreign_key "ai_assistances", "users"
+  add_foreign_key "ai_assistances", "voice_messages", column: "source_message_id"
+  add_foreign_key "ai_transcripts", "active_storage_blobs", column: "blob_id", on_delete: :cascade
   add_foreign_key "content_reports", "rooms"
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
   add_foreign_key "notification_tokens", "users"
-  add_foreign_key "posts", "languages"
-  add_foreign_key "posts", "users"
-  add_foreign_key "rooms", "languages"
   add_foreign_key "rooms", "users"
   add_foreign_key "rooms", "users", column: "deleted_by_id"
   add_foreign_key "rooms", "users", column: "dismissed_by_id"
   add_foreign_key "rooms", "users", column: "last_sender_id"
   add_foreign_key "rooms", "users", column: "opponent_id"
   add_foreign_key "sessions", "users"
-  add_foreign_key "user_activity_hours", "users"
   add_foreign_key "user_blocks", "users", column: "blocked_id"
   add_foreign_key "user_blocks", "users", column: "blocker_id"
-  add_foreign_key "users", "languages", column: "learning_language_id"
-  add_foreign_key "users", "languages", column: "mother_language_id"
+  add_foreign_key "users", "languages", column: "native_language_id"
+  add_foreign_key "vip_subscriptions", "users", on_delete: :cascade
   add_foreign_key "voice_deliveries", "rooms"
   add_foreign_key "voice_deliveries", "users", column: "recipient_id"
   add_foreign_key "voice_deliveries", "voice_drops"
-  add_foreign_key "voice_drops", "languages"
   add_foreign_key "voice_drops", "users", column: "sender_id"
   add_foreign_key "voice_messages", "rooms"
   add_foreign_key "voice_messages", "users", column: "sender_id"

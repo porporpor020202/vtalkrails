@@ -2,7 +2,6 @@ class CreateVoiceMessaging < ActiveRecord::Migration[8.1]
   def change
     create_table :voice_drops do |t|
       t.references :sender, null: false, foreign_key: { to_table: :users }
-      t.references :language, null: false, foreign_key: true
       t.string :request_key, null: false
       t.integer :recipient_count, null: false, default: 0
       t.timestamps

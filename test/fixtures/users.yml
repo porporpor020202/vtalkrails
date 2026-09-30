@@ -1,15 +1,13 @@
-english_speaker:
+korean_native:
   oauth_provider: google
   oauth_uid: fixture-google-one
   email_address: one@example.com
   display_name: Calm Tiger
-  mother_language: korean
-  learning_language: english
+  native_language: korean
 
-korean_learner:
+english_native:
   oauth_provider: apple
   oauth_uid: fixture-apple-two
   email_address: two@example.com
   display_name: Bright Panda
-  mother_language: english
-  learning_language: korean
+  native_language: english

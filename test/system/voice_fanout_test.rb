@@ -1,13 +1,13 @@
 require "application_system_test_case"
 
 class VoiceFanoutSystemTest < ApplicationSystemTestCase
-  test "retrying a recording after a lost response keeps one delivery and returns to its tab" do
-    user = users(:english_speaker)
+  test "retrying a recording after a lost response keeps one delivery and returns to Say" do
+    user = users(:korean_native)
     visit authenticate_by_token_google_oauth_sessions_path(token: user.signed_id(purpose: :native_auth, expires_in: 5.minutes))
     within "#bottom-tab-bar" do
-      click_link "Mother Language"
+      click_link "Say"
     end
-    assert_current_path rooms_path(tab: "mother")
+    assert_current_path rooms_path
     page.execute_script <<~JS
       const element = document.querySelector('[data-controller~="voice-recorder"]');
       const controller = window.Stimulus.getControllerForElementAndIdentifier(element, "voice-recorder");
@@ -32,10 +32,9 @@ class VoiceFanoutSystemTest < ApplicationSystemTestCase
     assert_text "Simulated lost response"
     click_button "Try again"
     assert_text "Sent to 1 listener."
-    assert_current_path rooms_path(tab: "mother")
+    assert_current_path rooms_path
     drop = VoiceDrop.find_by!(sender: user)
     assert_equal 1, VoiceDrop.where(sender: user).count
-    assert_equal languages(:korean).id, drop.language_id
     assert_equal 1, drop.rooms.count
   end
 end

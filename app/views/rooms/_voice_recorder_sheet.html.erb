@@ -9,6 +9,12 @@
         <button type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500" data-action="voice-recorder#close" aria-label="Close recorder">✕</button>
       </div>
 
+      <% if @room && @room.can_reply?(current_user) && @messages&.last %>
+        <div class="mt-4">
+          <%= render "ai_helper", room: @room, message: @messages.last %>
+        </div>
+      <% end %>
+
       <div class="my-8 text-center">
         <div class="font-mono text-5xl font-black tracking-tight text-slate-950" data-voice-recorder-target="timer">00:00</div>
         <p class="mt-3 min-h-5 text-sm font-semibold text-slate-500" data-voice-recorder-target="status">Tap record when you are ready.</p>
