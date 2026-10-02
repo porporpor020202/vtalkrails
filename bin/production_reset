@@ -9,7 +9,7 @@ bin/kamal app stop
 
 echo "Resetting production databases..."
 bin/kamal app exec --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 bin/rails db:migrate:reset
-bin/kamal app exec --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 bin/rails db:seed
+bin/kamal app exec --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 bin/rails db:reset
 
 echo "Starting the production app..."
 bin/kamal app start
