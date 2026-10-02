@@ -1,12 +1,5 @@
 class User < ApplicationRecord
   # 1. Associations
-  belongs_to :native_language, class_name: "Language", optional: true
-  has_many :vip_subscriptions, dependent: :destroy
-
-  def vip?
-    vip_subscriptions.entitled.exists?
-  end
-  has_many :ai_assistances, dependent: :destroy
   has_many :voice_drops, foreign_key: :sender_id, dependent: :destroy
   has_many :voice_deliveries, foreign_key: :recipient_id, dependent: :destroy
   has_many :sessions, dependent: :destroy
@@ -25,30 +18,39 @@ class User < ApplicationRecord
   # 3. Scopes
 
   # 4. Validations
-  validates :native_language, presence: true, if: -> { native_language_id.present? }
   validates :oauth_provider, presence: true
   validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }
   validates :email_address, presence: true
-  validates :display_name, presence: true, uniqueness: true
+  validates :display_name, uniqueness: true, allow_nil: true
+  validates :display_name, :country_code, presence: true, on: :onboarding
+  validate :country_code_must_exist, on: :onboarding
 
   validates :native_language, presence: true, on: :language_setup
 
   # 5. Callbacks
-  before_validation :assign_display_name, on: :create, if: -> { display_name.blank? }
 
   # 6. Normalizations
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
+  normalizes :display_name, with: ->(name) { name.strip.presence }
 
   # 7. Public Methods / Custom Logic
+  def onboarding_complete?
+    display_name.present? && country_code.present?
+  end
+
   def profile_image_path_for
-    noun = display_name.split(" ", 2).last.sub(/ \d+\z/, "")
-    UserDisplayNameGenerator::ALL_IMAGE_PATHS_BY_NOUN.fetch(noun)
+    noun = display_name.to_s.split(" ", 2).last.to_s.sub(/ \d+\z/, "")
+    UserDisplayNameGenerator::ALL_IMAGE_PATHS_BY_NOUN.fetch(
+      noun, "emoji/animals_and_nature/raccoon_3d.png"
+    )
   end
 
   private
 
   # 8. Private Methods
-  def assign_display_name
-    self.display_name = UserDisplayNameGenerator.display_name
+  def country_code_must_exist
+    return if country_code.blank? || Country.exists?(code: country_code)
+
+    errors.add(:country_code, "is not a supported country or region")
   end
 end

@@ -154,8 +154,8 @@ class AppleOauthSessionsController < ApplicationController
     secure_cookie = Rails.env.production? || request.ssl?
     cookies.delete(:apple_oauth_return_to, same_site: :none, secure: secure_cookie)
 
-    session.delete(:return_to_after_authenticating)
-    current_user.language_setup_complete? ? (return_url.presence || root_url) : language_setup_url
+    session[:return_to_after_authenticating] = return_url if return_url.present?
+    after_authentication_url
   end
 
   def stored_nonce

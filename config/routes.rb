@@ -41,6 +41,7 @@ Rails.application.routes.draw do
   resource :voice_drop, only: :create
 
   resource :language_setup, only: %i[show update]
+  resource :onboarding, only: %i[show update], controller: "onboarding"
 
   resource :settings, only: %i[show update], controller: "settings"
 
@@ -69,8 +70,8 @@ Rails.application.routes.draw do
 
   resource :google_oauth_sessions, only: %i[ new create ] do
     collection do
-      get :authenticate_by_token
       get :callback
+      get :authenticate_by_token
       post :native_authenticate
     end
   end

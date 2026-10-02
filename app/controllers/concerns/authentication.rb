@@ -39,8 +39,9 @@ module Authentication
     end
 
     def after_authentication_url
-      destination = session.delete(:return_to_after_authenticating)
-      current_user.language_setup_complete? ? (destination || root_url) : language_setup_url
+      return onboarding_url unless current_user.onboarding_complete?
+
+      session.delete(:return_to_after_authenticating) || root_url
     end
 
 

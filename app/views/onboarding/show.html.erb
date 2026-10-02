@@ -1,0 +1,46 @@
+<% content_for :title, "Complete your profile | Say One Thing" %>
+<% content_for :hide_bottom_nav, "true" %>
+
+<div class="flex flex-1 items-center px-6 py-10">
+  <section class="w-full rounded-3xl bg-white p-6 shadow-sm"
+           aria-labelledby="onboarding-title">
+    <h1 id="onboarding-title"
+        class="text-2xl font-extrabold tracking-tight text-slate-900">
+      Complete your profile
+    </h1>
+    <p class="mt-2 text-sm text-slate-600">
+      Choose a nickname and your country or region to get started.
+    </p>
+
+    <%= form_with model: @user, url: onboarding_path, method: :patch,
+                  class: "mt-8 space-y-5" do |form| %>
+      <% if @user.errors.any? %>
+        <div role="alert" class="rounded-xl bg-red-50 p-4 text-sm text-red-700">
+          <% @user.errors.full_messages.each do |message| %>
+            <p><%= message %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :display_name, "Nickname",
+                       class: "mb-2 block text-sm font-semibold text-slate-800" %>
+        <%= form.text_field :display_name, required: true, autocomplete: "nickname",
+              class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" %>
+      </div>
+
+      <div>
+        <%= form.label :country_code, "Country or region",
+                       class: "mb-2 block text-sm font-semibold text-slate-800" %>
+        <%= form.collection_select :country_code, @countries, :code, :name,
+              { prompt: "Select your country or region" },
+              { required: true,
+                class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
+      </div>
+
+      <%= form.submit "Continue",
+            class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white",
+            data: { turbo_submits_with: "Saving..." } %>
+    <% end %>
+  </section>
+</div>

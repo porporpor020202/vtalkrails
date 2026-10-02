@@ -1,36 +1,36 @@
 class GoogleOauthSessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
+  # skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
 
-  def native_authenticate
-    identity_token = params[:identity_token]
-    nonce = params[:nonce]
-    if identity_token.blank? || nonce.blank?
-      render json: { error: "Missing identity token or nonce" }, status: :bad_request
-      return
-    end
-
-    user_info = GoogleOauthClient.new.authenticate_id_token(identity_token, nonce: nonce)
-    user = OauthUserService.find_or_create(
-      oauth_provider: :google,
-      uid: user_info[:uid],
-      email: user_info[:email]
-    )
-
-    if user.persisted?
-      token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
-      render json: { token: token }
-    else
-      render json: { error: "Unable to create or find user" }, status: :unprocessable_entity
-    end
-  rescue GoogleOauthClient::AuthenticationError => e
-    Rails.logger.error "Native Google authentication failed: #{e.message}"
-    render json: { error: "Authentication failed" }, status: :unprocessable_entity
-  rescue => e
-    Rails.logger.error "Native Google authentication error: #{e.class} - #{e.message}"
-    render json: { error: "Authentication failed" }, status: :unprocessable_entity
-  end
-
+  # def native_authenticate
+  #   identity_token = params[:identity_token]
+  #   nonce = params[:nonce]
+  #   if identity_token.blank? || nonce.blank?
+  #     render json: { error: "Missing identity token or nonce" }, status: :bad_request
+  #     return
+  #   end
+  #
+  #   user_info = GoogleOauthClient.new.authenticate_id_token(identity_token, nonce: nonce)
+  #   user = OauthUserService.find_or_create(
+  #     oauth_provider: :google,
+  #     uid: user_info[:uid],
+  #     email: user_info[:email]
+  #   )
+  #
+  #   if user.persisted?
+  #     token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
+  #     render json: { token: token }
+  #   else
+  #     render json: { error: "Unable to create or find user" }, status: :unprocessable_entity
+  #   end
+  # rescue GoogleOauthClient::AuthenticationError => e
+  #   Rails.logger.error "Native Google authentication failed: #{e.message}"
+  #   render json: { error: "Authentication failed" }, status: :unprocessable_entity
+  # rescue => e
+  #   Rails.logger.error "Native Google authentication error: #{e.class} - #{e.message}"
+  #   render json: { error: "Authentication failed" }, status: :unprocessable_entity
+  # end
+  #
   def new
     render :new, layout: false
   end
@@ -76,7 +76,6 @@ class GoogleOauthSessionsController < ApplicationController
       return
     end
 
-    # Exchange code for tokens and decode ID token
     oauth_client = GoogleOauthClient.new
     user_info = oauth_client.authenticate(
       code: params[:code],
@@ -84,7 +83,6 @@ class GoogleOauthSessionsController < ApplicationController
       nonce: session_nonce
     )
 
-    # Create or find the user
     @user = OauthUserService.find_or_create(
       oauth_provider: :google,
       uid: user_info[:uid],
@@ -120,11 +118,10 @@ class GoogleOauthSessionsController < ApplicationController
       redirect_to new_session_path, alert: "Unable to sign in. Please try again."
     end
   end
-
   private
 
   def sign_in_and_redirect_user(user)
     start_new_session_for user
-    redirect_to after_authentication_url
+    redirect_to after_authentication_url, status: :see_other
   end
 end

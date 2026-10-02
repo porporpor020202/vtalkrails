@@ -1,14 +1,14 @@
-<% if native_app? %>
-  <%= link_to "vtalk://sign-in?provider=google", class: "flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-zinc-950 shadow-lg shadow-black/20 transition active:scale-[0.98]" do %>
-    <%= image_tag "google.svg", class: "w-5 h-5", alt: "" %>
-    <span class="text-[16px] tracking-tight">Continue with Google</span>
-  <% end %>
-<% else %>
+<%# if native_app? %>
+  <%#= link_to "vtalk://sign-in?provider=google", class: "flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-zinc-950 shadow-lg shadow-black/20" do %>
+    <%#= image_tag "google.svg", class: "w-5 h-5", alt: "" %>
+<!--    <span class="text-[16px] tracking-tight">Continue with Google</span>-->
+  <%# end %>
+<%# else %>
   <%= form_with url: google_oauth_sessions_path, method: :post, data: { turbo: false } do |form| %>
     <%= form.hidden_field :platform, value: "web" %>
     <%= form.button class: "flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white font-semibold text-zinc-950 shadow-lg shadow-black/20 cursor-pointer" do %>
-      <%= image_tag "google.svg", class: "w-5 h-5", alt: "" %>
+      <%= image_tag "google.svg", class: "w-5 h-5"%>
       <span class="text-[16px] tracking-tight">Continue with Google</span>
     <% end %>
   <% end %>
-<% end %>
+<%# end %>
