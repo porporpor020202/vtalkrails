@@ -27,6 +27,16 @@ class OnboardingTest < ApplicationSystemTestCase
     assert_select "user_native_language", selected: "Korean"
   end
 
+  test "r_온보딩을 완료한 사용자가 온보딩 페이지에 접속하면 root_path로 이동한다" do
+    @user.update!(display_name: "Bright Panda", native_language: "English")
+    assert @user.onboarding_complete?
+
+    visit onboarding_path
+    assert @user.onboarding_complete?
+
+    assert_current_path root_path, wait: 5
+  end
+
   test "r_모국어를 선택하지 않고 Continue를 누르면 입력 오류를 표시한다" do
     click_button "Continue"
 
