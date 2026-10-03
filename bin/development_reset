@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+export RAILS_ENV=development
+
+echo "Resetting development databases..."
+bin/rails db:migrate:reset
+
+echo "Seeding development databases..."
+bin/rails db:seed
+
+echo "Starting the development app..."
+exec bin/dev

@@ -1,5 +1,4 @@
 class AccountsController < ApplicationController
-  skip_before_action :require_language_setup
   def destroy
     user = current_user
     terminate_session
