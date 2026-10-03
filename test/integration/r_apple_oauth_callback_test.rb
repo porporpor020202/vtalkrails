@@ -44,7 +44,7 @@ class AppleOauthCallbackTest < ActionDispatch::IntegrationTest
     assert_redirected_to onboarding_url
   end
 
-  test "r_Apple 재로그인 시 닉네임이나 모국어 중 하나라도 없으면 온보딩으로 이동한다" do
+  test "r_Apple 로그인 시 닉네임이나 모국어 중 하나라도 없으면 온보딩으로 이동한다" do
     scenarios = [
       { display_name: nil, native_language: "English" },
       { display_name: "Bright Panda", native_language: nil }

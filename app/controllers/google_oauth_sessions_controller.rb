@@ -119,6 +119,7 @@ class GoogleOauthSessionsController < ApplicationController
       redirect_to new_session_path, alert: "Unable to sign in. Please try again."
     end
   end
+
   private
 
   def sign_in_and_redirect_user(user)

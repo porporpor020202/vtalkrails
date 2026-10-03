@@ -27,12 +27,13 @@ class User < ApplicationRecord
   validates :oauth_provider, presence: true
   validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }
   validates :email_address, presence: true
+
   validates :display_name, uniqueness: true, allow_nil: true
   validates :display_name, presence: true, on: :onboarding
 
   validates :native_language,
             inclusion: { in: NATIVE_LANGUAGES },
-            on: [ :language_setup, :onboarding ]
+            on: [ :onboarding ]
 
   # 5. Callbacks
 

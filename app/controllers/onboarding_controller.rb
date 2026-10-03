@@ -4,6 +4,10 @@ class OnboardingController < ApplicationController
 
   def show
     @user = current_user
+
+    if @user.display_name.blank?
+      @user.update!(display_name: UserDisplayNameGenerator.display_name)
+    end
   end
 
   def update
@@ -11,7 +15,7 @@ class OnboardingController < ApplicationController
     @user.assign_attributes(onboarding_params)
 
     if @user.save(context: :onboarding)
-      redirect_to after_authentication_url, status: :see_other
+      redirect_to root_path, status: :see_other
     else
       render :show, status: :unprocessable_entity
     end
@@ -26,6 +30,6 @@ class OnboardingController < ApplicationController
   end
 
   def onboarding_params
-    params.require(:user).permit(:display_name, :native_language)
+    params.require(:user).permit(:native_language)
   end
 end
