@@ -54,7 +54,7 @@ class AppleOauthClient
   end
 
   def decode_native_id_token(id_token, nonce:)
-    user_info = decode_id_token(id_token, audience: native_app_identifier)
+    user_info = decode_id_token(id_token, audience: native_app_identifiers)
     expected_nonce = Digest::SHA256.hexdigest(nonce)
     raise AuthenticationError, "Nonce verification failed" unless user_info["nonce"] == expected_nonce
 
@@ -71,8 +71,11 @@ class AppleOauthClient
     Rails.application.credentials.dig(:apple, :service_identifier)
   end
 
-  def native_app_identifier
-    ENV.fetch("APPLE_IOS_APP_IDENTIFIER", "com.porporpor020202.vtalkios")
+  def native_app_identifiers
+    %w[
+      com.porporpor020202.vtalkios
+      com.porporpor020202.vtalkios.dev
+    ]
   end
 
   def generate_client_secret

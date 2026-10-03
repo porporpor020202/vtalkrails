@@ -1,6 +1,4 @@
 class SettingsController < ApplicationController
-  before_action :load_settings
-
   def show
   end
 
@@ -11,16 +9,5 @@ class SettingsController < ApplicationController
     else
       render :show, status: :unprocessable_entity
     end
-  end
-
-  private
-
-  def load_settings
-    @languages = Language.order(:name)
-    @child_safety_contact_email = ENV.fetch("PRIVACY_CONTACT_EMAIL", "privacy@vtalks.net")
-  end
-
-  def language_params
-    params.require(:user).permit(:native_language_id)
   end
 end

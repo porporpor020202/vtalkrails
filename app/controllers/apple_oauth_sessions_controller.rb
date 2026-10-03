@@ -1,6 +1,7 @@
 class AppleOauthSessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   allow_unauthenticated_access
+
+  skip_before_action :verify_authenticity_token, only: [ :callback, :native_authenticate ]
   before_action :verify_oauth_state, only: [ :callback ]
   before_action :verify_oauth_nonce, only: [ :callback ]
 
