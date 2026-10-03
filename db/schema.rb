@@ -137,10 +137,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "country_code", limit: 2
     t.datetime "created_at", null: false
     t.string "display_name"
     t.string "email_address", null: false
+    t.string "native_language"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false

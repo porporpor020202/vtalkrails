@@ -5,7 +5,7 @@ class CreateUsers < ActiveRecord::Migration[8.1]
       t.string :oauth_uid, null: false
       t.string :email_address, null: false
       t.string :display_name, null: true
-      t.string :country_code, limit: 2, null: true
+      t.string :native_language, null: true
 
       t.timestamps null: false
     end

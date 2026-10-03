@@ -9,7 +9,7 @@
       Complete your profile
     </h1>
     <p class="mt-2 text-sm text-slate-600">
-      Choose a nickname and your country or region to get started.
+      Choose a nickname and your native language to get started.
     </p>
 
     <%= form_with model: @user, url: onboarding_path, method: :patch,
@@ -30,10 +30,10 @@
       </div>
 
       <div>
-        <%= form.label :country_code, "Country or region",
+        <%= form.label :native_language, "Native language",
                        class: "mb-2 block text-sm font-semibold text-slate-800" %>
-        <%= form.collection_select :country_code, @countries, :code, :name,
-              { prompt: "Select your country or region" },
+        <%= form.select :native_language, User::NATIVE_LANGUAGES,
+              { prompt: "Select your native language" },
               { required: true,
                 class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
       </div>

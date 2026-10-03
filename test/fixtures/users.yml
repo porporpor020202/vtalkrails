@@ -3,25 +3,25 @@ korean_native:
   oauth_uid: fixture-google-korean
   email_address: korean@example.com
   display_name: Calm Tiger
-  country_code: KR
+  native_language: Korean
 
 english_native:
   oauth_provider: apple
   oauth_uid: fixture-apple-english
   email_address: english@example.com
   display_name: Bright Panda
-  country_code: GB
+  native_language: English
 
 spanish_native:
   oauth_provider: google
   oauth_uid: fixture-google-spanish
   email_address: spanish@example.com
   display_name: Happy Raccoon
-  country_code: ES
+  native_language: Spanish
 
 japanese_native:
   oauth_provider: apple
   oauth_uid: fixture-apple-japanese
   email_address: japanese@example.com
   display_name: Calm Polar Bear
-  country_code: JP
+  native_language: Japanese

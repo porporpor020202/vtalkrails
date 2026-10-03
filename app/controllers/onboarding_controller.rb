@@ -1,7 +1,6 @@
 class OnboardingController < ApplicationController
   skip_before_action :require_onboarding
   before_action :redirect_completed_user
-  before_action :load_countries
 
   def show
     @user = current_user
@@ -26,11 +25,7 @@ class OnboardingController < ApplicationController
     redirect_to after_authentication_url, status: :see_other
   end
 
-  def load_countries
-    @countries = Country.order(:name)
-  end
-
   def onboarding_params
-    params.require(:user).permit(:display_name, :country_code)
+    params.require(:user).permit(:display_name, :native_language)
   end
 end

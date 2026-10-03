@@ -3,7 +3,6 @@ module ApplicationHelper
     Rails.env.development?
   end
 
-
   # def nav_tab_class(path)
   #   if current_page?(path)
   #     "text-indigo-400 font-semibold"

@@ -19,31 +19,35 @@ class AppleOauthCallbackTest < ActionDispatch::IntegrationTest
     assert_equal email, user.email_address
     assert_equal 1, user.sessions.count
     assert cookies[:session_id].present?
+    assert_redirected_to root_url
+    follow_redirect!
     assert_redirected_to onboarding_url
 
     follow_redirect!
     assert_response :success
     assert_select "form[action='#{onboarding_path}']" do
       assert_select "input[name='user[display_name]']"
-      assert_select "select[name='user[country_code]']"
+      assert_select "select[name='user[native_language]']"
     end
   end
 
-  test "r_Apple OAuth 가입 직후 국가와 닉네임은 NULL이다" do
+  test "r_Apple OAuth 가입 직후 모국어와 닉네임은 NULL이다" do
     uid = "apple-test-#{SecureRandom.hex(8)}"
 
     complete_apple_callback(uid: uid, email: "#{uid}@example.com")
 
     user = User.find_by!(oauth_provider: "apple", oauth_uid: uid)
-    assert_nil user.country_code
+    assert_nil user.native_language
     assert_nil user.display_name
+    assert_redirected_to root_url
+    follow_redirect!
     assert_redirected_to onboarding_url
   end
 
-  test "r_Apple 재로그인 시 닉네임이나 국가 중 하나라도 없으면 온보딩으로 이동한다" do
+  test "r_Apple 재로그인 시 닉네임이나 모국어 중 하나라도 없으면 온보딩으로 이동한다" do
     scenarios = [
-      { display_name: nil, country_code: "GB" },
-      { display_name: "Bright Panda", country_code: nil }
+      { display_name: nil, native_language: "English" },
+      { display_name: "Bright Panda", native_language: nil }
     ]
 
     scenarios.each do |scenario|
@@ -57,11 +61,13 @@ class AppleOauthCallbackTest < ActionDispatch::IntegrationTest
         complete_apple_callback(uid: user.oauth_uid, email: user.email_address)
       end
 
+      assert_redirected_to root_url
+      follow_redirect!
       assert_redirected_to onboarding_url
     end
   end
 
-  test "r_Apple 재로그인 시 국가와 닉네임이 모두 있으면 홈으로 이동한다" do
+  test "r_Apple 재로그인 시 모국어와 닉네임이 모두 있으면 홈으로 이동한다" do
     user = users(:english_native)
 
     assert_no_difference "User.count" do

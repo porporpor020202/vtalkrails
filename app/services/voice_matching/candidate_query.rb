@@ -6,7 +6,7 @@ module VoiceMatching
 
     def call
       engaged = Room.involving(@sender).where.not(status: :deleted)
-      User.where.not(native_language_id: nil)
+      User.where.not(native_language: [nil, ""])
         .where.not(id: @sender.id)
         .where.not(id: UserBlock.where(blocker: @sender).select(:blocked_id))
         .where.not(id: UserBlock.where(blocked: @sender).select(:blocker_id))
