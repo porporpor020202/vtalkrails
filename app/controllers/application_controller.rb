@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  before_action :require_onboarding
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   # allow_browser versions: :modern
 
@@ -9,6 +10,13 @@ class ApplicationController < ActionController::Base
   helper_method :native_app?, :android_app?, :ios_app?
 
   private
+
+  def require_onboarding
+    return unless authenticated?
+    return if current_user.onboarding_complete?
+
+    redirect_to onboarding_path, status: :see_other
+  end
 
   def native_app?
     android_app? || ios_app?

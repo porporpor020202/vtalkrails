@@ -1,4 +1,5 @@
 class OnboardingController < ApplicationController
+  skip_before_action :require_onboarding
   before_action :redirect_completed_user
   before_action :load_countries
 
