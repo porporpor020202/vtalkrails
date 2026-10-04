@@ -8,7 +8,7 @@ class AppleOauthPageAccessTest < RemoteOriginTestCase
       assert_selector "button", text: "Continue with Apple", wait: 4
       click_button "Continue with Apple"
 
-      assert_selector "h1#contentheader", text: "Use your Apple Account to sign in to say one thing.", normalize_ws: true, wait: 4
+      assert_selector "h1#contentheader", text: "Use your Apple Account to sign in to Say One Thing.", normalize_ws: true, wait: 4
     end
   end
 end

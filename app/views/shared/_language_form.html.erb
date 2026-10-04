@@ -9,10 +9,10 @@
   <% end %>
 
   <div>
-    <%= form.label :native_language, "Native language",
+    <%= form.label :native_language_id, "Native language",
           class: "mb-2 block text-sm font-semibold text-slate-700" %>
-    <%= form.select :native_language,
-          User::NATIVE_LANGUAGES,
+    <%= form.collection_select :native_language_id,
+          Language.enabled.order(:label), :id, :label,
           { include_blank: "Select language" },
           required: true,
           class: "h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 focus:border-indigo-500 focus:ring-indigo-500" %>

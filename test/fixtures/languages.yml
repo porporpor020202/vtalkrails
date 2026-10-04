@@ -1,0 +1,19 @@
+english:
+  label: English
+  code: en
+  enable: true
+
+korean:
+  label: Korean
+  code: ko
+  enable: true
+
+spanish:
+  label: Spanish
+  code: es
+  enable: false
+
+japanese:
+  label: Japanese
+  code: ja
+  enable: false

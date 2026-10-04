@@ -1,6 +1,13 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  test "r_모국어와 같은 학습 언어는 저장할 수 없다" do
+    user = users(:english_native)
+    assert_not user.update(learning_language: user.native_language)
+    assert user.errors.added?(:learning_language, "must be different from native language")
+    assert_equal languages(:korean), user.reload.learning_language
+  end
+
   test "r_닉네임의 명사에 맞는 이미지 경로를 반환한다" do
     {
       "Happy Raccoon" => "emoji/animals_and_nature/raccoon_3d.png",

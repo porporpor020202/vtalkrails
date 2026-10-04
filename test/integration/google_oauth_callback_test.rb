@@ -25,7 +25,7 @@ class GoogleOauthCallbackTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_select "form[action='#{onboarding_path}']" do
-      assert_select "select[name='user[native_language]']"
+      assert_select "select[name='user[native_language_id]']"
     end
   end
 
@@ -44,7 +44,7 @@ class GoogleOauthCallbackTest < ActionDispatch::IntegrationTest
 
   test "r_Google 재로그인 시 닉네임이나 모국어 중 하나라도 없으면 온보딩으로 이동한다" do
     scenarios = [
-      { display_name: nil, native_language: "Korean" },
+      { display_name: nil, native_language: languages(:korean) },
       { display_name: "Calm Tiger", native_language: nil }
     ]
 

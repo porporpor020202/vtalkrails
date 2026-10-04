@@ -1,11 +1,7 @@
 class User < ApplicationRecord
-  NATIVE_LANGUAGES = %w[
-    Arabic Bengali Chinese Dutch English French German Gujarati
-    Hausa Hindi Indonesian Italian Japanese Korean Marathi Persian
-    Polish Portuguese Punjabi Russian Spanish Tamil Telugu Turkish Vietnamese
-  ].freeze
-
   # 1. Associations
+  belongs_to :native_language, class_name: "Language", optional: true
+  belongs_to :learning_language, class_name: "Language", optional: true
   has_many :voice_drops, foreign_key: :sender_id, dependent: :destroy
   has_many :voice_deliveries, foreign_key: :recipient_id, dependent: :destroy
   has_many :sessions, dependent: :destroy
@@ -31,9 +27,12 @@ class User < ApplicationRecord
   validates :display_name, uniqueness: true, allow_nil: true
   validates :display_name, presence: true, on: :onboarding
 
-  validates :native_language,
-            inclusion: { in: NATIVE_LANGUAGES },
+  validates :native_language, :learning_language,
+            presence: true,
             on: [ :onboarding ]
+
+  validate :onboarding_languages_enabled, on: :onboarding
+  validate :learning_language_differs_from_native_language
 
   # 5. Callbacks
 
@@ -43,7 +42,8 @@ class User < ApplicationRecord
 
   # 7. Public Methods / Custom Logic
   def onboarding_complete?
-    display_name.present? && native_language.present?
+    display_name.present? && native_language.present? &&
+      learning_language.present? && native_language_id != learning_language_id
   end
 
   def profile_image_path_for
@@ -55,4 +55,19 @@ class User < ApplicationRecord
 
   # 8. Private Methods
   private
+
+  # TODO: 공식문서 이해하자.
+  def onboarding_languages_enabled
+    [ :native_language, :learning_language ].each do |attribute|
+      language = public_send(attribute)
+      errors.add(attribute, "is not enabled") if language && !language.enable?
+    end
+  end
+
+  # TODO: 공식문서 이해하자.
+  def learning_language_differs_from_native_language
+    if learning_language_id.present? && learning_language_id == native_language_id
+      errors.add(:learning_language, "must be different from native language")
+    end
+  end
 end

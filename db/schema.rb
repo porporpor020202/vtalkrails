@@ -65,6 +65,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
     t.index ["code"], name: "index_countries_on_code", unique: true
   end
 
+  create_table "languages", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enable", default: false, null: false
+    t.string "label", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_languages_on_code", unique: true
+    t.index ["label"], name: "index_languages_on_label", unique: true
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.timestamp "created_at", precision: 6, null: false
     t.integer "notifications_count"
@@ -140,11 +150,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
     t.datetime "created_at", null: false
     t.string "display_name"
     t.string "email_address", null: false
-    t.string "native_language"
+    t.bigint "learning_language_id"
+    t.bigint "native_language_id"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false
     t.index ["display_name"], name: "index_users_on_display_name", unique: true
+    t.index ["learning_language_id"], name: "index_users_on_learning_language_id"
+    t.index ["native_language_id"], name: "index_users_on_native_language_id"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
   end
 
@@ -196,6 +209,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
   add_foreign_key "sessions", "users"
   add_foreign_key "user_blocks", "users", column: "blocked_id"
   add_foreign_key "user_blocks", "users", column: "blocker_id"
+  add_foreign_key "users", "languages", column: "learning_language_id"
+  add_foreign_key "users", "languages", column: "native_language_id"
   add_foreign_key "voice_deliveries", "rooms"
   add_foreign_key "voice_deliveries", "users", column: "recipient_id"
   add_foreign_key "voice_deliveries", "voice_drops"

@@ -30,6 +30,6 @@ class OnboardingController < ApplicationController
   end
 
   def onboarding_params
-    params.require(:user).permit(:native_language)
+    params.require(:user).permit(:native_language_id, :learning_language_id)
   end
 end
