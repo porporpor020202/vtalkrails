@@ -4,7 +4,7 @@
   </div>
 
 <!--  TODO: 공식문서 확인.-->
-  <div class="mt-4 mb-6">
+  <header class="mt-4 mb-6">
     <%= select_tag :say_language_id,
           options_from_collection_for_select(
             [current_user.learning_language, current_user.native_language],
@@ -12,7 +12,7 @@
           ),
           aria: { label: "Language" },
           class: "h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-base text-slate-950" %>
-  </div>
+  </header>
 
   <% if @rooms.any? %>
     <div class="space-y-3">

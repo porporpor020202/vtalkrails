@@ -22,6 +22,10 @@
               data: { onboarding_languages_target: "learning" },
               class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
 
+      <p class="text-sm text-slate-500">
+        Your native language and learning language cannot be the same.
+      </p>
+
       <%= form.submit "Continue",
             class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white",
             data: { turbo_submits_with: "Saving..." } %>

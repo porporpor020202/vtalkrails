@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = [
     "sheet",
     "timer",
-    "status",
+    "recordingMessage",
     "recordButton",
     "stopButton",
     "previewArea",
@@ -72,13 +72,13 @@ export default class extends Controller {
       this.stopButtonTarget.classList.add("flex")
       this.stopButtonTarget.classList.remove("hidden")
 
-      this.statusTarget.classList.remove("hidden")
+      this.recordingMessageTarget.classList.remove("hidden")
 
       this.tick()
       this.timerInterval = window.setInterval(() => this.tick(), 100)
 
     } catch (error) {
-      this.statusTarget.textContent = error.name === "NotAllowedError"
+      this.recordingMessageTarget.textContent = error.name === "NotAllowedError"
         ? "Microphone access is required to record."
         : "The microphone could not be started."
       this.releaseStream()
@@ -100,7 +100,7 @@ export default class extends Controller {
 
     this.sendButtonTarget.disabled = true
     this.sendButtonTarget.textContent = "Sending…"
-    this.statusTarget.textContent = "Sending your voice…"
+    this.recordingMessageTarget.textContent = "Sending your voice…"
 
     const formData = new FormData()
     formData.append("request_key", this.requestKey)
@@ -127,7 +127,7 @@ export default class extends Controller {
       this.releaseMedia()
       window.Turbo.visit(payload.redirect_url)
     } catch (error) {
-      this.statusTarget.textContent = error.message
+      this.recordingMessageTarget.textContent = error.message
       this.sendButtonTarget.disabled = false
       this.sendButtonTarget.textContent = "Try again"
     }
@@ -150,7 +150,7 @@ export default class extends Controller {
     this.releaseStream()
 
     if (this.audioBlob.size === 0) {
-      this.statusTarget.textContent = "No audio was recorded. Please try again."
+      this.recordingMessageTarget.textContent = "No audio was recorded. Please try again."
       this.resetControls()
       return
     }
@@ -160,7 +160,7 @@ export default class extends Controller {
     this.previewAreaTarget.classList.remove("hidden")
     this.stopButtonTarget.classList.add("hidden")
     this.stopButtonTarget.classList.remove("flex")
-    this.statusTarget.textContent = "Listen once, then send it."
+    this.recordingMessageTarget.classList.add("hidden")
   }
 
   preferredMimeType() {

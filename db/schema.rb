@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,14 +57,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
     t.index ["status"], name: "index_content_reports_on_status"
   end
 
-  create_table "countries", force: :cascade do |t|
-    t.string "code", limit: 2, null: false
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_countries_on_code", unique: true
-  end
-
   create_table "languages", force: :cascade do |t|
     t.string "code", null: false
     t.datetime "created_at", null: false
@@ -73,39 +65,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_languages_on_code", unique: true
     t.index ["label"], name: "index_languages_on_label", unique: true
-  end
-
-  create_table "noticed_events", force: :cascade do |t|
-    t.timestamp "created_at", precision: 6, null: false
-    t.integer "notifications_count"
-    t.jsonb "params"
-    t.bigint "record_id"
-    t.string "record_type"
-    t.string "type"
-    t.timestamp "updated_at", precision: 6, null: false
-    t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
-  end
-
-  create_table "noticed_notifications", force: :cascade do |t|
-    t.timestamp "created_at", precision: 6, null: false
-    t.bigint "event_id", null: false
-    t.timestamp "read_at"
-    t.bigint "recipient_id", null: false
-    t.string "recipient_type", null: false
-    t.timestamp "seen_at"
-    t.string "type"
-    t.timestamp "updated_at", precision: 6, null: false
-    t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
-    t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
-  end
-
-  create_table "notification_tokens", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "platform", null: false
-    t.string "token", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id"], name: "index_notification_tokens_on_user_id"
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -200,7 +159,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
   add_foreign_key "content_reports", "rooms"
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
-  add_foreign_key "notification_tokens", "users"
   add_foreign_key "rooms", "users"
   add_foreign_key "rooms", "users", column: "deleted_by_id"
   add_foreign_key "rooms", "users", column: "dismissed_by_id"

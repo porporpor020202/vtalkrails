@@ -7,6 +7,13 @@ export default class extends Controller {
     this.sync()
   }
 
+  validate(event) {
+    if (this.nativeTarget.value && this.learningTarget.value) return
+
+    event.preventDefault()
+    window.alert("Please select both your native language and learning language.")
+  }
+
   sync() {
     const nativeLanguage = this.nativeTarget.value
 

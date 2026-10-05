@@ -14,4 +14,40 @@
     <% end %>
   </section>
 
+  <section class="mt-6">
+    <h2 class="mb-3 px-1 text-sm font-extrabold text-slate-800">
+      Languages
+    </h2>
+
+    <%= link_to language_setup_path,
+          aria: { label: "Open language settings" },
+          class: "group flex items-center gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500" do %>
+      <div class="min-w-0 flex-1 divide-y divide-slate-100">
+        <div class="pb-4">
+          <p class="text-xs font-semibold text-indigo-600">
+            Learning language
+          </p>
+          <p class="mt-1 text-lg font-bold text-slate-950">
+            <%= current_user.learning_language.label %>
+          </p>
+        </div>
+
+        <div class="pt-4">
+          <p class="text-xs font-semibold text-slate-500">
+            Native language
+          </p>
+          <p class="mt-1 text-lg font-bold text-slate-950">
+            <%= current_user.native_language.label %>
+          </p>
+        </div>
+      </div>
+
+      <svg class="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor"
+           aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" d="m9 5 7 7-7 7" />
+      </svg>
+    <% end %>
+  </section>
 </section>

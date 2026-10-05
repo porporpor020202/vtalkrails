@@ -77,11 +77,12 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "녹음을 완료하면 미리듣기와 Record again 버튼이 표시된다" do
-    record_voice
+  test "r_녹음을 완료하면 미리듣기와 Record again 버튼이 표시된다" do
+    start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
       assert_selector 'audio[src^="blob:"]'
+      assert_no_selector '[data-voice-recorder-target="recordingMessage"]'
       assert_button "Record again"
       assert_button "Send voice"
       assert_no_button "Start recording", enable_aria_label: true
@@ -123,8 +124,8 @@ class SayTabTest < ApplicationSystemTestCase
     assert message.audio.attached?
   end
 
-  test "Record again을 누르면 기존 녹음이 지워지고 다시 녹음할 수 있다" do
-    record_voice
+  test "r_Record again을 누르면 기존 녹음이 지워지고 다시 녹음할 수 있다" do
+    start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
       assert_selector 'audio[src^="blob:"]'
@@ -133,12 +134,11 @@ class SayTabTest < ApplicationSystemTestCase
 
       assert_selector "audio:not([src])", visible: :all
       assert_selector '[data-voice-recorder-target="timer"]', exact_text: "00:00"
-      assert_text "Tap record when you are ready."
       assert_button "Start recording", enable_aria_label: true
       assert_no_button "Record again"
       assert_no_button "Send voice"
 
-      finish_recording
+      start_and_finish_recording_within_sheet
 
       assert_selector 'audio[src^="blob:"]'
       assert_button "Record again"
@@ -146,8 +146,8 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "녹음 완료 후 X를 눌러 닫으면 기존 녹음이 삭제된다" do
-    record_voice
+  test "r_녹음 완료 후 X를 눌러 닫으면 기존 녹음이 삭제된다" do
+    start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
       assert_button "Record again"
@@ -163,7 +163,6 @@ class SayTabTest < ApplicationSystemTestCase
     within recorder_sheet do
       assert_selector "audio:not([src])", visible: :all
       assert_selector '[data-voice-recorder-target="timer"]', exact_text: "00:00"
-      assert_text "Tap record when you are ready."
       assert_button "Start recording", enable_aria_label: true
       assert_no_button "Record again"
       assert_no_button "Send voice"
@@ -191,15 +190,15 @@ class SayTabTest < ApplicationSystemTestCase
     '[data-voice-recorder-target="sheet"]'
   end
 
-  def record_voice
+  def start_and_finish_recording_with_click_drop_a_voice
     click_button "Drop a voice"
 
     within recorder_sheet do
-      finish_recording
+      start_and_finish_recording_within_sheet
     end
   end
 
-  def finish_recording
+  def start_and_finish_recording_within_sheet
     click_button "Start recording", enable_aria_label: true
 
     assert_button "Stop recording", enable_aria_label: true
