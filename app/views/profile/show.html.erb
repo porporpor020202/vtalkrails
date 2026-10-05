@@ -11,6 +11,18 @@
     <h1 class="mt-2 text-3xl font-black tracking-[-0.035em] text-slate-950">Profile</h1>
   </header>
 
+  <div class="rounded-[28px] border border-slate-200 bg-white p-6 text-center shadow-sm">
+    <%= image_tag current_user.profile_image_path_for,
+          alt: "My profile", width: 96, height: 96,
+          class: "mx-auto h-24 w-24 object-contain" %>
+    <h2 class="mt-4 break-words text-xl font-bold text-slate-950">
+      <%= current_user.display_name %>
+    </h2>
+    <p class="mt-2 break-words text-sm text-slate-500">
+      <%= current_user.email_address %>
+    </p>
+  </div>
+
   <div class="mt-auto space-y-3 pt-8">
     <%= button_to session_path,
           method: :delete,
