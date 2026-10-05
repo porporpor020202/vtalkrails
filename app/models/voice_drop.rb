@@ -1,7 +1,9 @@
 class VoiceDrop < ApplicationRecord
   belongs_to :sender, class_name: "User"
-  has_many :voice_deliveries, dependent: :destroy
-  has_many :rooms, through: :voice_deliveries
+  belongs_to :language
+  has_many :voice_messages, dependent: :nullify
+  has_many :rooms, through: :voice_messages
 
-  validates :request_key, presence: true, length: { maximum: 100 }, uniqueness: { scope: :sender_id }
+  validates :request_key, presence: true, uniqueness: { scope: :sender_id }
+  validates :recipient_count, numericality: { only_integer: true, greater_than: 0 }
 end

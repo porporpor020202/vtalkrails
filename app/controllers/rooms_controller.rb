@@ -1,24 +1,21 @@
 class RoomsController < ApplicationController
   def index
+    @languages = [current_user.learning_language, current_user.native_language]
+    @language = @languages.find { |language| language.id.to_s == params[:room_language_id] } ||
+      current_user.learning_language
     @rooms = Room.visible_to(current_user)
-      .includes(:user, :opponent, :last_sender, voice_messages: { audio_attachment: :blob })
-      .order(Arel.sql("COALESCE(last_message_at, rooms.updated_at) DESC"))
-      .to_a
-      .uniq { |room| room.opponent_for(current_user).id }
+      .where(language: @language)
+      .includes(:host, :opponent)
+      .order(created_at: :desc, id: :desc)
   end
 
   def show
     @room = Room.involving(current_user)
-      .includes(:user, :opponent, voice_messages: { audio_attachment: :blob })
+      .includes(:host, :opponent)
       .find(params[:id])
 
-    if @room.hidden_for?(current_user)
-      redirect_to rooms_path, status: :see_other
-      return
-    end
-
     @opponent = @room.opponent_for(current_user)
-    @messages = @room.deleted? ? [] : @room.voice_messages.order(:created_at)
+    @messages = @room.voice_messages.with_attached_audio.order(:created_at, :id)
   end
 
   def destroy

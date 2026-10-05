@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 class OnboardingHistoryTest < ApplicationSystemTestCase
-  test "신규 사용자가 온보딩을 완료하면 뒤로가도 온보딩과 로그인 화면이 표시되지 않는다" do
+  test "r_신규 사용자가 온보딩을 완료하면 뒤로가도 온보딩과 로그인 화면이 표시되지 않는다" do
     user = User.create!(
       oauth_provider: "google",
       oauth_uid: SecureRandom.uuid,

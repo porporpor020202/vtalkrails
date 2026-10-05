@@ -1,7 +1,10 @@
 <% content_for :title, "Complete your profile | Say One Thing" %>
 <% content_for :hide_bottom_nav, "true" %>
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
 
-<div class="flex flex-1 items-center px-6 py-10">
+<div class="flex flex-1 items-center px-6 py-10" data-controller="auth-history" data-action="pageshow@window->auth-history#restore">
   <section class="w-full">
     <%= form_with model: @user, url: onboarding_path, method: :patch, class: "mt-8 space-y-5", data: { controller: "onboarding-languages" } do |form| %>
       <% if @user.errors.any? %>

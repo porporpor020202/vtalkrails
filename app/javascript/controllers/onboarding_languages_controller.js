@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["native", "learning"]
+  static targets = ["native", "learning", "dialog"]
 
   connect() {
     this.sync()
@@ -11,7 +11,11 @@ export default class extends Controller {
     if (this.nativeTarget.value && this.learningTarget.value) return
 
     event.preventDefault()
-    window.alert("Please select both your native language and learning language.")
+    this.dialogTarget.showModal()
+  }
+
+  closeDialog() {
+    this.dialogTarget.close()
   }
 
   sync() {

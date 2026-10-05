@@ -109,7 +109,7 @@ class LanguageSettingsTest < ApplicationSystemTestCase
     assert_select "user_learning_language_id", selected: "English"
   end
 
-  test "r_언어 중 하나가 비어 있으면 저장하지 않고 선택 안내 alert를 표시한다" do
+  test "r_언어 중 하나가 비어 있으면 저장하지 않고 선택 안내 dialog를 표시한다" do
     [
       [ "user_native_language_id", "Select your native language" ],
       [ "user_learning_language_id", "Select your learning language" ]
@@ -119,12 +119,16 @@ class LanguageSettingsTest < ApplicationSystemTestCase
       assert_select "user_native_language_id", selected: @user.native_language.label
       assert_select "user_learning_language_id", selected: @user.learning_language.label
 
+      assert_no_selector "dialog[open]"
       select prompt, from: field
+      click_button "Save changes"
 
-      accept_alert "Please select both your native language and learning language." do
-        click_button "Save changes"
+      within "dialog[open]" do
+        assert_text "Please select both your native language and learning language."
+        click_button "OK"
       end
 
+      assert_no_selector "dialog[open]"
       assert_current_path language_setup_path
       assert_equal "", find("##{field}").value
 
@@ -134,21 +138,27 @@ class LanguageSettingsTest < ApplicationSystemTestCase
     end
   end
 
-  %w[native learning].each do |kind|
-    test "#{kind} 언어를 선택하지 않으면 브라우저가 저장을 막는다" do
+  test "r_언어를 선택하지 않으면 저장하지 않고 안내 dialog를 표시한다" do
+    [
+      [ "user_native_language_id", "Select your native language" ],
+      [ "user_learning_language_id", "Select your learning language" ]
+    ].each do |field, prompt|
+      visit settings_path
       click_link "Open language settings", enable_aria_label: true
 
-      field = find("#user_#{kind}_language_id")
-      field.select find(
-        "#user_#{kind}_language_id option[value='']",
-        visible: :all
-      ).text(:all)
+      assert_no_selector "dialog[open]"
 
+      select prompt, from: field
       click_button "Save changes"
 
-      assert field.evaluate_script("this.validity.valueMissing")
-      assert field.evaluate_script("this === document.activeElement")
+      within "dialog[open]" do
+        assert_text "Please select both your native language and learning language."
+        click_button "OK"
+      end
+
+      assert_no_selector "dialog[open]"
       assert_current_path language_setup_path
+      assert_equal "", find("##{field}").value
 
       @user.reload
       assert_equal languages(:english), @user.native_language
@@ -156,20 +166,24 @@ class LanguageSettingsTest < ApplicationSystemTestCase
     end
   end
 
-  [
-    [ "모국어가 비어 있으면", nil, :korean ],
-    [ "학습 언어가 비어 있으면", :english, nil ],
-    [ "모국어가 비활성이면", :spanish, :korean ],
-    [ "학습 언어가 비활성이면", :english, :spanish ],
-    [ "두 언어가 같으면", :english, :english ]
-  ].each do |description, native, learning|
-    test "#{description} 브라우저 제한을 우회해도 서버가 저장을 거부한다" do
+  test "r_언어 설정이 유효하지 않으면 브라우저 제한을 우회해도 서버가 저장을 거부한다" do
+    [
+      [ "모국어가 비어 있으면", nil, :korean ],
+      [ "학습 언어가 비어 있으면", :english, nil ],
+      [ "모국어가 비활성이면", :spanish, :korean ],
+      [ "학습 언어가 비활성이면", :english, :spanish ],
+      [ "두 언어가 같으면", :english, :english ]
+    ].each do |description, native, learning|
+      visit settings_path
       click_link "Open language settings", enable_aria_label: true
 
       native_id = native ? languages(native).id.to_s : ""
       learning_id = learning ? languages(learning).id.to_s : ""
 
-      # 선택 제한과 required 검사를 우회하되 실제 폼을 서버에 제출한다.
+      assert_selector "#user_native_language_id"
+      assert_selector "#user_learning_language_id"
+
+      # 클라이언트 검증을 우회하고 실제 폼을 서버에 제출한다.
       page.execute_script(<<~JS, native_id, learning_id)
         const native = document.querySelector("#user_native_language_id");
         const learning = document.querySelector("#user_learning_language_id");
@@ -177,15 +191,14 @@ class LanguageSettingsTest < ApplicationSystemTestCase
         native.replaceChildren(new Option("Native", arguments[0], true, true));
         learning.replaceChildren(new Option("Learning", arguments[1], true, true));
 
-        native.form.noValidate = true;
-        native.form.requestSubmit();
+        HTMLFormElement.prototype.submit.call(native.form);
       JS
 
       assert_selector '[role="alert"]', text: /\S/
 
       @user.reload
-      assert_equal languages(:english), @user.native_language
-      assert_equal languages(:korean), @user.learning_language
+      assert_equal languages(:english), @user.native_language, description
+      assert_equal languages(:korean), @user.learning_language, description
     end
   end
 end

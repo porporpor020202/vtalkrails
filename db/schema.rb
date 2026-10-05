@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,21 +69,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
 
   create_table "rooms", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "deleted_by_id"
-    t.bigint "dismissed_by_id"
-    t.datetime "last_message_at"
-    t.bigint "last_sender_id"
+    t.bigint "host_id", null: false
+    t.bigint "language_id", null: false
     t.bigint "opponent_id", null: false
-    t.integer "status", default: 1, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["deleted_by_id"], name: "index_rooms_on_deleted_by_id"
-    t.index ["dismissed_by_id"], name: "index_rooms_on_dismissed_by_id"
-    t.index ["last_message_at"], name: "index_rooms_on_last_message_at"
-    t.index ["last_sender_id"], name: "index_rooms_on_last_sender_id"
+    t.index ["host_id", "opponent_id"], name: "index_rooms_on_host_id_and_opponent_id"
+    t.index ["host_id"], name: "index_rooms_on_host_id"
+    t.index ["language_id"], name: "index_rooms_on_language_id"
     t.index ["opponent_id"], name: "index_rooms_on_opponent_id"
-    t.index ["user_id", "opponent_id"], name: "index_rooms_on_user_id_and_opponent_id"
-    t.index ["user_id"], name: "index_rooms_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -109,6 +102,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
     t.datetime "created_at", null: false
     t.string "display_name"
     t.string "email_address", null: false
+    t.datetime "last_active_at"
     t.bigint "learning_language_id"
     t.bigint "native_language_id"
     t.string "oauth_provider", null: false
@@ -120,28 +114,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
   end
 
-  create_table "voice_deliveries", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "first_replied_at"
-    t.bigint "recipient_id", null: false
-    t.bigint "room_id"
-    t.datetime "updated_at", null: false
-    t.bigint "voice_drop_id", null: false
-    t.index ["recipient_id", "created_at"], name: "index_voice_deliveries_on_recipient_id_and_created_at"
-    t.index ["recipient_id"], name: "index_voice_deliveries_on_recipient_id"
-    t.index ["room_id"], name: "index_voice_deliveries_on_room_id", unique: true
-    t.index ["voice_drop_id", "recipient_id"], name: "index_voice_deliveries_on_voice_drop_id_and_recipient_id", unique: true
-    t.index ["voice_drop_id"], name: "index_voice_deliveries_on_voice_drop_id"
-  end
-
   create_table "voice_drops", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.integer "recipient_count", default: 0, null: false
+    t.bigint "language_id", null: false
+    t.integer "recipient_count", null: false
     t.string "request_key", null: false
     t.bigint "sender_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["language_id"], name: "index_voice_drops_on_language_id"
     t.index ["sender_id", "request_key"], name: "index_voice_drops_on_sender_id_and_request_key", unique: true
-    t.index ["sender_id"], name: "index_voice_drops_on_sender_id"
   end
 
   create_table "voice_messages", force: :cascade do |t|
@@ -150,8 +131,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
     t.bigint "room_id", null: false
     t.bigint "sender_id", null: false
     t.datetime "updated_at", null: false
+    t.bigint "voice_drop_id"
     t.index ["room_id"], name: "index_voice_messages_on_room_id"
     t.index ["sender_id"], name: "index_voice_messages_on_sender_id"
+    t.index ["voice_drop_id"], name: "index_voice_messages_on_voice_drop_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -159,20 +142,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_010000) do
   add_foreign_key "content_reports", "rooms"
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
-  add_foreign_key "rooms", "users"
-  add_foreign_key "rooms", "users", column: "deleted_by_id"
-  add_foreign_key "rooms", "users", column: "dismissed_by_id"
-  add_foreign_key "rooms", "users", column: "last_sender_id"
+  add_foreign_key "rooms", "languages"
+  add_foreign_key "rooms", "users", column: "host_id"
   add_foreign_key "rooms", "users", column: "opponent_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "user_blocks", "users", column: "blocked_id"
   add_foreign_key "user_blocks", "users", column: "blocker_id"
   add_foreign_key "users", "languages", column: "learning_language_id"
   add_foreign_key "users", "languages", column: "native_language_id"
-  add_foreign_key "voice_deliveries", "rooms"
-  add_foreign_key "voice_deliveries", "users", column: "recipient_id"
-  add_foreign_key "voice_deliveries", "voice_drops"
+  add_foreign_key "voice_drops", "languages"
   add_foreign_key "voice_drops", "users", column: "sender_id"
   add_foreign_key "voice_messages", "rooms"
   add_foreign_key "voice_messages", "users", column: "sender_id"
+  add_foreign_key "voice_messages", "voice_drops"
 end

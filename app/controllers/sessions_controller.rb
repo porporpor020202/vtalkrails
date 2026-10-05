@@ -3,6 +3,12 @@ class SessionsController < ApplicationController
   allow_unauthenticated_access only: :new
 
   def new
+    return unless authenticated?
+
+    redirect_to(
+      current_user.onboarding_complete? ? root_path : onboarding_path,
+      status: :see_other
+    )
   end
 
   def destroy

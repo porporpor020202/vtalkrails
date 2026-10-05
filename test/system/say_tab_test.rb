@@ -1,6 +1,9 @@
 require "application_system_test_case"
+require_relative "../test_helpers/voice_test_helper"
 
 class SayTabTest < ApplicationSystemTestCase
+  include VoiceTestHelper
+
   driven_by :selenium, using: :headless_chrome,
             screen_size: [ 1400, 1000 ] do |options|
     options.add_argument "--use-fake-device-for-media-stream"
@@ -90,38 +93,90 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "Send voice를 누르면 현재 선택된 언어 ID와 녹음이 전송된다" do
+  test "r_Say 탭에서 선택한 언어의 룸만 표시된다" do
+    host = users(:korean_native)
+    opponent = users(:english_native)
+
+    english_room = Room.create!(
+      host: host,
+      opponent: opponent,
+      language: languages(:english)
+    )
+
+    korean_room = Room.create!(
+      host: host,
+      opponent: opponent,
+      language: languages(:korean)
+    )
+
+    visit rooms_path
+
+    select "English", from: "room_language_id"
+    assert_select "room_language_id", selected: "English"
+
+    within "main" do
+      assert_selector "a[href='#{room_path(english_room)}']"
+      assert_no_selector "a[href='#{room_path(korean_room)}']"
+    end
+
+    select "Korean", from: "room_language_id"
+    assert_select "room_language_id", selected: "Korean"
+
+    within "main" do
+      assert_selector "a[href='#{room_path(korean_room)}']"
+      assert_no_selector "a[href='#{room_path(english_room)}']"
+    end
+  end
+
+  test "Say 탭에서 내가 참여하지 않은 룸은 표시되지 않는다" do
     user = users(:english_native)
+    other = users(:korean_native)
+    room_language = languages(:korean)
 
-    # 기본값인 학습 언어에서 모국어로 변경해 현재 선택값을 검증한다.
-    select user.native_language.label, from: "say_language_id"
-    assert_select "say_language_id", selected: user.native_language.label
+    received_room = Room.create!(
+      host: other,
+      opponent: user,
+      language: room_language
+    )
 
-    observe_voice_drop_request
-    record_voice
+    unrelated_room = Room.create!(
+      host: other,
+      opponent: users(:japanese_native),
+      language: room_language
+    )
 
-    within recorder_sheet do
-      click_button "Send voice"
+    visit rooms_path
+    assert_select "room_language_id", selected: room_language.label
+
+    within "main" do
+      assert_selector "a[href='#{room_path(received_room)}']"
+      assert_no_selector "a[href='#{room_path(unrelated_room)}']"
     end
+  end
 
-    Selenium::WebDriver::Wait.new(timeout: 10).until do
-      page.evaluate_script("window.voiceDropRequest?.status != null")
+  test "r_Say 탭에서 내가 호스트이고 아직 답장이 없는 룸은 표시되지 않는다" do
+    user = users(:english_native)
+    other = users(:korean_native)
+    room_language = languages(:korean)
+
+    unanswered_room = Room.create!(host: user, opponent: other, language: room_language)
+    create_voice_message(room: unanswered_room, sender: user)
+
+    answered_room = Room.create!(host: user, opponent: other, language: room_language)
+    create_voice_message(room: answered_room, sender: user)
+    create_voice_message(room: answered_room, sender: other)
+
+    received_room = Room.create!(host: other, opponent: user, language: room_language)
+    create_voice_message(room: received_room, sender: other)
+
+    visit rooms_path
+    assert_select "room_language_id", selected: room_language.label
+
+    within "main" do
+      assert_selector "a[href='#{room_path(answered_room)}']"
+      assert_selector "a[href='#{room_path(received_room)}']"
+      assert_no_selector "a[href='#{room_path(unanswered_room)}']"
     end
-
-    request = page.evaluate_script("window.voiceDropRequest")
-
-    assert_equal user.native_language_id.to_s, request["language_id"]
-    assert_operator request["audio_size"], :>, 0
-    assert_equal 201, request["status"]
-
-    drop = VoiceDrop.find_by!(sender: user, request_key: request["request_key"])
-    message = VoiceMessage.where(
-      sender: user,
-      room_id: drop.rooms.select(:id)
-    ).order(:id).last
-
-    assert_not_nil message
-    assert message.audio.attached?
   end
 
   test "r_Record again을 누르면 기존 녹음이 지워지고 다시 녹음할 수 있다" do
@@ -169,18 +224,18 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_Say 탭의 언어 목록에는 학습 언어와 모국어가 순서대로 표시된다" do
+  test "Say 탭의 언어 목록에는 학습 언어와 모국어가 순서대로 표시된다" do
     user = users(:english_native)
     expected_languages = [ user.learning_language, user.native_language ]
 
     within "header" do
-      assert_selector "#say_language_id option", count: 2, visible: :all
-      options = all("#say_language_id option", visible: :all)
+      assert_selector "#room_language_id option", count: 2, visible: :all
+      options = all("#room_language_id option", visible: :all)
 
       # TODO: &:label 공식문서 확인하자.
       assert_equal expected_languages.map(&:label), options.map { |option| option.text(:all) }
       assert_equal expected_languages.map { |language| language.id.to_s }, options.map { |option| option[:value] }
-      assert_select "say_language_id", selected: user.learning_language.label
+      assert_select "room_language_id", selected: user.learning_language.label
     end
   end
 
@@ -207,39 +262,5 @@ class SayTabTest < ApplicationSystemTestCase
     click_button "Stop recording", enable_aria_label: true
 
     assert_button "Record again"
-  end
-
-  def observe_voice_drop_request
-    page.execute_script(<<~JS)
-      const originalFetch = window.fetch.bind(window);
-      const endpoint = #{voice_drop_path.to_json};
-
-      window.voiceDropRequest = null;
-
-      window.fetch = async function(url, options = {}) {
-        if (
-          new URL(url, window.location.href).pathname !== endpoint ||
-          options.method !== "POST"
-        ) {
-          return originalFetch(url, options);
-        }
-
-        const body = options.body;
-        const request = {
-          language_id: body.get("say_language_id"),
-          request_key: body.get("request_key"),
-          audio_size: body.get("voice_message[audio]")?.size || 0,
-          status: null
-        };
-
-        window.voiceDropRequest = request;
-
-        // 실제 서버로 전송한다. 성공 응답을 가짜로 만들지 않는다.
-        const response = await originalFetch(url, options);
-        request.status = response.status;
-
-        return response;
-      };
-    JS
   end
 end

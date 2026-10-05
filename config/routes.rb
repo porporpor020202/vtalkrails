@@ -33,7 +33,9 @@ Rails.application.routes.draw do
 
   resources :rooms, only: %i[index show destroy] do
     resources :ai_assistances, only: %i[create show]
-    resources :voice_messages, only: :create
+    resources :voice_messages, only: :create do
+      get :audio, on: :member
+    end
     resource :safety, only: :show, controller: "room_safeties"
     resource :report, only: :create, controller: "content_reports"
     resource :block, only: :create, controller: "user_blocks"

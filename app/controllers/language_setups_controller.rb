@@ -5,7 +5,12 @@ class LanguageSetupsController < ApplicationController
 
   def update
     @user = current_user
-    @user.update!(params.require(:user).permit(:native_language_id, :learning_language_id))
-    redirect_to settings_path, status: :see_other
+    @user.assign_attributes(params.require(:user).permit(:native_language_id, :learning_language_id))
+
+    if @user.save(context: :language_setup)
+      redirect_to settings_path, status: :see_other
+    else
+      render :show, status: :unprocessable_entity
+    end
   end
 end

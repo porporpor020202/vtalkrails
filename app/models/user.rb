@@ -3,7 +3,6 @@ class User < ApplicationRecord
   belongs_to :native_language, class_name: "Language", optional: true
   belongs_to :learning_language, class_name: "Language", optional: true
   has_many :voice_drops, foreign_key: :sender_id, dependent: :destroy
-  has_many :voice_deliveries, foreign_key: :recipient_id, dependent: :destroy
   has_many :sessions, dependent: :destroy
   has_many :rooms, dependent: :destroy
   has_many :opponent_rooms, class_name: "Room", foreign_key: :opponent_id, inverse_of: :opponent, dependent: :destroy
@@ -29,9 +28,9 @@ class User < ApplicationRecord
 
   validates :native_language, :learning_language,
             presence: true,
-            on: [ :onboarding ]
+            on: [ :onboarding, :language_setup ]
 
-  validate :onboarding_languages_enabled, on: :onboarding
+  validate :languages_enabled, on: [ :onboarding, :language_setup ]
   validate :learning_language_differs_from_native_language
 
   # 5. Callbacks
@@ -57,7 +56,7 @@ class User < ApplicationRecord
   private
 
   # TODO: 공식문서 이해하자.
-  def onboarding_languages_enabled
+  def languages_enabled
     [ :native_language, :learning_language ].each do |attribute|
       language = public_send(attribute)
       errors.add(attribute, "is not enabled") if language && !language.enable?

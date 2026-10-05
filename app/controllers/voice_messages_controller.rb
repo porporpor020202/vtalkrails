@@ -6,19 +6,12 @@ class VoiceMessagesController < ApplicationController
 
     ApplicationRecord.transaction do
       @room.lock!
-      unless @room.can_reply?(current_user)
-        raise ActiveRecord::RecordInvalid.new(@room.tap do |room|
-          room.errors.add(:base, "Wait for your partner to reply before recording again")
-        end)
-      end
-
       message = @room.voice_messages.build(
         sender: current_user,
         duration_ms: attributes.fetch(:duration_ms)
       )
       message.audio.attach(attributes.fetch(:audio))
       message.save!
-      @room.update!(last_sender: current_user, last_message_at: Time.current)
     end
 
     render json: { redirect_url: room_path(@room) }, status: :created
@@ -26,6 +19,17 @@ class VoiceMessagesController < ApplicationController
     render json: { error: "A recorded voice message is required" }, status: :bad_request
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
+  end
+
+  def audio
+    message = @room.voice_messages.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless message.audio.attached?
+
+    response.headers["Cache-Control"] = "private, no-store"
+    send_data message.audio.download,
+      filename: message.audio.filename.to_s,
+      type: message.audio.content_type,
+      disposition: "inline"
   end
 
   private

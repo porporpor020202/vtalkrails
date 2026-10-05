@@ -6,6 +6,13 @@ export default class extends Controller {
 
   connect() {
     this.updateActiveTab()
+    this.resizeObserver = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        "--bottom-nav-height",
+        `${this.element.getBoundingClientRect().height}px`
+      )
+    })
+    this.resizeObserver.observe(this.element)
     this.onFrameLoad = this.updateActiveTab.bind(this)
     this.onTurboLoad = this.updateActiveTab.bind(this)
     document.addEventListener("turbo:frame-render", this.onFrameLoad)
@@ -13,6 +20,8 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.resizeObserver.disconnect()
+    document.documentElement.style.removeProperty("--bottom-nav-height")
     document.removeEventListener("turbo:frame-render", this.onFrameLoad)
     document.removeEventListener("turbo:load", this.onTurboLoad)
   }

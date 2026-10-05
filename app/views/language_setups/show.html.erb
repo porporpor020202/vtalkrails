@@ -14,6 +14,16 @@
   <%= form_with model: @user, url: language_setup_path, method: :patch,
         data: { controller: "onboarding-languages", action: "submit->onboarding-languages#validate" },
         class: "space-y-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm" do |form| %>
+    <% if @user.errors.any? %>
+      <div role="alert" class="rounded-2xl bg-red-50 p-4 text-sm text-red-700">
+        <ul class="list-disc pl-5">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div>
       <%= form.label :learning_language_id, "Learning language",
             class: "mb-2 block text-sm font-semibold text-indigo-600" %>
@@ -38,5 +48,19 @@
     <%= form.submit "Save changes",
           class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white",
           data: { turbo_submits_with: "Saving..." } %>
+
+    <dialog data-onboarding-languages-target="dialog"
+            aria-label="Language selection"
+            aria-describedby="language-selection-message"
+            class="m-auto w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl backdrop:bg-black/40">
+      <p id="language-selection-message" class="text-sm text-slate-700">
+        Please select both your native language and learning language.
+      </p>
+      <button type="button" autofocus
+              data-action="onboarding-languages#closeDialog"
+              class="mt-5 w-full cursor-pointer rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white">
+        OK
+      </button>
+    </dialog>
   <% end %>
 </section>
