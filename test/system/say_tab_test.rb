@@ -25,16 +25,55 @@ class SayTabTest < ApplicationSystemTestCase
     Current.reset
   end
 
-  test "Say 탭에서 녹음 버튼을 누르면 녹음 창이 열린다" do
+  test "r_Say 화면 맨 위에서 아래로 당기면 현재 화면을 새로고침한다" do
+    page.execute_script(<<~JS)
+      const section = document
+        .querySelector('[data-pull-to-refresh-target="indicator"]')
+        .closest("section");
+
+      // 새로고침으로 HTML이 교체되는지 확인하기 위한 임시 표시
+      section.dataset.refreshProbe = "before";
+      section.closest("main").scrollTop = 0;
+
+      function dispatchTouch(type, y) {
+        const event = new Event(type, {
+          bubbles: true,
+          cancelable: true
+        });
+
+        Object.defineProperty(event, "touches", {
+          value: [{ clientY: y }]
+        });
+
+        section.dispatchEvent(event);
+      }
+
+      dispatchTouch("touchstart", 100);
+      dispatchTouch("touchmove", 300);
+    JS
+
+    assert_selector(
+      '[data-pull-to-refresh-target="label"]',
+      text: "Release to refresh"
+    )
+
+    page.execute_script(<<~JS)
+      document.querySelector('[data-refresh-probe="before"]')
+        .dispatchEvent(new Event("touchend", { bubbles: true }));
+    JS
+
+    assert_no_selector '[data-refresh-probe="before"]'
+    assert_current_path rooms_path
+    assert_selector '[data-pull-to-refresh-target="label"]', text: "Pull to refresh"
+  end
+
+  test "r_Say 탭에서 녹음 버튼을 누르면 녹음 창이 열린다" do
     assert_no_selector recorder_sheet
 
     click_button "Drop a voice"
 
     within recorder_sheet do
-      assert_text "Tap record when you ready."
-      assert_button "Start recording", enable_aria_label: true
-      assert_no_button "Record again"
-      assert_no_button "Send voice"
+      assert_selector '[data-voice-recorder-target="timer"]'
     end
   end
 
@@ -107,6 +146,30 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
+  test "녹음 완료 후 X를 눌러 닫으면 기존 녹음이 삭제된다" do
+    record_voice
+
+    within recorder_sheet do
+      assert_button "Record again"
+      assert_selector 'audio[src^="blob:"]'
+
+      click_button "Close recorder", enable_aria_label: true
+    end
+
+    assert_no_selector recorder_sheet
+
+    click_button "Drop a voice"
+
+    within recorder_sheet do
+      assert_selector "audio:not([src])", visible: :all
+      assert_selector '[data-voice-recorder-target="timer"]', exact_text: "00:00"
+      assert_text "Tap record when you are ready."
+      assert_button "Start recording", enable_aria_label: true
+      assert_no_button "Record again"
+      assert_no_button "Send voice"
+    end
+  end
+
   test "r_Say 탭의 언어 목록에는 학습 언어와 모국어가 순서대로 표시된다" do
     user = users(:english_native)
     expected_languages = [ user.learning_language, user.native_language ]
@@ -140,7 +203,7 @@ class SayTabTest < ApplicationSystemTestCase
     click_button "Start recording", enable_aria_label: true
 
     assert_button "Stop recording", enable_aria_label: true
-    assert_selector '[data-voice-recorder-target="timer"]', text: /00:0[1-9]/, wait: 5
+    assert_selector '[data-voice-recorder-target="timer"]', text: /00:03/, wait: 5
 
     click_button "Stop recording", enable_aria_label: true
 

@@ -27,17 +27,16 @@ export default class extends Controller {
     this.releaseMedia()
   }
 
-  open() {
+  openSheet() {
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
       window.alert("Voice recording is not supported on this device.")
       return
     }
 
     this.sheetTarget.classList.remove("hidden")
-    document.body.classList.add("overflow-hidden")
   }
 
-  close() {
+  closeSheet() {
     this.recordingGeneration += 1
     if (this.recorder?.state === "recording") this.recorder.stop()
     this.releaseMedia()
@@ -46,7 +45,7 @@ export default class extends Controller {
     this.reset()
   }
 
-  async start() {
+  async startRecording() {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -68,12 +67,16 @@ export default class extends Controller {
       })
       this.startedAt = performance.now()
       this.recorder.start(500)
+
       this.recordButtonTarget.classList.add("hidden")
-      this.stopButtonTarget.classList.remove("hidden")
       this.stopButtonTarget.classList.add("flex")
-      this.statusTarget.textContent = "Recording… tap stop when you are done."
+      this.stopButtonTarget.classList.remove("hidden")
+
+      this.statusTarget.classList.remove("hidden")
+
       this.tick()
       this.timerInterval = window.setInterval(() => this.tick(), 100)
+
     } catch (error) {
       this.statusTarget.textContent = error.name === "NotAllowedError"
         ? "Microphone access is required to record."
@@ -82,7 +85,7 @@ export default class extends Controller {
     }
   }
 
-  stop() {
+  stopRecording() {
     if (this.recorder?.state === "recording") this.recorder.stop()
   }
 
@@ -198,7 +201,6 @@ export default class extends Controller {
     this.durationMs = 0
     this.recorder = null
     this.timerTarget.textContent = "00:00"
-    this.statusTarget.textContent = "Tap record when you are ready."
     this.previewTarget.removeAttribute("src")
     this.previewAreaTarget.classList.add("hidden")
     this.sendButtonTarget.disabled = false

@@ -1,9 +1,10 @@
-<section class="relative flex min-h-full flex-1 flex-col bg-slate-50 px-5 pb-36 pt-[max(1.5rem,env(safe-area-inset-top))]" data-controller="pull-to-refresh">
-  <div class="pointer-events-none absolute inset-x-0 top-0 z-30 flex h-12 items-center justify-center bg-white/90 text-xs font-bold text-slate-500 shadow-sm transition-transform duration-150" data-pull-to-refresh-target="indicator" aria-hidden="true">
+<section class="flex flex-1 flex-col bg-slate-50 px-5 pb-36" data-controller="pull-to-refresh">
+  <div class="pointer-events-none flex h-10 items-center justify-center bg-white/90 text-xs font-bold text-slate-500 shadow-sm transition-transform duration-150" data-pull-to-refresh-target="indicator">
     <span data-pull-to-refresh-target="label">Pull to refresh</span>
   </div>
 
-  <header class="mb-6">
+<!--  TODO: 공식문서 확인.-->
+  <div class="mt-4 mb-6">
     <%= select_tag :say_language_id,
           options_from_collection_for_select(
             [current_user.learning_language, current_user.native_language],
@@ -11,7 +12,7 @@
           ),
           aria: { label: "Language" },
           class: "h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-base text-slate-950" %>
-  </header>
+  </div>
 
   <% if @rooms.any? %>
     <div class="space-y-3">
@@ -47,6 +48,16 @@
   <% end %>
 </section>
 
-<%= render "voice_recorder",
-      endpoint: voice_drop_path,
-      trigger_classes: "fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 to-red-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-rose-500/30 ring-4 ring-white transition active:scale-95" %>
+<section data-controller="voice-recorder" data-voice-recorder-endpoint-value=<%= voice_drop_path %> data-voice-recorder-max-duration-value="30000">
+
+  <button type="button" class="fixed bottom-25 left-1/2 z-30 -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 to-red-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-rose-500/30 ring-4 ring-white" data-action="voice-recorder#openSheet">
+    <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
+      <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3z" />
+      <path d="M17 11a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11h-2z" />
+    </svg>
+    <span class="sr-only">"Drop a voice"</span>
+  </button>
+
+  <%= render "voice_recorder_sheet" %>
+
+</section>

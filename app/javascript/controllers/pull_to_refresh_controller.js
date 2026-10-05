@@ -88,7 +88,7 @@ export default class extends Controller {
   setIndicator(distance) {
     if (!this.hasIndicatorTarget) return
 
-    const offset = Math.max(-48, Math.min(distance - 48, 72))
+    const offset = Math.max(0, Math.min(distance, 72))
     this.indicatorTarget.style.transform = `translateY(${offset}px)`
   }
 }
