@@ -11,6 +11,3 @@ bin/rails db:migrate:reset
 
 echo "Seeding development databases..."
 bin/rails db:seed
-
-echo "Starting the development app..."
-exec bin/dev

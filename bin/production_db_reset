@@ -4,6 +4,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+echo "Deploy the app"
+bin/kamal deploy
+
 echo "Stopping the production app..."
 bin/kamal app stop
 

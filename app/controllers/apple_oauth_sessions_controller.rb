@@ -91,7 +91,8 @@ class AppleOauthSessionsController < ApplicationController
     platform = params[:state].split(":").last
     if platform == "native"
       token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
-      redirect_to "vtalk://auth-callback?token=#{token}&platform=#{platform}", allow_other_host: true
+      scheme = request.host == "dev.sayonething.net" ? "vtalk-dev" : "vtalk"
+      redirect_to "#{scheme}://auth-callback?token=#{token}&platform=#{platform}", allow_other_host: true
     else
       sign_in_and_redirect_user(user)
     end

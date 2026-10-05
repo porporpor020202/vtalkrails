@@ -21,6 +21,9 @@
     <p class="mt-2 break-words text-sm text-slate-500">
       <%= current_user.email_address %>
     </p>
+    <p class="mt-2 text-sm font-medium text-slate-500">
+      Signed in with <%= current_user.oauth_provider.titleize %>
+    </p>
   </div>
 
   <div class="mt-auto space-y-3 pt-8">
