@@ -1,0 +1,6 @@
+<% content_for :title, "Edit feedback" %>
+<section class="flex min-h-full flex-col bg-slate-50 px-5 py-6">
+  <%= link_to "Back to feedback", feedback_path(@feedback), class: "mb-5 text-sm font-semibold text-indigo-600" %>
+  <h1 class="mb-6 text-3xl font-black tracking-tight text-slate-950">Edit feedback</h1>
+  <%= render "form", feedback: @feedback %>
+</section>

@@ -75,3 +75,4 @@ gem "noticed", "~> 3.0"
 gem "apnotic", "~> 1.8"
 
 gem "googleauth", "~> 1.17"
+gem "pundit", "~> 2.0"

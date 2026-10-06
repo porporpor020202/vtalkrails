@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,6 +57,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
     t.index ["status"], name: "index_content_reports_on_status"
   end
 
+  create_table "feedback_replies", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.bigint "feedback_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["feedback_id"], name: "index_feedback_replies_on_feedback_id"
+    t.index ["user_id"], name: "index_feedback_replies_on_user_id"
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_feedbacks_on_user_id"
+  end
+
   create_table "languages", force: :cascade do |t|
     t.string "code", null: false
     t.datetime "created_at", null: false
@@ -99,6 +118,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.string "display_name"
     t.string "email_address", null: false
@@ -142,6 +162,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   add_foreign_key "content_reports", "rooms"
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
+  add_foreign_key "feedback_replies", "feedbacks"
+  add_foreign_key "feedback_replies", "users"
+  add_foreign_key "feedbacks", "users"
   add_foreign_key "rooms", "languages"
   add_foreign_key "rooms", "users", column: "host_id"
   add_foreign_key "rooms", "users", column: "opponent_id"

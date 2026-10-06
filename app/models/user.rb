@@ -4,6 +4,8 @@ class User < ApplicationRecord
   belongs_to :learning_language, class_name: "Language", optional: true
   has_many :voice_drops, foreign_key: :sender_id, dependent: :destroy
   has_many :sessions, dependent: :destroy
+  has_many :feedbacks, dependent: :destroy
+  has_many :feedback_replies, dependent: :destroy
   has_many :rooms, dependent: :destroy
   has_many :opponent_rooms, class_name: "Room", foreign_key: :opponent_id, inverse_of: :opponent, dependent: :destroy
   has_many :voice_messages, foreign_key: :sender_id, inverse_of: :sender, dependent: :destroy

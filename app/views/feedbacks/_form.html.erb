@@ -1,0 +1,15 @@
+<%= form_with model: feedback, class: "space-y-5" do |form| %>
+  <% if feedback.errors.any? %>
+    <div role="alert" class="rounded-2xl bg-rose-50 p-4 text-sm text-rose-700"><%= feedback.errors.full_messages.to_sentence %></div>
+  <% end %>
+
+  <div>
+    <%= form.label :title, "Title", class: "mb-2 block text-sm font-bold text-slate-700" %>
+    <%= form.text_field :title, required: true, class: "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950" %>
+  </div>
+  <div>
+    <%= form.label :body, "Message", class: "mb-2 block text-sm font-bold text-slate-700" %>
+    <%= form.text_area :body, required: true, rows: 7, class: "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950" %>
+  </div>
+  <%= form.submit feedback.persisted? ? "Save changes" : "Send feedback", class: "w-full cursor-pointer rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white" %>
+<% end %>

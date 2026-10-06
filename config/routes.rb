@@ -47,6 +47,16 @@ Rails.application.routes.draw do
 
   resource :settings, only: %i[show update], controller: "settings"
 
+  resources :feedbacks, only: %i[index new create show edit update] do
+    resources :feedback_replies, only: :create
+  end
+
+  namespace :admin do
+    resources :feedbacks, only: %i[index show] do
+      resources :feedback_replies, only: :create
+    end
+  end
+
   resource :profile, only: [ :show ], controller: "profile"
   resource :account, only: [ :destroy ]
   resource :map, only: [ :show ]

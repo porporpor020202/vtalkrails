@@ -1,0 +1,35 @@
+<% content_for :title, feedback.title %>
+
+<section class="flex min-h-full flex-col bg-slate-50 px-5 py-6">
+  <%= link_to "Back to feedback", admin ? admin_feedbacks_path : feedbacks_path, class: "mb-5 text-sm font-semibold text-indigo-600" %>
+
+  <article class="rounded-2xl border border-slate-200 bg-white p-5">
+    <h1 class="break-words text-2xl font-black tracking-tight text-slate-950"><%= feedback.title %></h1>
+    <p class="mt-2 text-xs text-slate-500"><%= feedback.user.display_name %> · <%= feedback.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+    <p class="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-slate-700"><%= feedback.body %></p>
+    <% unless admin %>
+      <%= link_to "Edit feedback", edit_feedback_path(feedback), class: "mt-4 inline-block text-sm font-semibold text-indigo-600" %>
+    <% end %>
+  </article>
+
+  <section aria-label="Replies" class="mt-6 space-y-3">
+    <h2 class="text-sm font-bold text-slate-700">Replies</h2>
+    <% feedback.feedback_replies.includes(:user).order(:created_at, :id).each do |message| %>
+      <article class="rounded-2xl border p-4 <%= message.user.admin? ? 'border-indigo-100 bg-indigo-50' : 'border-slate-200 bg-white' %>">
+        <p class="text-xs font-bold text-slate-600">
+          <%= message.user.admin? ? "Team" : message.user.display_name %> · <%= message.created_at.strftime("%Y-%m-%d %H:%M") %>
+        </p>
+        <p class="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-slate-800"><%= message.body %></p>
+      </article>
+    <% end %>
+  </section>
+
+  <%= form_with model: reply, url: admin ? admin_feedback_feedback_replies_path(feedback) : feedback_feedback_replies_path(feedback), class: "mt-6 space-y-3" do |form| %>
+    <% if reply.errors.any? %>
+      <div role="alert" class="rounded-2xl bg-rose-50 p-4 text-sm text-rose-700"><%= reply.errors.full_messages.to_sentence %></div>
+    <% end %>
+    <%= form.label :body, "Reply", class: "block text-sm font-bold text-slate-700" %>
+    <%= form.text_area :body, required: true, rows: 4, class: "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950" %>
+    <%= form.submit "Send reply", class: "w-full cursor-pointer rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white" %>
+  <% end %>
+</section>
