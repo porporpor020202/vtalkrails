@@ -3,8 +3,8 @@ class Room < ApplicationRecord
   belongs_to :language
   belongs_to :opponent, class_name: "User"
 
-  has_many :ai_assistances, dependent: :destroy
   has_many :voice_messages, dependent: :destroy
+  has_one :last_voice_message, -> { order(created_at: :desc, id: :desc) }, class_name: "VoiceMessage"
   has_many :content_reports, dependent: :destroy
 
   validate :participants_must_be_different
@@ -28,6 +28,10 @@ class Room < ApplicationRecord
     return host if opponent_id == participant.id
 
     raise ActiveRecord::RecordNotFound, "User is not a participant in this room"
+  end
+
+  def can_reply?(participant)
+    last_voice_message&.sender_id == opponent_for(participant).id
   end
 
   private

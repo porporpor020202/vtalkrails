@@ -6,6 +6,11 @@ class VoiceMessagesController < ApplicationController
 
     ApplicationRecord.transaction do
       @room.lock!
+      unless @room.can_reply?(current_user)
+        @room.errors.add(:base, "You can reply after your partner responds.")
+        raise ActiveRecord::RecordInvalid.new(@room)
+      end
+
       message = @room.voice_messages.build(
         sender: current_user,
         duration_ms: attributes.fetch(:duration_ms)

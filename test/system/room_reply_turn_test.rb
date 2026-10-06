@@ -6,7 +6,7 @@ class RoomReplyTurnSystemTest < ApplicationSystemTestCase
 
   Capybara.register_driver :room_reply_chrome do |app|
     options = Selenium::WebDriver::Chrome::Options.new
-    %w[--headless --window-size=1400,1000 --use-fake-device-for-media-stream --use-fake-ui-for-media-stream].each do |argument|
+    %w[--headless --mute-audio --window-size=1400,1000 --use-fake-device-for-media-stream --use-fake-ui-for-media-stream].each do |argument|
       options.add_argument argument
     end
     Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
@@ -21,7 +21,7 @@ class RoomReplyTurnSystemTest < ApplicationSystemTestCase
     @first_message = create_voice_message(room: @room, sender: @host)
   end
 
-  test "수신자가 답장을 전송하면 녹음 버튼 대신 상대방 답장을 기다리는 안내가 표시된다" do
+  test "r_수신자가 답장을 전송하면 녹음 버튼 대신 상대방 답장을 기다리는 안내가 표시된다" do
     sign_in(user: @recipient)
     visit room_path(@room)
     click_button "Reply with voice"
@@ -39,14 +39,14 @@ class RoomReplyTurnSystemTest < ApplicationSystemTestCase
     assert_waiting_for_reply
   end
 
-  test "호스트도 마지막으로 보낸 사람이면 상대방 답장을 기다린다" do
+  test "r_호스트도 마지막으로 보낸 사람이면 상대방 답장을 기다린다" do
     sign_in(user: @host)
     visit room_path(@room)
 
     assert_waiting_for_reply
   end
 
-  test "상대방이 답장한 뒤 룸을 다시 열면 녹음 버튼이 표시된다" do
+  test "r_상대방이 답장한 뒤 룸을 다시 열면 녹음 버튼이 표시된다" do
     create_voice_message(room: @room, sender: @recipient)
     sign_in(user: @recipient)
     visit room_path(@room)
@@ -59,7 +59,7 @@ class RoomReplyTurnSystemTest < ApplicationSystemTestCase
     assert_no_text "You can reply after your partner responds."
   end
 
-  test "호스트와 수신자 모두 자기 메시지는 오른쪽에 상대방 메시지는 왼쪽에 표시된다" do
+  test "r_호스트와 수신자 모두 자기 메시지는 오른쪽에 상대방 메시지는 왼쪽에 표시된다" do
     reply = create_voice_message(room: @room, sender: @recipient)
 
     [ [ @host, @first_message, reply ], [ @recipient, reply, @first_message ] ].each do |user, own_message, partner_message|

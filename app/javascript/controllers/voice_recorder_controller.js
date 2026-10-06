@@ -50,8 +50,9 @@ export default class extends Controller {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
         }
       })
       this.chunks = []

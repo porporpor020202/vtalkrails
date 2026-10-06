@@ -1,17 +1,18 @@
 class RoomsController < ApplicationController
   def index
-    @languages = [current_user.learning_language, current_user.native_language]
+    @languages = [ current_user.learning_language, current_user.native_language ]
     @language = @languages.find { |language| language.id.to_s == params[:room_language_id] } ||
       current_user.learning_language
     @rooms = Room.visible_to(current_user)
       .where(language: @language)
-      .includes(:host, :opponent)
+      .includes(:host, :opponent, :last_voice_message)
       .order(created_at: :desc, id: :desc)
+    @voice_message_counts = VoiceMessage.where(room_id: @rooms.map(&:id)).group(:room_id).count
   end
 
   def show
     @room = Room.involving(current_user)
-      .includes(:host, :opponent)
+      .includes(:host, :opponent, :last_voice_message)
       .find(params[:id])
 
     @opponent = @room.opponent_for(current_user)
