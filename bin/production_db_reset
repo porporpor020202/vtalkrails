@@ -22,15 +22,10 @@ bin/kamal app stop
 
 # 운영 데이터를 전부 삭제하고, 동일한 이미지의 마이그레이션으로 재생성한다.
 echo "Resetting production databases..."
-bin/kamal app exec \
-  --version="$deploy_version" \
-  --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 \
-  bin/rails db:migrate:reset
+bin/kamal app exec --version="$deploy_version" --env=DISABLE_DATABASE_ENVIRONMENT_CHECK:1 bin/rails db:migrate:reset
 
 echo "Seeding production databases..."
-bin/kamal app exec \
-  --version="$deploy_version" \
-  bin/rails db:seed
+bin/kamal app exec --version="$deploy_version" bin/rails db:seed
 
 # start는 기존 컨테이너를 켜므로, 지정한 이미지로 실행하는 boot를 사용한다.
 echo "Booting production app: ${deploy_version}"
