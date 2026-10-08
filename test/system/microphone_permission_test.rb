@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class MicrophonePermissionTest < ApplicationSystemTestCase
   driven_by :selenium, using: :headless_chrome,
-            screen_size: [1400, 1000] do |options|
+            screen_size: [ 1400, 1000 ] do |options|
     options.add_argument "--mute-audio"
     options.add_argument "--use-fake-device-for-media-stream"
     options.add_argument "--use-fake-ui-for-media-stream"
@@ -24,8 +24,8 @@ class MicrophonePermissionTest < ApplicationSystemTestCase
     JS
   end
 
-  test "마이크 권한을 거부하면 안내를 표시하고 녹음과 전송을 진행하지 않는다" do
-    assert_no_difference ["VoiceDrop.count", "Room.count", "VoiceMessage.count"] do
+  test "r_마이크 권한을 거부하면 안내를 표시하고 녹음과 전송을 진행하지 않는다" do
+    assert_no_difference [ "VoiceDrop.count", "Room.count", "VoiceMessage.count" ] do
       within recorder_sheet do
         click_button "Start recording", enable_aria_label: true
 
@@ -34,12 +34,12 @@ class MicrophonePermissionTest < ApplicationSystemTestCase
         assert_button "Start recording", enable_aria_label: true, disabled: false
         assert_no_button "Stop recording", enable_aria_label: true
         assert_no_button "Send voice"
-        assert_no_selector 'audio[src]', visible: :all
+        assert_no_selector "audio[src]", visible: :all
       end
     end
   end
 
-  test "권한 거부 후 마이크 사용이 허용되면 다시 녹음할 수 있다" do
+  test "r_권한 거부 후 마이크 사용이 허용되면 다시 녹음할 수 있다" do
     within recorder_sheet do
       click_button "Start recording", enable_aria_label: true
       assert_selector '[role="alert"]', text: permission_message
@@ -62,7 +62,7 @@ class MicrophonePermissionTest < ApplicationSystemTestCase
     end
   end
 
-  test "마이크 권한을 거부해도 녹음 창을 닫을 수 있다" do
+  test "r_마이크 권한을 거부해도 녹음 창을 닫을 수 있다" do
     within recorder_sheet do
       click_button "Start recording", enable_aria_label: true
       assert_selector '[role="alert"]', text: permission_message

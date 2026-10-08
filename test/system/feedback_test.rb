@@ -10,31 +10,31 @@ class FeedbackTest < ApplicationSystemTestCase
     sign_in(user: @user)
   end
 
-  test "r_설정에서 피드백 게시판으로 이동해 글을 작성할 수 있다" do
+  test "설정에서 피드백 게시판으로 이동해 글을 작성할 수 있다" do
     visit settings_path
     click_link "Send feedback"
 
     assert_current_path feedbacks_path
     click_link "New feedback"
 
-    fill_in "Title", with: "녹음이 중간에 끊겨요"
-    fill_in "Message", with: "갤럭시에서 녹음하다가 중간에 멈췄어요."
+    fill_in "Title", with: "Recording stops midway"
+    fill_in "Message", with: "Recording stopped midway on my Galaxy phone."
 
     assert_difference "Feedback.count", 1 do
       click_button "Send feedback"
-      assert_selector "h1", text: "녹음이 중간에 끊겨요"
+      assert_selector "h1", text: "Recording stops midway"
     end
 
     feedback = @user.feedbacks.sole
     assert_current_path feedback_path(feedback)
-    assert_equal "갤럭시에서 녹음하다가 중간에 멈췄어요.", feedback.body
+    assert_equal "Recording stopped midway on my Galaxy phone.", feedback.body
   end
 
-  test "r_작성한 피드백을 목록에서 다시 열어 읽을 수 있다" do
+  test "작성한 피드백을 목록에서 다시 열어 읽을 수 있다" do
     feedback = Feedback.create!(
       user: @user,
-      title: "녹음 관련 문의",
-      body: "녹음 시간이 궁금해요."
+      title: "Recording inquiry",
+      body: "What is the recording time limit?"
     )
 
     visit feedbacks_path
@@ -48,35 +48,35 @@ class FeedbackTest < ApplicationSystemTestCase
     assert_text feedback.body
   end
 
-  test "r_작성자는 자기 피드백의 제목과 내용을 수정할 수 있다" do
+  test "작성자는 자기 피드백의 제목과 내용을 수정할 수 있다" do
     feedback = Feedback.create!(
       user: @user,
-      title: "수정 전 제목",
-      body: "수정 전 내용"
+      title: "Original title",
+      body: "Original content"
     )
 
     visit feedback_path(feedback)
     click_link "Edit feedback"
 
-    fill_in "Title", with: "수정한 제목"
-    fill_in "Message", with: "문제가 발생하는 조건을 추가했어요."
+    fill_in "Title", with: "Updated title"
+    fill_in "Message", with: "Added the conditions that cause the issue."
     click_button "Save changes"
 
     assert_current_path feedback_path(feedback)
-    assert_selector "h1", text: "수정한 제목"
-    assert_text "문제가 발생하는 조건을 추가했어요."
+    assert_selector "h1", text: "Updated title"
+    assert_text "Added the conditions that cause the issue."
 
     feedback.reload
-    assert_equal "수정한 제목", feedback.title
-    assert_equal "문제가 발생하는 조건을 추가했어요.", feedback.body
+    assert_equal "Updated title", feedback.title
+    assert_equal "Added the conditions that cause the issue.", feedback.body
   end
 
-  test "r_사용자의 피드백 목록에는 자기 글만 표시된다" do
+  test "사용자의 피드백 목록에는 자기 글만 표시된다" do
     own_feedback = Feedback.create!(
-      user: @user, title: "내 문의", body: "내 문의 내용"
+      user: @user, title: "My inquiry", body: "My inquiry content"
     )
     other_feedback = Feedback.create!(
-      user: @other, title: "다른 사용자 문의", body: "다른 문의 내용"
+      user: @other, title: "Another user's inquiry", body: "Another inquiry's content"
     )
 
     visit feedbacks_path
@@ -86,12 +86,12 @@ class FeedbackTest < ApplicationSystemTestCase
     assert_no_text other_feedback.body
   end
 
-  test "r_운영자는 관리자 피드백 목록에서 여러 사용자의 문의를 확인할 수 있다" do
+  test "운영자는 관리자 피드백 목록에서 여러 사용자의 문의를 확인할 수 있다" do
     first = Feedback.create!(
-      user: @user, title: "녹음 문의", body: "녹음 관련 내용"
+      user: @user, title: "Recording inquiry", body: "Recording details"
     )
     second = Feedback.create!(
-      user: @other, title: "언어 문의", body: "언어 관련 내용"
+      user: @other, title: "Language inquiry", body: "Language details"
     )
 
     sign_in(user: @admin)
@@ -103,21 +103,21 @@ class FeedbackTest < ApplicationSystemTestCase
     assert_link second.title, href: admin_feedback_path(second)
   end
 
-  test "r_운영자의 답글을 작성자가 읽고 같은 글에서 다시 답글을 보낼 수 있다" do
+  test "운영자의 답글을 작성자가 읽고 같은 글에서 다시 답글을 보낼 수 있다" do
     feedback = Feedback.create!(
       user: @user,
-      title: "녹음 문제",
-      body: "녹음이 중간에 끊겨요."
+      title: "Recording issue",
+      body: "Recording stops midway."
     )
 
     sign_in(user: @admin)
     visit admin_feedback_path(feedback)
     assert_current_path admin_feedback_path(feedback)
-    fill_in "Reply", with: "사용 중인 휴대폰 모델을 알려주세요."
+    fill_in "Reply", with: "Please tell us your phone model."
 
     assert_difference -> { feedback.feedback_replies.count }, 1 do
       click_button "Send reply"
-      assert_text "사용 중인 휴대폰 모델을 알려주세요."
+      assert_text "Please tell us your phone model."
     end
 
     assert_current_path admin_feedback_path(feedback)
@@ -125,12 +125,12 @@ class FeedbackTest < ApplicationSystemTestCase
 
     sign_in(user: @user)
     visit feedback_path(feedback)
-    assert_text "사용 중인 휴대폰 모델을 알려주세요."
-    fill_in "Reply", with: "갤럭시 S24를 사용하고 있어요."
+    assert_text "Please tell us your phone model."
+    fill_in "Reply", with: "I use a Galaxy S24."
 
     assert_difference -> { feedback.feedback_replies.count }, 1 do
       click_button "Send reply"
-      assert_text "갤럭시 S24를 사용하고 있어요."
+      assert_text "I use a Galaxy S24."
     end
 
     sign_in(user: @admin)
@@ -138,8 +138,8 @@ class FeedbackTest < ApplicationSystemTestCase
     assert_current_path admin_feedback_path(feedback)
 
     assert_text feedback.body
-    assert_text "사용 중인 휴대폰 모델을 알려주세요."
-    assert_text "갤럭시 S24를 사용하고 있어요."
+    assert_text "Please tell us your phone model."
+    assert_text "I use a Galaxy S24."
 
     # 두 답글이 같은 글에 저장됐고, 작성자도 운영자 → 사용자 순서로 기록됐는지 확인한다.
     assert_equal [ @admin.id, @user.id ],

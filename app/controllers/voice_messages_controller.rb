@@ -6,7 +6,7 @@ class VoiceMessagesController < ApplicationController
 
     ApplicationRecord.transaction do
       @room.lock!
-      unless @room.can_reply?(current_user)
+      unless !@room.unavailable?(current_user) && @room.can_reply?(current_user)
         @room.errors.add(:base, "You can reply after your partner responds.")
         raise ActiveRecord::RecordInvalid.new(@room)
       end
@@ -27,6 +27,7 @@ class VoiceMessagesController < ApplicationController
   end
 
   def audio
+    raise ActiveRecord::RecordNotFound if @room.unavailable?(current_user)
     message = @room.voice_messages.find(params[:id])
     raise ActiveRecord::RecordNotFound unless message.audio.attached?
 

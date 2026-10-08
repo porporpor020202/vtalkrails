@@ -6,8 +6,8 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
   has_many :feedback_replies, dependent: :destroy
-  has_many :rooms, dependent: :destroy
-  has_many :opponent_rooms, class_name: "Room", foreign_key: :opponent_id, inverse_of: :opponent, dependent: :destroy
+  has_many :rooms, foreign_key: :host_id, dependent: :nullify
+  has_many :opponent_rooms, class_name: "Room", foreign_key: :opponent_id, inverse_of: :opponent, dependent: :nullify
   has_many :voice_messages, foreign_key: :sender_id, inverse_of: :sender, dependent: :destroy
   has_many :notification_tokens, dependent: :destroy
   has_many :initiated_blocks, class_name: "UserBlock", foreign_key: :blocker_id, inverse_of: :blocker, dependent: :destroy
@@ -35,7 +35,13 @@ class User < ApplicationRecord
   validate :languages_enabled, on: [ :onboarding, :language_setup ]
   validate :learning_language_differs_from_native_language
 
+  attr_accessor :date_of_birth, :microphone_confirmed
+  validate :onboarding_requirements, on: :onboarding
+
   # 5. Callbacks
+  before_destroy :clear_conversation_audio, prepend: true
+  before_validation :reset_incomplete_onboarding
+
 
   # 6. Normalizations
   normalizes :email_address, with: ->(e) { e.strip.downcase if e }
@@ -44,7 +50,8 @@ class User < ApplicationRecord
   # 7. Public Methods / Custom Logic
   def onboarding_complete?
     display_name.present? && native_language.present? &&
-      learning_language.present? && native_language_id != learning_language_id
+      learning_language.present? && native_language_id != learning_language_id &&
+      age_confirmed_at.present? && onboarding_completed_at.present?
   end
 
   def profile_image_path_for
@@ -56,6 +63,29 @@ class User < ApplicationRecord
 
   # 8. Private Methods
   private
+
+  def reset_incomplete_onboarding
+    if display_name.blank? || native_language_id.blank? || learning_language_id.blank?
+      self.age_confirmed_at = nil
+      self.onboarding_completed_at = nil
+    end
+  end
+
+  def clear_conversation_audio
+    Room.involving(self).find_each do |room|
+      room.voice_messages.destroy_all
+    end
+  end
+
+  def onboarding_requirements
+    begin
+      birthday = Date.iso8601(date_of_birth.to_s)
+      errors.add(:date_of_birth, "must be at least 18 years ago") if birthday > Date.current.years_ago(18)
+    rescue Date::Error
+      errors.add(:date_of_birth, "must be a valid date")
+    end
+    errors.add(:microphone_confirmed, "must be allowed") unless ActiveModel::Type::Boolean.new.cast(microphone_confirmed)
+  end
 
   # TODO: 공식문서 이해하자.
   def languages_enabled

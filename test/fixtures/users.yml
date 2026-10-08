@@ -2,6 +2,8 @@ korean_native:
   oauth_provider: google
   oauth_uid: fixture-google-korean
   email_address: korean@example.com
+  age_confirmed_at: 2026-10-01 00:00:00
+  onboarding_completed_at: 2026-10-01 00:00:00
   display_name: Calm Tiger
   native_language: korean
   learning_language: english
@@ -10,6 +12,8 @@ english_native:
   oauth_provider: apple
   oauth_uid: fixture-apple-english
   email_address: english@example.com
+  age_confirmed_at: 2026-10-01 00:00:00
+  onboarding_completed_at: 2026-10-01 00:00:00
   display_name: Bright Panda
   native_language: english
   learning_language: korean
@@ -18,6 +22,8 @@ spanish_native:
   oauth_provider: google
   oauth_uid: fixture-google-spanish
   email_address: spanish@example.com
+  age_confirmed_at: 2026-10-01 00:00:00
+  onboarding_completed_at: 2026-10-01 00:00:00
   display_name: Happy Raccoon
   native_language: spanish
   learning_language: english
@@ -26,6 +32,8 @@ japanese_native:
   oauth_provider: apple
   oauth_uid: fixture-apple-japanese
   email_address: japanese@example.com
+  age_confirmed_at: 2026-10-01 00:00:00
+  onboarding_completed_at: 2026-10-01 00:00:00
   display_name: Calm Polar Bear
   native_language: japanese
   learning_language: english

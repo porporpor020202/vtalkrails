@@ -25,7 +25,7 @@ class NewRoomReceptionTest < ApplicationSystemTestCase
     assert_in_delta recorder.evaluate_script("this.getBoundingClientRect().top + this.getBoundingClientRect().height / 2"), toggle.evaluate_script("this.getBoundingClientRect().top + this.getBoundingClientRect().height / 2"), 8
   end
 
-  test "새 룸 수신을 끄면 새로고침 후에도 꺼진 상태가 유지된다" do
+  test "r_새 룸 수신을 끄면 새로고침 후에도 꺼진 상태가 유지된다" do
     set_reception(false)
 
     page.refresh
@@ -33,7 +33,7 @@ class NewRoomReceptionTest < ApplicationSystemTestCase
     assert_selector 'button[aria-label="Receive new rooms"][aria-pressed="false"]'
   end
 
-  test "수신을 끈 사용자는 언어와 접속 조건이 맞아도 반복 전송에서 새 룸을 받지 않는다" do
+  test "r_수신을 끈 사용자는 언어와 접속 조건이 맞아도 반복 전송에서 새 룸을 받지 않는다" do
     set_reception(false)
 
     2.times do
@@ -46,7 +46,7 @@ class NewRoomReceptionTest < ApplicationSystemTestCase
     assert_not_includes VoiceRecipientSelector.recipients(sender: @sender, language: @room_language).map(&:id), @recipient.id
   end
 
-  test "수신을 다시 켜면 매칭 후보에 포함되고 다음 전송에서 새 룸을 받는다" do
+  test "r_수신을 다시 켜면 매칭 후보에 포함되고 다음 전송에서 새 룸을 받는다" do
     set_reception(false)
     dispatch_recording
     assert_empty Room.where(opponent: @recipient)
@@ -61,7 +61,7 @@ class NewRoomReceptionTest < ApplicationSystemTestCase
     assert_equal voice_audio, received_room.voice_messages.sole.audio.download
   end
 
-  test "새 룸 수신을 꺼도 기존 룸과 답장 기능은 유지된다" do
+  test "r_새 룸 수신을 꺼도 기존 룸과 답장 기능은 유지된다" do
     room = Room.create!(host: @sender, opponent: @recipient, language: @room_language)
     message = create_voice_message(room: room, sender: @sender)
     set_reception(false)

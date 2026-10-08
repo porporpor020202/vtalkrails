@@ -29,14 +29,22 @@ class SayTabTest < ApplicationSystemTestCase
     Current.reset
   end
 
-  test "r_Say 화면 맨 위에서 아래로 당기면 현재 화면을 새로고침한다" do
+  test "앱의 Say 화면 맨 위에서 아래로 당기면 현재 룸 목록을 새로고침한다" do
+    # 웹에는 Refresh 버튼을 표시하므로 앱 User-Agent로 당기기 동작을 검증한다.
+    web_user_agent = page.evaluate_script("navigator.userAgent")
+    page.driver.browser.execute_cdp("Network.setUserAgentOverride",
+      userAgent: "#{web_user_agent} vtalk/ios/1.0")
+    page.refresh
+    assert_selector '[data-pull-to-refresh-target="indicator"]'
+
     page.execute_script(<<~JS)
       const section = document
         .querySelector('[data-pull-to-refresh-target="indicator"]')
         .closest("section");
 
-      // 새로고침으로 HTML이 교체되는지 확인하기 위한 임시 표시
-      section.dataset.refreshProbe = "before";
+      // 목록만 갱신되어 녹음 UI는 유지되는지 확인하기 위한 임시 표시
+      window.originalRecorder = document.querySelector('[data-controller="voice-recorder"]');
+      document.querySelector("#room-list").firstElementChild.dataset.refreshProbe = "before";
       section.closest("main").scrollTop = 0;
 
       function dispatchTouch(type, y) {
@@ -62,13 +70,21 @@ class SayTabTest < ApplicationSystemTestCase
     )
 
     page.execute_script(<<~JS)
-      document.querySelector('[data-refresh-probe="before"]')
+      document.querySelector('[data-controller="pull-to-refresh"]')
         .dispatchEvent(new Event("touchend", { bubbles: true }));
     JS
 
     assert_no_selector '[data-refresh-probe="before"]'
     assert_current_path rooms_path
     assert_selector '[data-pull-to-refresh-target="label"]', text: "Pull to refresh"
+    assert page.evaluate_script(<<~JS)
+      window.originalRecorder === document.querySelector('[data-controller="voice-recorder"]')
+    JS
+  ensure
+    # 앱 User-Agent가 다른 웹 테스트에 영향을 주지 않도록 복구한다.
+    if web_user_agent
+      page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: web_user_agent)
+    end
   end
 
   test "r_Say 탭에서 녹음 버튼을 누르면 녹음 창이 열린다" do

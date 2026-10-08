@@ -10,7 +10,7 @@ module SystemSessionTestHelper
       when "apple"
         authenticate_by_token_apple_oauth_sessions_path(token: token)
       else
-        raise ArgumentError, "지원하지 않는 로그인 제공자: #{user.oauth_provider}"
+        raise ArgumentError, "Unsupported sign-in provider: #{user.oauth_provider}"
       end
 
     visit path
@@ -21,7 +21,7 @@ module SystemSessionTestHelper
       new_sessions.exists?
     end
 
-    assert_equal 1, new_sessions.count, "로그인 세션이 생성되어야 합니다."
+    assert_equal 1, new_sessions.count, "A sign-in session must be created."
 
     new_sessions.first!
   end

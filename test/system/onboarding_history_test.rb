@@ -16,6 +16,24 @@ class OnboardingHistoryTest < ApplicationSystemTestCase
 
     select "English", from: "user_native_language_id"
     select "Korean", from: "user_learning_language_id"
+
+    assert_button "Continue", disabled: true
+
+    page.execute_script(<<~JS)
+      navigator.mediaDevices.getUserMedia = async () => ({
+        getTracks() {
+          return [{ stop() {} }];
+        }
+      });
+    JS
+
+    # 생년월일로 18세 이상임을 확인한 후 온보딩을 완료한다.
+    fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
+
+    click_button "Allow microphone"
+
+    assert_text "Microphone access allowed"
+    assert_button "Continue", disabled: false
     click_button "Continue"
 
     assert_current_path root_path

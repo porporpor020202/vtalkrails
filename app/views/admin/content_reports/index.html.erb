@@ -1,0 +1,12 @@
+<section class="p-5 space-y-4">
+  <h1>Content reports</h1>
+  <% @reports.each do |report| %>
+    <article data-testid="content-report" data-report-id="<%= report.id %>" class="rounded-xl border p-4">
+      <p><%= report.reporter&.display_name %> → <%= report.reported_user&.display_name %></p>
+      <p><%= ContentReport::REASONS[report.reason.to_sym] %></p>
+      <p><%= report.details %></p>
+      <p><%= report.pending? ? "Pending review" : "Review completed" %></p>
+      <%= link_to "Review report", admin_content_report_path(report) %>
+    </article>
+  <% end %>
+</section>

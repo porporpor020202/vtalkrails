@@ -6,7 +6,7 @@
 
 <div class="flex flex-1 items-center px-6 py-10" data-controller="auth-history" data-action="pageshow@window->auth-history#restore">
   <section class="w-full">
-    <%= form_with model: @user, url: onboarding_path, method: :patch, class: "mt-8 space-y-5", data: { controller: "onboarding-languages" } do |form| %>
+    <%= form_with model: @user, url: onboarding_path, method: :patch, class: "mt-8 space-y-5", data: { controller: "onboarding-languages", action: "submit->onboarding-languages#validate" } do |form| %>
       <% if @user.errors.any? %>
         <p role="alert" class="text-sm text-rose-600"><%= @user.errors.full_messages.to_sentence %></p>
       <% end %>
@@ -19,19 +19,35 @@
               data: { onboarding_languages_target: "native", action: "change->onboarding-languages#sync" },
               class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
 
+      <p data-onboarding-languages-target="nativeGuidance" class="text-sm text-slate-500">Please select your native language.</p>
+
       <%= form.collection_select :learning_language_id, languages, :id, :label,
             { prompt: "Select your learning language", disabled: [@user.native_language_id] },
             { required: true,
-              data: { onboarding_languages_target: "learning" },
+              data: { onboarding_languages_target: "learning", action: "change->onboarding-languages#sync" },
               class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
+
+      <p data-onboarding-languages-target="learningGuidance" class="text-sm text-slate-500">Please select your learning language.</p>
 
       <p class="text-sm text-slate-500">
         Your native language and learning language cannot be the same.
       </p>
 
+      <button type="button" data-action="onboarding-languages#requestMicrophone" class="h-14 w-full rounded-2xl border border-slate-300 bg-white font-semibold text-slate-900">
+        Allow microphone
+      </button>
+
+      <p role="status" data-onboarding-languages-target="microphoneStatus" class="text-sm text-slate-500">Microphone access is denied. Please enable microphone access.</p>
+
+      <%= form.hidden_field :microphone_confirmed, value: "0", data: { onboarding_languages_target: "microphoneConfirmed" } %>
+      <%= form.label :date_of_birth, "Date of birth", class: "block text-sm font-semibold" %>
+      <%= form.text_field :date_of_birth, required: true, placeholder: "YYYY-MM-DD", autocomplete: "bday", inputmode: "numeric", maxlength: 10, class: "h-14 w-full rounded-2xl border border-slate-300 px-4", data: { onboarding_languages_target: "birthday", action: "input->onboarding-languages#formatBirthday change->onboarding-languages#sync" } %>
+      <p data-onboarding-languages-target="ageGuidance" class="text-sm text-slate-500">Please enter your date of birth.</p>
+
       <%= form.submit "Continue",
-            class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white",
-            data: { turbo_submits_with: "Saving..." } %>
+            disabled: true,
+            class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50",
+            data: { onboarding_languages_target: "continue", turbo_submits_with: "Saving..." } %>
     <% end %>
 
     <%= button_to "Sign Out", session_path, method: :delete,

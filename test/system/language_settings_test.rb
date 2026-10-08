@@ -166,13 +166,13 @@ class LanguageSettingsTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_언어 설정이 유효하지 않으면 브라우저 제한을 우회해도 서버가 저장을 거부한다" do
+  test "언어 설정이 유효하지 않으면 브라우저 제한을 우회해도 서버가 저장을 거부한다" do
     [
-      [ "모국어가 비어 있으면", nil, :korean ],
-      [ "학습 언어가 비어 있으면", :english, nil ],
-      [ "모국어가 비활성이면", :spanish, :korean ],
-      [ "학습 언어가 비활성이면", :english, :spanish ],
-      [ "두 언어가 같으면", :english, :english ]
+      [ "Native language is missing", nil, :korean ],
+      [ "Learning language is missing", :english, nil ],
+      [ "Native language is disabled", :spanish, :korean ],
+      [ "Learning language is disabled", :english, :spanish ],
+      [ "Both languages are the same", :english, :english ]
     ].each do |description, native, learning|
       visit settings_path
       click_link "Open language settings", enable_aria_label: true

@@ -16,7 +16,7 @@ class RoomsController < ApplicationController
       .find(params[:id])
 
     @opponent = @room.opponent_for(current_user)
-    @messages = @room.voice_messages.with_attached_audio.order(:created_at, :id)
+    @messages = @room.unavailable?(current_user) ? VoiceMessage.none : @room.voice_messages.with_attached_audio.order(:created_at, :id)
   end
 
   def destroy
@@ -25,7 +25,7 @@ class RoomsController < ApplicationController
     ApplicationRecord.transaction do
       @room.lock!
       if @room.deleted?
-        @room.update!(dismissed_by: current_user) unless @room.deleted_by?(current_user)
+        @room.update!(dismissed_by_id: current_user.id) unless @room.deleted_by?(current_user)
       else
         @room.voice_messages.find_each do |message|
           message.destroy!
@@ -33,9 +33,7 @@ class RoomsController < ApplicationController
 
         @room.update!(
           status: :deleted,
-          deleted_by: current_user,
-          last_sender: nil,
-          last_message_at: Time.current
+          deleted_by_id: current_user.id,
         )
       end
     end

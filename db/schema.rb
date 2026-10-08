@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
     t.string "reason", null: false
     t.bigint "reported_user_id", null: false
     t.bigint "reporter_id", null: false
+    t.text "resolution"
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
     t.bigint "room_id", null: false
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
@@ -86,11 +89,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
     t.index ["label"], name: "index_languages_on_label", unique: true
   end
 
+  create_table "notification_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "platform", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_notification_tokens_on_user_id"
+  end
+
   create_table "rooms", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "host_id", null: false
+    t.bigint "deleted_by_id"
+    t.bigint "dismissed_by_id"
+    t.bigint "host_id"
     t.bigint "language_id", null: false
-    t.bigint "opponent_id", null: false
+    t.bigint "opponent_id"
+    t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.index ["host_id", "opponent_id"], name: "index_rooms_on_host_id_and_opponent_id"
     t.index ["host_id"], name: "index_rooms_on_host_id"
@@ -119,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
 
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
+    t.datetime "age_confirmed_at"
     t.datetime "created_at", null: false
     t.string "display_name"
     t.string "email_address", null: false
@@ -127,6 +143,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
     t.bigint "native_language_id"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
+    t.datetime "onboarding_completed_at"
+    t.boolean "receive_new_rooms", default: true, null: false
+    t.datetime "suspended_at"
     t.datetime "updated_at", null: false
     t.index ["display_name"], name: "index_users_on_display_name", unique: true
     t.index ["learning_language_id"], name: "index_users_on_learning_language_id"
@@ -148,6 +167,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
   create_table "voice_messages", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_ms", null: false
+    t.string "moderation_status", default: "approved", null: false
     t.bigint "room_id", null: false
     t.bigint "sender_id", null: false
     t.datetime "updated_at", null: false
@@ -162,9 +182,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_000001) do
   add_foreign_key "content_reports", "rooms"
   add_foreign_key "content_reports", "users", column: "reported_user_id"
   add_foreign_key "content_reports", "users", column: "reporter_id"
+  add_foreign_key "content_reports", "users", column: "reviewed_by_id", on_delete: :nullify
   add_foreign_key "feedback_replies", "feedbacks"
   add_foreign_key "feedback_replies", "users"
   add_foreign_key "feedbacks", "users"
+  add_foreign_key "notification_tokens", "users"
   add_foreign_key "rooms", "languages"
   add_foreign_key "rooms", "users", column: "host_id"
   add_foreign_key "rooms", "users", column: "opponent_id"

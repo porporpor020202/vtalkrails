@@ -46,6 +46,9 @@ export default class extends Controller {
   }
 
   async startRecording() {
+    this.recordingMessageTarget.removeAttribute("role")
+    this.recordingMessageTarget.textContent = "Recording…"
+    this.recordingMessageTarget.classList.add("hidden")
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -80,8 +83,10 @@ export default class extends Controller {
 
     } catch (error) {
       this.recordingMessageTarget.textContent = error.name === "NotAllowedError"
-        ? "Microphone access is required to record."
+        ? "Allow microphone access in your browser or device settings, then try again."
         : "The microphone could not be started."
+      this.recordingMessageTarget.setAttribute("role", "alert")
+      this.recordingMessageTarget.classList.remove("hidden")
       this.releaseStream()
     }
   }
@@ -203,6 +208,9 @@ export default class extends Controller {
     this.requestKey = null
     this.durationMs = 0
     this.recorder = null
+    this.recordingMessageTarget.removeAttribute("role")
+    this.recordingMessageTarget.classList.add("hidden")
+    this.recordingMessageTarget.textContent = "Recording…"
     this.timerTarget.textContent = "00:00"
     this.previewTarget.removeAttribute("src")
     this.previewAreaTarget.classList.add("hidden")

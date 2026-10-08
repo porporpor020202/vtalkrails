@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["indicator", "label"]
+  static targets = ["indicator", "label", "button", "frame"]
 
   connect() {
     this.startY = null
@@ -28,6 +28,7 @@ export default class extends Controller {
   }
 
   handleTouchStart(event) {
+    if (!this.hasIndicatorTarget) return
     if (this.isRefreshing || event.touches.length !== 1 || !this.isAtTop()) return
 
     const target = event.target instanceof Element ? event.target : null
@@ -64,14 +65,31 @@ export default class extends Controller {
     if (this.isRefreshing) return
 
     this.isRefreshing = true
-    this.labelTarget.textContent = "Refreshing…"
-    this.setIndicator(72)
+    if (this.hasLabelTarget) {
+      this.labelTarget.textContent = "Refreshing…"
+      this.setIndicator(72)
+    }
+    if (this.hasButtonTarget) {
+      this.buttonTarget.disabled = true
+      this.buttonTarget.textContent = "Refreshing…"
+    }
 
-    // Turbo will replace the current index without adding a browser history entry.
-    if (window.Turbo) {
-      window.Turbo.visit(window.location.href, { action: "replace" })
-    } else {
-      window.location.reload()
+    try {
+      // Reload only the room list so the selected language and recorder stay intact.
+      if (this.frameTarget.src === window.location.href) {
+        await this.frameTarget.reload()
+      } else {
+        this.frameTarget.src = window.location.href
+        await this.frameTarget.loaded
+      }
+    } finally {
+      this.isRefreshing = false
+      if (this.hasLabelTarget) this.labelTarget.textContent = "Pull to refresh"
+      if (this.hasButtonTarget) {
+        this.buttonTarget.disabled = false
+        this.buttonTarget.textContent = "Refresh"
+      }
+      this.setIndicator(0)
     }
   }
 

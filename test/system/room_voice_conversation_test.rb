@@ -61,7 +61,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_수신자는 룸에 들어가 발신자가 보낸 음성을 재생할 수 있다" do
+  test "수신자는 룸에 들어가 발신자가 보낸 음성을 재생할 수 있다" do
     room = create_conversation(@recipient)
     assert_equal voice_audio, room.voice_messages.sole.audio.download
 
@@ -73,7 +73,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_수신자가 처음 답장하면 발신자의 Say 탭에도 룸이 표시된다" do
+  test "수신자가 처음 답장하면 발신자의 Say 탭에도 룸이 표시된다" do
     room = create_conversation(@recipient)
 
     as_user(@sender) do
@@ -99,11 +99,11 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_룸에서 주고받는 답장은 새 매칭 없이 해당 룸에만 저장된다" do
+  test "룸에서 주고받는 답장은 새 매칭 없이 해당 룸에만 저장된다" do
     room = create_conversation(@recipient)
     other_room = create_conversation(@other_recipient)
     other_message_ids = other_room.voice_messages.pluck(:id)
-    reject_matching = ->(**) { flunk "룸 답장은 수신자 선정 알고리즘을 호출하면 안 됩니다." }
+    reject_matching = ->(**) { flunk "Room replies must not call the recipient selection algorithm." }
 
     VoiceRecipientSelector.stub(:recipients, reject_matching) do
       assert_no_difference "Room.count" do
@@ -199,7 +199,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
   def assert_audio_plays(audio)
     audio.execute_script("this.play()")
     assert audio.synchronize(5, errors: [ Capybara::ExpectationNotMet ]) {
-      raise Capybara::ExpectationNotMet, "음성 재생 시간이 증가하지 않습니다." unless audio.evaluate_script("this.currentTime > 0 && !this.error")
+      raise Capybara::ExpectationNotMet, "Audio playback time is not increasing." unless audio.evaluate_script("this.currentTime > 0 && !this.error")
       true
     }
   end

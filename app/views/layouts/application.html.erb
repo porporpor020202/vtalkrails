@@ -3,7 +3,12 @@
   <head>
     <title><%= content_for(:title) || "Say One Thing" %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <%= csrf_meta_tags %>
+    <% csrf_tags = csrf_meta_tags %>
+    <% if csrf_tags.present? %>
+      <%= csrf_tags %>
+    <% else %>
+      <%= tag.meta name: "csrf-token", content: form_authenticity_token %>
+    <% end %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
@@ -19,20 +24,28 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="h-dvh flex flex-col overflow-hidden select-none max-w-[430px] mx-auto bg-[#FFF7F2]">
+  <body class="h-dvh overflow-hidden select-none bg-slate-200">
+    <div id="app-shell" class="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#FFF7F2] [contain:layout]">
 
-  <% if dev_mode? %>
-      <div class="fixed top-4 right-3 z-[9999] pointer-events-none max-w-[430px] mx-auto">
-        <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
-      </div>
-    <% end %>
+      <% if dev_mode? %>
+        <div class="fixed top-4 right-3 z-[9999] pointer-events-none">
+          <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
+        </div>
+      <% end %>
 
-    <main class="flex-1 min-h-0 overflow-y-auto flex flex-col">
-      <%= yield %>
-    </main>
+      <main class="flex-1 min-h-0 overflow-y-auto flex flex-col">
+        <% unless content_for?(:hide_flash) %>
+          <% flash.each do |type, message| %>
+            <% next if type == "reception_notice" %>
+            <p role="<%= type == "alert" ? "alert" : "status" %>" class="px-5 py-3 text-sm"><%= message %></p>
+          <% end %>
+        <% end %>
+        <%= yield %>
+      </main>
 
-    <% unless content_for?(:hide_bottom_nav) %>
-      <%= render "shared/bottom_nav" %>
-    <% end %>
+      <% unless content_for?(:hide_bottom_nav) %>
+        <%= render "shared/bottom_nav" %>
+      <% end %>
+    </div>
   </body>
 </html>

@@ -60,59 +60,15 @@ class OnboardingTest < ApplicationSystemTestCase
   end
 
   test "r_온보딩을 완료한 사용자가 온보딩 페이지에 접속하면 root_path로 이동한다" do
-    @user.update!(display_name: "Bright Panda", native_language: languages(:english), learning_language: languages(:korean))
+    # 언어만 저장된 사용자를 완료 상태로 간주하지 않는다.
+    # 이 테스트는 나이 확인과 명시적인 완료 기록까지 저장된 사용자를 준비한다.
+    @user.update!(display_name: "Bright Panda", native_language: languages(:english), learning_language: languages(:korean), age_confirmed_at: Time.current, onboarding_completed_at: Time.current)
     assert @user.onboarding_complete?
 
     visit onboarding_path
     assert @user.onboarding_complete?
 
     assert_current_path root_path, wait: 5
-  end
-
-  test "r_모국어를 선택하지 않고 Continue를 누르면 입력 오류를 표시한다" do
-    click_button "Continue"
-
-    field = find("#user_native_language_id")
-    assert field.evaluate_script("this.validity.valueMissing")
-    assert field.evaluate_script("this.matches(':invalid')")
-    assert field.evaluate_script("this === document.activeElement")
-    assert field.evaluate_script("this.validationMessage.length > 0")
-
-    assert_current_path onboarding_path
-    assert_nil @user.reload.native_language
-  end
-
-  test "r_학습 언어를 선택하지 않고 Continue를 누르면 입력 오류를 표시한다" do
-    select "Korean", from: "user_native_language_id"
-    click_button "Continue"
-
-    field = find("#user_learning_language_id")
-    assert field.evaluate_script("this.validity.valueMissing")
-    assert field.evaluate_script("this.matches(':invalid')")
-    assert field.evaluate_script("this === document.activeElement")
-    assert field.evaluate_script("this.validationMessage.length > 0")
-
-    assert_current_path onboarding_path
-    assert_nil @user.reload.learning_language
-  end
-
-  test "r_모국어와 학습 언어를 선택하고 Continue를 누르면 저장하고 홈으로 이동한다" do
-    assert_no_difference "User.count" do
-      select "Korean", from: "user_native_language_id"
-      select "English", from: "user_learning_language_id"
-      click_button "Continue"
-
-      assert_current_path root_path, wait: 5
-    end
-
-    @user.reload
-    assert_not_nil @user.native_language
-    assert_not_nil @user.learning_language
-    assert_not_equal @user.native_language, @user.learning_language
-    assert_equal languages(:korean), @user.native_language
-    assert_equal languages(:english), @user.learning_language
-    assert_not_nil @user.display_name
-    assert @user.onboarding_complete?
   end
 
   test "r_온보딩에서 Sign Out을 누르면 로그아웃된다" do

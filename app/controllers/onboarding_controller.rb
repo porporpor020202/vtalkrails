@@ -14,7 +14,10 @@ class OnboardingController < ApplicationController
     @user = current_user
     @user.assign_attributes(onboarding_params)
 
-    if @user.save(context: :onboarding)
+    if @user.valid?(:onboarding)
+      @user.age_confirmed_at = Time.current
+      @user.onboarding_completed_at = Time.current
+      @user.save!
       redirect_to root_path, status: :see_other
     else
       render :show, status: :unprocessable_entity
@@ -30,6 +33,6 @@ class OnboardingController < ApplicationController
   end
 
   def onboarding_params
-    params.require(:user).permit(:native_language_id, :learning_language_id)
+    params.require(:user).permit(:native_language_id, :learning_language_id, :date_of_birth, :microphone_confirmed)
   end
 end

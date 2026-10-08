@@ -1,5 +1,7 @@
 class ContentReport < ApplicationRecord
   REASONS = {
+    child_exploitation: "Child sexual abuse or exploitation",
+    underage_user: "Suspected underage user",
     harassment: "Harassment or bullying",
     hate_speech: "Hate speech",
     sexual_content: "Sexual content",
@@ -15,6 +17,9 @@ class ContentReport < ApplicationRecord
   enum :reason, REASONS.keys.index_with(&:to_s), validate: true
   enum :status, { pending: "pending", reviewed: "reviewed", actioned: "actioned", dismissed: "dismissed" }, default: :pending
 
+  belongs_to :reviewed_by, class_name: "User", optional: true
+  validates :resolution, presence: true, unless: :pending?
+
   validates :details, length: { maximum: 1_000 }
   validate :reporter_must_belong_to_room
   validate :reported_user_must_be_the_other_participant
@@ -23,14 +28,14 @@ class ContentReport < ApplicationRecord
 
   def reporter_must_belong_to_room
     return if room.blank? || reporter.blank?
-    return if room.user_id == reporter_id || room.opponent_id == reporter_id
+    return if room.host_id == reporter_id || room.opponent_id == reporter_id
 
     errors.add(:reporter, "must belong to the conversation")
   end
 
   def reported_user_must_be_the_other_participant
     return if room.blank? || reporter.blank? || reported_user.blank?
-    return if room.opponent_for(reporter).id == reported_user_id
+    return if room.opponent_for(reporter)&.id == reported_user_id
 
     errors.add(:reported_user, "must be the other conversation participant")
   end

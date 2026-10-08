@@ -70,7 +70,7 @@ class SayTabStateTest < ApplicationSystemTestCase
     language_top = language.evaluate_script("this.getBoundingClientRect().top")
     recorder_top = recorder.evaluate_script("this.getBoundingClientRect().top")
     list = find("#room-list")
-    assert list.evaluate_script("this.scrollHeight > this.clientHeight"), "룸 목록 자체가 스크롤 영역이어야 합니다."
+    assert list.evaluate_script("this.scrollHeight > this.clientHeight"), "The room list itself must be scrollable."
 
     list.execute_script("this.scrollTop = this.scrollHeight")
 

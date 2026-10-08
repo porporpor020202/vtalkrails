@@ -10,9 +10,6 @@ Rails.application.routes.draw do
   get "child_safety" => "pages#child_safety", as: :child_safety
   get "delete_account" => "pages#delete_account", as: :delete_account
   get "delete_account/confirm" => "account_deletions#show", as: :confirm_account_deletion
-  get "test" => "test#index"
-  resource :modal, only: [ :new ]
-
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
@@ -27,12 +24,8 @@ Rails.application.routes.draw do
     post :manage
     get :status
   end
-  post "billing/webhooks/paddle", to: "billing_webhooks#paddle"
-  post "billing/webhooks/apple", to: "billing_webhooks#apple"
-  post "billing/webhooks/google", to: "billing_webhooks#google"
 
   resources :rooms, only: %i[index show destroy] do
-    resources :ai_assistances, only: %i[create show]
     resources :voice_messages, only: :create do
       get :audio, on: :member
     end
@@ -45,6 +38,8 @@ Rails.application.routes.draw do
   resource :language_setup, only: %i[show update]
   resource :onboarding, only: %i[show update], controller: "onboarding"
 
+  resource :room_reception, only: :update
+
   resource :settings, only: %i[show update], controller: "settings"
 
   resources :feedbacks, only: %i[index new create show edit update] do
@@ -52,6 +47,13 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    resources :content_reports, only: %i[index show update]
+    resources :voice_messages, only: [] do
+      get :audio, on: :member
+    end
+    resources :users, only: [] do
+      resource :suspension, only: :create, controller: "suspensions"
+    end
     resources :feedbacks, only: %i[index show] do
       resources :feedback_replies, only: :create
     end
@@ -59,18 +61,6 @@ Rails.application.routes.draw do
 
   resource :profile, only: [ :show ], controller: "profile"
   resource :account, only: [ :destroy ]
-  resource :map, only: [ :show ]
-
-  resources :hikes, only: [] do
-    get :map, on: :member
-  end
-
-  resources :demos, only: [ :index ] do
-    collection do
-      get :cors_allowed
-      get :cors_blocked
-    end
-  end
 
   resource :apple_oauth_sessions, only: %i[ new create ] do
     collection do
@@ -93,6 +83,4 @@ Rails.application.routes.draw do
   resources :notification_tokens, only: :create do
     post :test_push, on: :collection
   end
-
-  resources :numbers, only: %i[index show]
 end

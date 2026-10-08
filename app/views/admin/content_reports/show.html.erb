@@ -1,0 +1,26 @@
+<section class="p-5 space-y-4">
+  <h1>Review report</h1>
+  <p data-testid="reporter"><%= @report.reporter&.display_name %></p>
+  <div data-testid="reported-user">
+    <%= @report.reported_user&.display_name %>
+    <% if @report.reported_user %>
+      <%= form_with url: admin_user_suspension_path(@report.reported_user) do |form| %>
+        <%= form.submit "Suspend user" %>
+      <% end %>
+    <% end %>
+  </div>
+  <p data-testid="report-details"><%= @report.details %></p>
+  <% @report.room.voice_messages.each do |message| %>
+    <audio controls src="<%= audio_admin_voice_message_path(message) %>"></audio>
+  <% end %>
+  <%= form_with model: [:admin, @report], class: "space-y-3" do |form| %>
+    <% if @report.errors.any? %>
+      <p role="alert"><%= @report.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form.label :status, "Status" %>
+    <%= form.select :status, [["Pending review", "pending"], ["Review completed", "reviewed"], ["Action taken", "actioned"], ["Dismissed", "dismissed"]] %>
+    <%= form.label :resolution, "Resolution" %>
+    <%= form.text_area :resolution %>
+    <%= form.submit "Save review" %>
+  <% end %>
+</section>
