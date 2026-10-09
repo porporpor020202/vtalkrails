@@ -44,6 +44,11 @@
       <%= form.text_field :date_of_birth, required: true, placeholder: "YYYY-MM-DD", autocomplete: "bday", inputmode: "numeric", maxlength: 10, class: "h-14 w-full rounded-2xl border border-slate-300 px-4", data: { onboarding_languages_target: "birthday", action: "input->onboarding-languages#formatBirthday change->onboarding-languages#sync" } %>
       <p data-onboarding-languages-target="ageGuidance" class="text-sm text-slate-500">Please enter your date of birth.</p>
 
+      <label class="flex items-start gap-3 text-sm leading-6 text-slate-700">
+        <%= form.check_box :community_rules_accepted, required: true, class: "mt-1 h-5 w-5 shrink-0", data: { onboarding_languages_target: "rules", action: "change->onboarding-languages#sync" } %>
+        <span>I agree to the <%= link_to "Community Rules and Terms of Use", community_rules_path, class: "font-semibold underline underline-offset-2", target: "_blank", rel: "noopener" %>, including the prohibition of abusive content and conduct.</span>
+      </label>
+
       <%= form.submit "Continue",
             disabled: true,
             class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50",

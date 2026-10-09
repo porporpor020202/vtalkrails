@@ -3,6 +3,10 @@ class PagesController < ApplicationController
   before_action :set_privacy_contact, only: %i[privacy child_safety delete_account]
   before_action :set_support_contact, only: :support
 
+  def community_rules
+    render layout: "public"
+  end
+
   def support; end
 
   def landing

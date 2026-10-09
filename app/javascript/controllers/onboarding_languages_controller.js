@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["native", "learning", "dialog", "continue", "microphoneStatus", "microphoneConfirmed", "birthday", "nativeGuidance", "learningGuidance", "ageGuidance"]
+  static targets = ["native", "learning", "dialog", "continue", "microphoneStatus", "microphoneConfirmed", "birthday", "nativeGuidance", "learningGuidance", "ageGuidance", "rules"]
 
   connect() {
     this.microphoneGranted = false
@@ -68,7 +68,7 @@ export default class extends Controller {
     this.ageGuidanceTarget.hidden = adult
     this.ageGuidanceTarget.textContent = !this.birthdayTarget.value ? "Please enter your date of birth." :
       Number.isNaN(birthday.getTime()) || birthday > today ? "Please enter a valid date of birth." : "You must be at least 18 years old."
-    this.continueTarget.disabled = !(this.nativeTarget.value && this.learningTarget.value && this.microphoneGranted && adult)
+    this.continueTarget.disabled = !(this.nativeTarget.value && this.learningTarget.value && this.microphoneGranted && adult && this.rulesTarget.checked)
   }
 
   async requestMicrophone() {

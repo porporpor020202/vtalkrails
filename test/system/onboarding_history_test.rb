@@ -16,6 +16,8 @@ class OnboardingHistoryTest < ApplicationSystemTestCase
 
     select "English", from: "user_native_language_id"
     select "Korean", from: "user_learning_language_id"
+    # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
+    check "user_community_rules_accepted"
 
     assert_button "Continue", disabled: true
 

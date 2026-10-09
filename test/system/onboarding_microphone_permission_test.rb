@@ -88,6 +88,8 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
   def select_languages_and_age
     select "Korean", from: "user_native_language_id"
     select "English", from: "user_learning_language_id"
+    # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
+    check "user_community_rules_accepted"
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
   end
 

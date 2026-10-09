@@ -11,18 +11,21 @@ class OnboardingMicrophoneTest < ApplicationSystemTestCase
     page.execute_script("sessionStorage.removeItem('onboarding_microphone_stopped')")
   end
 
-  test "언어 두 개와 마이크와 나이를 모두 확인해야 Continue가 활성화된다" do
-    # 네 조건의 16가지 조합을 검사한다. 이전 화면에서 확인한 마이크 상태가
+  test "언어 두 개와 마이크와 나이와 이용정책 동의를 모두 확인해야 Continue가 활성화된다" do
+    # 필수 동의를 포함한 다섯 조건의 32가지 조합을 검사한다. 이전 화면에서 확인한 마이크 상태가
     # 다음 조합으로 이어지지 않도록 매번 온보딩 페이지를 새로 방문한다.
-    conditions = [ false, true ].repeated_permutation(4).to_a
+    conditions = [ false, true ].repeated_permutation(5).to_a
 
-    conditions.each do |native, learning, microphone, adult|
+    conditions.each do |native, learning, microphone, adult, rules|
       visit onboarding_path
       assert_continue_disabled
 
       select "Korean", from: "user_native_language_id" if native
       select "English", from: "user_learning_language_id" if learning
       fill_in "Date of birth", with: Date.current.years_ago(20).iso8601 if adult
+      # 동의는 기본 선택이 아니며 사용자가 직접 체크해야 한다.
+      assert_unchecked_field "user_community_rules_accepted"
+      check "user_community_rules_accepted" if rules
 
       if microphone
         allow_microphone
@@ -55,10 +58,10 @@ class OnboardingMicrophoneTest < ApplicationSystemTestCase
         assert_text "Please enter your date of birth."
       end
 
-      context = "native=#{native}, learning=#{learning}, microphone=#{microphone}, adult=#{adult}"
-      assert_equal !(native && learning && microphone && adult), find_button("Continue", disabled: :all).disabled?, context
+      context = "native=#{native}, learning=#{learning}, microphone=#{microphone}, adult=#{adult}, rules=#{rules}"
+      assert_equal !(native && learning && microphone && adult && rules), find_button("Continue", disabled: :all).disabled?, context
 
-      if native && learning && microphone && adult
+      if native && learning && microphone && adult && rules
         assert_continue_enabled
       else
         assert_continue_disabled
@@ -77,6 +80,13 @@ class OnboardingMicrophoneTest < ApplicationSystemTestCase
 
     click_button "Allow microphone"
     assert_text "Microphone access allowed"
+    assert_continue_enabled
+
+    # 나머지 조건이 준비되어도 동의를 취소하면 완료할 수 없어야 한다.
+    uncheck "user_community_rules_accepted"
+    assert_continue_disabled
+    assert_onboarding_not_saved
+    check "user_community_rules_accepted"
     assert_continue_enabled
 
     assert_equal "true", page.evaluate_script("sessionStorage.getItem('onboarding_microphone_stopped')")
@@ -129,7 +139,7 @@ class OnboardingMicrophoneTest < ApplicationSystemTestCase
     assert_onboarding_not_saved
   end
 
-  test "네 조건 완료 후 언어 선택이 초기화되면 Continue도 다시 비활성화된다" do
+  test "다섯 조건 완료 후 언어 선택이 초기화되면 Continue도 다시 비활성화된다" do
     select_languages
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
     allow_microphone
@@ -153,6 +163,8 @@ class OnboardingMicrophoneTest < ApplicationSystemTestCase
   def select_languages
     select "Korean", from: "user_native_language_id"
     select "English", from: "user_learning_language_id"
+    # 마이크 테스트에서는 다른 필수 조건인 이용정책 동의를 미리 완료한다.
+    check "user_community_rules_accepted"
   end
 
   def assert_continue_disabled

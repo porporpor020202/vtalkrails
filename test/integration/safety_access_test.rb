@@ -20,7 +20,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     @message = create_voice_message(room: @room, sender: @sender)
   end
 
-  test "r_신고 사유에 아동 성착취와 미성년 사용자 의심을 제공한다" do
+  test "신고 사유에 아동 성착취와 미성년 사용자 의심을 제공한다" do
     sign_in_as(@recipient)
     get room_safety_path(@room)
 
@@ -62,7 +62,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "r_차단하면 양방향 수신 후보에서 제외한다" do
+  test "차단하면 양방향 수신 후보에서 제외한다" do
     sign_in_as(@recipient)
     post room_block_path(@room)
 
@@ -79,7 +79,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "r_차단 후에는 이전 음성 주소로도 상대 음성을 읽을 수 없다" do
+  test "차단 후에는 이전 음성 주소로도 상대 음성을 읽을 수 없다" do
     @message.update!(moderation_status: "approved")
     sign_in_as(@recipient)
     get audio_room_voice_message_path(@room, @message)
@@ -94,7 +94,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "r_차단하면 양쪽 모두 직접 답장 API로도 전송할 수 없다" do
+  test "차단하면 양쪽 모두 직접 답장 API로도 전송할 수 없다" do
     sign_in_as(@recipient)
     post room_block_path(@room)
     actors = [ @sender, @recipient ]
@@ -113,7 +113,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "r_나이 미확인 사용자와 정지 사용자는 수신 후보에서 제외한다" do
+  test "나이 미확인 사용자와 정지 사용자는 수신 후보에서 제외한다" do
     # setup의 온보딩 요청은 다른 User 객체로 DB에 나이 확인 시각을 저장한다.
     # @recipient는 아직 nil을 기억하므로 먼저 최신 값을 읽어야 한다.
     # reload 없이 nil을 대입하면 Rails가 변경으로 인식하지 않아 DB에
@@ -127,7 +127,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert_not_includes candidates.pluck(:id), @admin.id
   end
 
-  test "r_일반 사용자는 운영자 신고 목록과 처리 API를 사용할 수 없다" do
+  test "일반 사용자는 운영자 신고 목록과 처리 API를 사용할 수 없다" do
     report = create_report
     sign_in_as(@recipient)
 
@@ -140,7 +140,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert report.reload.pending?
   end
 
-  test "r_운영자는 신고와 음성 증거를 확인하고 처리 기록을 남긴다" do
+  test "운영자는 신고와 음성 증거를 확인하고 처리 기록을 남긴다" do
     report = create_report
     sign_in_as(@admin)
     get "/admin/content_reports/#{report.id}"
@@ -168,7 +168,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert_equal "Blocked access to the violating voice message and suspended the account.", report.resolution
   end
 
-  test "r_아동 안전 신고는 일반 신고보다 운영자 목록 상단에 표시한다" do
+  test "아동 안전 신고는 일반 신고보다 운영자 목록 상단에 표시한다" do
     # 오래된 아동 안전 신고가 최신 일반 신고 뒤에 묻히지 않도록 한다.
     urgent = @room.content_reports.create!(reporter: @recipient, reported_user: @sender, reason: "child_exploitation", details: "Child safety concern")
     urgent.update_columns(created_at: 2.days.ago)
@@ -184,7 +184,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "r_처리 내용을 남기지 않은 신고는 종결할 수 없다" do
+  test "처리 내용을 남기지 않은 신고는 종결할 수 없다" do
     report = create_report
     sign_in_as(@admin)
 
@@ -194,7 +194,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert report.reload.pending?
   end
 
-  test "r_운영자가 계정을 정지하면 기존 로그인 세션으로도 전송할 수 없다" do
+  test "운영자가 계정을 정지하면 기존 로그인 세션으로도 전송할 수 없다" do
     # 정상 상태에서는 전송자에게 답장 차례가 있음을 확인한다.
     create_voice_message(room: @room, sender: @recipient)
     assert @room.reload.can_reply?(@sender)
@@ -229,7 +229,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     assert_equal 403, user_session.response.status
   end
 
-  test "r_일반 사용자는 다른 사용자를 운영자 권한으로 정지할 수 없다" do
+  test "일반 사용자는 다른 사용자를 운영자 권한으로 정지할 수 없다" do
     sign_in_as(@recipient)
     post "/admin/users/#{@sender.id}/suspension"
 
@@ -250,7 +250,9 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
         native_language_id: native_id,
         learning_language_id: learning_id,
         date_of_birth: Date.current.years_ago(20).iso8601,
-        microphone_confirmed: "1"
+      # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
+      community_rules_accepted: "1",
+      microphone_confirmed: "1"
       }
     }
     assert_equal 303, session.response.status

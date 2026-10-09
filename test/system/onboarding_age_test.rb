@@ -43,7 +43,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_언어와 마이크를 준비해도 나이를 입력하지 않으면 완료할 수 없다" do
+  test "언어와 마이크를 준비해도 나이를 입력하지 않으면 완료할 수 없다" do
     prepare_languages_and_microphone
 
     assert_text "Please enter your date of birth."
@@ -52,7 +52,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_not @user.reload.onboarding_complete?
   end
 
-  test "r_18세 생일 전날인 사용자는 완료할 수 없다" do
+  test "18세 생일 전날인 사용자는 완료할 수 없다" do
     prepare_languages_and_microphone
 
     # 오늘보다 생일이 하루 늦으므로 아직 만 17세이다.
@@ -63,7 +63,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_not @user.reload.onboarding_complete?
   end
 
-  test "r_미래 생년월일을 입력하면 올바른 날짜를 입력하도록 안내한다" do
+  test "미래 생년월일을 입력하면 올바른 날짜를 입력하도록 안내한다" do
     prepare_languages_and_microphone
     fill_in "Date of birth", with: Date.tomorrow.iso8601
 
@@ -72,7 +72,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_not @user.reload.onboarding_complete?
   end
 
-  test "r_18세 생일 당일부터 Continue로 저장하고 루트로 이동할 수 있다" do
+  test "18세 생일 당일부터 Continue로 저장하고 루트로 이동할 수 있다" do
     prepare_languages_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(18).iso8601
 
@@ -95,7 +95,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert @user.onboarding_complete?
   end
 
-  test "r_나이를 입력했다가 지우면 안내와 Continue 비활성 상태로 돌아온다" do
+  test "나이를 입력했다가 지우면 안내와 Continue 비활성 상태로 돌아온다" do
     prepare_languages_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
     assert_button "Continue", disabled: false
@@ -107,7 +107,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_not @user.reload.onboarding_complete?
   end
 
-  test "r_완료 후 재로그인해도 나이를 다시 묻지 않는다" do
+  test "완료 후 재로그인해도 나이를 다시 묻지 않는다" do
     prepare_languages_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
     click_button "Continue"
@@ -158,6 +158,8 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   def prepare_languages_and_microphone
     select "Korean", from: "user_native_language_id"
     select "English", from: "user_learning_language_id"
+    # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
+    check "user_community_rules_accepted"
     page.driver.browser.execute_cdp(
       "Browser.setPermission",
       permission: { name: "microphone" },

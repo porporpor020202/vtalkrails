@@ -25,7 +25,9 @@ class OnboardingAgeBoundaryTest < ActionDispatch::IntegrationTest
         native_language_id: languages(:korean).id,
         learning_language_id: languages(:english).id,
         date_of_birth: "2008-10-08",
-        microphone_confirmed: "1"
+      # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
+      community_rules_accepted: "1",
+      microphone_confirmed: "1"
       } }
 
       assert_redirected_to root_path
@@ -51,7 +53,9 @@ class OnboardingAgeBoundaryTest < ActionDispatch::IntegrationTest
         native_language_id: languages(:korean).id,
         learning_language_id: languages(:english).id,
         date_of_birth: "2008-10-09",
-        microphone_confirmed: "1"
+      # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
+      community_rules_accepted: "1",
+      microphone_confirmed: "1"
       } }
 
       assert_response :unprocessable_entity

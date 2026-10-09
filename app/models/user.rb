@@ -35,8 +35,9 @@ class User < ApplicationRecord
   validate :languages_enabled, on: [ :onboarding, :language_setup ]
   validate :learning_language_differs_from_native_language
 
-  attr_accessor :date_of_birth, :microphone_confirmed
+  attr_accessor :date_of_birth, :microphone_confirmed, :community_rules_accepted
   validate :onboarding_requirements, on: :onboarding
+  validates :community_rules_accepted, acceptance: { accept: "1" }, allow_nil: false, on: :onboarding
 
   # 5. Callbacks
   before_destroy :clear_conversation_audio, prepend: true

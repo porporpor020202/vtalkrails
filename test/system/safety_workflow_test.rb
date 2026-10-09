@@ -18,7 +18,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     create_voice_message(room: @room, sender: @sender)
   end
 
-  test "r_Room 화면에 신고 버튼과 차단 버튼을 모두 표시한다" do
+  test "Room 화면에 신고 버튼과 차단 버튼을 모두 표시한다" do
     # 호스트와 수신자 모두 현재 대화에서 바로 신고·차단할 수 있어야 한다.
     participants = [ @sender, @recipient ]
 
@@ -39,7 +39,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_사용자가 아동 안전 우려를 앱 안에서 신고할 수 있다" do
+  test "사용자가 아동 안전 우려를 앱 안에서 신고할 수 있다" do
     as_user(@recipient) do
       visit room_path(@room)
       click_link "Report or block"
@@ -57,7 +57,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     assert report.pending?
   end
 
-  test "r_사용자가 상대방을 차단할 수 있다" do
+  test "사용자가 상대방을 차단할 수 있다" do
     as_user(@recipient) do
       visit room_path(@room)
       click_link "Report or block"
@@ -71,7 +71,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     assert UserBlock.exists?(blocker: @recipient, blocked: @sender)
   end
 
-  test "r_운영자가 신고 목록에서 내용을 검토하고 처리 결과를 저장할 수 있다" do
+  test "운영자가 신고 목록에서 내용을 검토하고 처리 결과를 저장할 수 있다" do
     # 사용자가 제출한 기록이 별도의 수동 등록 없이 운영자 목록에 나타나야 한다.
     as_user(@recipient) do
       visit room_safety_path(@room)
@@ -110,7 +110,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     assert_equal "Reviewed the report and warned the violating user.", report.resolution
   end
 
-  test "r_앱 내 안전 화면에서 공개 정책과 연락처에 접근할 수 있다" do
+  test "앱 내 안전 화면에서 공개 정책과 연락처에 접근할 수 있다" do
     as_user(@recipient) do
       visit room_safety_path(@room)
 
@@ -125,7 +125,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_운영자가 신고 대상 계정을 정지하면 기존 브라우저에서도 이용할 수 없다" do
+  test "운영자가 신고 대상 계정을 정지하면 기존 브라우저에서도 이용할 수 없다" do
     report = @room.content_reports.create!(reporter: @recipient, reported_user: @sender, reason: "harassment", details: "Report of repeated abusive messages")
 
     as_user(@admin) do
@@ -165,6 +165,8 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
       sign_in(user: user)
       select native, from: "user_native_language_id"
       select learning, from: "user_learning_language_id"
+      # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
+      check "user_community_rules_accepted"
       fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
       page.execute_script(<<~JS)
         navigator.mediaDevices.getUserMedia = async () => ({
