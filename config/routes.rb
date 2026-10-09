@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "support" => "pages#support", as: :support
   get "about" => "pages#about", as: :about
+  get "ko" => "pages#landing", as: :korean_landing
+  get "eng" => "pages#landing_english", as: :english_landing
   get "privacy" => "pages#privacy", as: :privacy
   get "child_safety" => "pages#child_safety", as: :child_safety
   get "delete_account" => "pages#delete_account", as: :delete_account
@@ -17,13 +19,6 @@ Rails.application.routes.draw do
 
 
   root "rooms#index"
-  get "vip/terms", to: "vips#terms"
-  resource :vip, only: :show do
-    post :checkout
-    post :verify
-    post :manage
-    get :status
-  end
 
   resources :rooms, only: %i[index show destroy] do
     resources :voice_messages, only: :create do

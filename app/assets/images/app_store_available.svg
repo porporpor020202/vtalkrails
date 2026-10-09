@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="48" viewBox="0 0 152 48">
+  <rect x=".5" y=".5" width="151" height="47" rx="10" fill="#fff7f2" stroke="#decaba"/>
+  <rect x="12" y="10" width="28" height="28" rx="7" fill="#2785e8"/>
+  <g fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m23 16 10 17M29 16 19 33M17 28h18"/></g>
+  <text x="49" y="20" font-family="Arial,sans-serif" font-size="10" fill="#786454">iOS · 출시</text>
+  <text x="49" y="35" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#262520">App Store</text>
+</svg>

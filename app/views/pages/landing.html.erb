@@ -1,0 +1,130 @@
+<div class="mx-auto max-w-6xl px-5 sm:px-10">
+  <header class="fixed inset-x-0 top-0 z-50 border-b border-[#e5ded3] bg-[#fff7f2]/95 shadow-sm backdrop-blur-md">
+    <div class="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 px-5 sm:px-10">
+    <%= link_to korean_landing_path, class: "flex items-center gap-2 text-sm font-extrabold tracking-tight sm:text-lg", aria: { label: "say one thing 홈" } do %>
+      <img src="/say_one_thing_icon.png" alt="" width="32" height="32" class="rounded-lg">
+      say one thing
+    <% end %>
+    <%= link_to "앱 설치하기 ↗", landing_install_url, class: "rounded-full bg-[#e65e3c] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#c94b2c] focus-visible:outline-2 focus-visible:outline-offset-4 sm:text-sm" %>
+    </div>
+  </header>
+
+  <main class="pt-20">
+    <section class="mx-auto max-w-3xl pb-16 pt-14 sm:pb-24 sm:pt-20" aria-labelledby="landing-title">
+      <p class="mb-6 text-xs font-bold tracking-widest text-[#ba472f]">제가 이 앱을 만든 이유</p>
+      <h1 id="landing-title" class="text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.4] tracking-[-0.055em]">저도 영어 회화 배우러<br>당근 모임에 가봤습니다.</h1>
+      <p class="mt-6 text-lg leading-9 text-[#68645b] sm:text-xl">하고 싶은 말은 있는데, 영어로 어떻게 말할지 몰랐어요.<br class="hidden sm:block"> 번역기로 검색하고, 다시 말하고.<br>대화 흐름이 뚝뚝 끊기니 재미가 없었습니다.</p>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">영어 잘하고 싶어서<br>쉐도잉도 해봤습니다.</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">하루 하고 포기했어요.<br>너무 어려웠습니다.</p>
+      </div>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">AI랑 영어로 대화하는 앱도<br>써봤습니다.</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">재미가 없더라고요.<br>대화가 너무 딱딱하게 느껴졌어요.<br>저는 사람과 이야기하고 싶었습니다.</p>
+      </div>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">원어민 화상회화도<br>해봤습니다.</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">50분 동안 떠드는 게 지옥이더라고요.<br>할 말도 없고…<br>상대방이 하는 말도 못 알아듣겠고.</p>
+      </div>
+
+      <div class="mt-14 rounded-[2rem] border border-[#eed9ca] bg-[#fbece1] px-6 py-9 sm:mt-14 sm:px-12 sm:py-12">
+        <span class="mb-7 block h-1 w-10 rounded-full bg-[#e65e3c]" aria-hidden="true"></span>
+        <p class="text-sm font-semibold leading-7 text-[#786454] sm:text-base">그래서 제가 직접 만들었습니다.</p>
+        <h2 class="mt-4 text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.35] tracking-[-0.055em]">영어.<br><span class="text-[#ba472f]">한 문장씩 주고받는 앱.</span></h2>
+        <div class="mt-8 border-t border-[#ead1be] pt-6 sm:mt-10">
+          <%= link_to landing_install_url, class: "group flex items-center gap-3 rounded-2xl bg-[#262520] p-4 text-white transition hover:bg-[#3a382f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ba472f] sm:gap-4 sm:p-5", aria: { label: "Say One Thing 앱 설치하기" } do %>
+            <img src="/say_one_thing_icon.png" alt="" width="48" height="48" class="h-12 w-12 rounded-xl shadow-sm">
+            <span class="min-w-0 flex-1">
+              <span class="block text-lg font-extrabold tracking-tight">Say One Thing</span>
+              <span class="mt-1 block text-xs font-medium text-[#e7cbbb]">앱 설치하기</span>
+            </span>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e65e3c] text-lg text-white" aria-hidden="true">↗</span>
+          <% end %>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl border-t border-[#e5ded3] py-12 sm:py-16" aria-labelledby="conversation-title">
+      <p class="text-sm leading-7 text-[#787267] sm:text-base">씻고, 약속 잡고, 영어 모임에 나갈 준비 대신.</p>
+      <h2 id="conversation-title" class="mt-5 text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.35] tracking-[-0.055em]">그냥 앱 켜서<br>영어 한마디 <span class="text-[#ba472f]">던져보세요.</span></h2>
+      <p class="mt-6 text-lg leading-9 text-[#68645b]">영어 모임에 가려고 시간을 비우지 않아도,<br>한 시간짜리 화상회화를 잡지 않아도 돼요.<br>카톡처럼, 하고 싶은 말을 영어로 녹음해 보내세요.</p>
+
+      <div class="my-8 grid grid-cols-[2.75rem_1fr] items-center gap-x-4 rounded-2xl border border-[#eadfd4] bg-white/70 p-5 sm:my-9 sm:gap-x-5 sm:p-7">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fbece1] text-[#ba472f]" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 2V11.5a9 9 0 0 1 18 0Z"/><path d="M8 10v4m4-6v8m4-6v4"/></svg></span>
+        <div>
+          <p class="text-xl font-bold leading-snug tracking-tight sm:text-2xl">답장은 사람의 목소리로 와요.</p>
+          <p class="mt-2 text-base font-bold text-[#ba472f] sm:text-lg">AI가 아니라, 진짜 사람.</p>
+        </div>
+        <p class="col-span-2 mt-4 text-sm leading-7 text-[#68645b]">서로 시간을 맞출 필요도 없어요.<br>답장을 듣고, 내가 편할 때 다시 말하면 돼요.</p>
+      </div>
+      <div class="mt-8 divide-y divide-[#e5ded3]">
+        <% [
+          ["01 / 어디서든", "만나러 가지 않아도 돼요.", "영어 모임 장소까지 이동할 필요 없어요. 집에서, 산책하다가, 내 이야기를 목소리로 보내세요."],
+          ["02 / 내 시간에", "한 시간 말고, 한마디.", "출근 전에도, 잠들기 전에도. 최대 30초로 짧게 보내고, 답장이 오면 내가 편할 때 이어가세요."],
+          ["03 / 진짜 사람과", "정답 대신, 대화.", "AI와 연습하는 게 아니에요. 누군가 내 말을 듣고, 자신의 이야기를 목소리로 돌려줄 수 있어요."]
+        ].each do |eyebrow, title, description| %>
+          <div class="py-6 sm:grid sm:grid-cols-[10rem_1fr] sm:gap-x-6">
+            <p class="text-xs font-bold leading-7 text-[#ba472f] sm:row-span-2"><%= eyebrow %></p>
+            <h3 class="mt-2 text-xl font-bold tracking-tight sm:mt-0"><%= title %></h3>
+            <p class="mt-2 text-sm leading-7 text-[#68645b]"><%= description %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="mx-auto max-w-3xl rounded-3xl bg-[#262e25] px-6 py-9 text-[#fff7f2] sm:p-10" aria-labelledby="steps-title">
+      <p class="text-xs font-bold tracking-widest text-[#c5d7ad]">HOW IT WORKS</p>
+      <h2 id="steps-title" class="mt-4 text-3xl font-extrabold tracking-[-0.05em] sm:text-4xl">당신의 영어가 닿는 방법.</h2>
+      <div class="mt-8 grid gap-7">
+        <% [
+          ["1", "가입하고 영어를 선택해요", "Google 또는 Apple로 로그인하고, 연습할 언어를 영어로 설정하세요."],
+          ["2", "녹음 버튼을 눌러 말해요", "최대 30초. 녹음을 마치고 보내면, 영어를 사용하는 다른 이용자에게 전달돼요."],
+          ["3", "답장이 오면, 이어가요", "상대의 음성 메시지를 듣고 내 목소리로 답하세요. 한마디가 대화가 되는 경험이에요."]
+        ].each do |number, title, description| %>
+          <div class="grid grid-cols-[2.25rem_1fr] gap-x-4"><span class="row-span-2 flex h-9 w-9 items-center justify-center rounded-full border border-[#77836a] text-sm font-bold text-[#c5d7ad]"><%= number %></span><h3 class="pt-1 text-lg font-bold"><%= title %></h3><p class="mt-2 text-sm leading-7 text-[#c7cec0]"><%= description %></p></div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl py-12 sm:py-16" aria-labelledby="faq-title">
+      <div class="grid gap-6">
+        <h2 id="faq-title" class="text-3xl font-extrabold tracking-[-0.05em]">첫마디 전,<br>궁금할 수 있는 것들.</h2>
+        <div>
+          <% [
+            ["영어를 잘 못해도 괜찮나요?", "짧고 쉬운 문장으로 시작해보세요. 유창한 발표를 하는 곳이 아니라, 내 이야기를 영어로 전해보는 곳이에요. “I like coffee.”도 첫마디가 될 수 있어요."],
+            ["원어민과 연결되나요?", "영어를 모국어로 쓰거나 영어를 배우는 이용자와 연결돼요. 원어민 연결을 보장하지는 않아요. 함께 영어를 실제로 써보는 게 이 앱의 시작이에요."],
+            ["전화처럼 바로 대화해야 하나요?", "아니요. 녹음한 음성 메시지를 주고받는 방식이에요. 상대의 메시지를 듣고, 내가 말할 수 있을 때 답하면 돼요."],
+            ["문법이나 발음을 교정해주나요?", "자동 교정이나 수업을 제공하는 앱은 아니에요. 배운 영어를 실제 사람과의 대화에 써보는 공간이에요."],
+            ["불편한 상대를 만나면요?", "대화에서 상대를 차단하거나 부적절한 내용을 신고할 수 있어요. 이 서비스는 만 18세 이상 이용자를 위한 공간이에요."]
+          ].each do |question, answer| %>
+            <details class="group border-b border-[#e5ded3] py-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-5 text-base font-bold [&::-webkit-details-marker]:hidden"><%= question %><span class="text-xl font-normal text-[#ba472f] group-open:rotate-45" aria-hidden="true">+</span></summary>
+              <p class="mt-4 max-w-xl text-sm leading-7 text-[#68645b]"><%= answer %></p>
+            </details>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-2 pb-12 pt-4 text-center sm:pb-16 sm:pt-6" aria-labelledby="start-title">
+      <p class="text-xs font-bold text-[#865432]">첫 문장은, 거창하지 않아도 돼요.</p>
+      <p class="mt-6 text-3xl font-semibold tracking-tight text-[#ba472f] sm:text-5xl" lang="en">“Hi. How was your day?”</p>
+      <h2 id="start-title" class="mt-5 text-lg font-bold tracking-tight sm:text-2xl">그 한마디가 누군가에게 닿는 순간부터.</h2>
+      <p class="mt-3 text-sm leading-7 text-[#785d40]">더 잘하게 될 때까지 기다리지 마세요.<br>지금 가진 영어로, 대화를 시작해보세요.</p>
+      <%= link_to "앱 설치하기 ↗", landing_install_url, class: "mt-8 inline-flex items-center justify-center rounded-full bg-[#e65e3c] px-8 py-4 text-base font-bold text-white transition hover:bg-[#c94b2c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ba472f]" %>
+    </section>
+  </main>
+
+  <footer class="mt-16 flex flex-col justify-between gap-5 border-t border-[#e5ded3] pb-8 pt-7 text-xs leading-6 text-[#787267] sm:flex-row">
+    <p class="font-semibold">say one thing<br><span class="font-normal">© <%= Time.current.year %> say one thing Team</span></p>
+    <nav aria-label="서비스 안내" class="flex flex-wrap gap-x-5 gap-y-2">
+      <%= link_to "개인정보 처리방침 ↗", privacy_path, class: "underline underline-offset-4" %>
+      <%= link_to "문의 ↗", support_path, class: "underline underline-offset-4" %>
+      <%= link_to "서비스 소개 (English) ↗", about_path, class: "underline underline-offset-4" %>
+    </nav>
+  </footer>
+</div>

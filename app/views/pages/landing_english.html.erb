@@ -1,0 +1,131 @@
+<div class="mx-auto max-w-6xl px-5 sm:px-10">
+  <header class="fixed inset-x-0 top-0 z-50 border-b border-[#e5ded3] bg-[#fff7f2]/95 shadow-sm backdrop-blur-md">
+    <div class="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 px-5 sm:px-10">
+    <%= link_to english_landing_path, class: "flex items-center gap-2 text-sm font-extrabold tracking-tight sm:text-lg", aria: { label: "say one thing home" } do %>
+      <img src="/say_one_thing_icon.png" alt="" width="32" height="32" class="rounded-lg">
+      say one thing
+    <% end %>
+    <%= link_to "Get the app ↗", landing_install_url, class: "rounded-full bg-[#e65e3c] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#c94b2c] focus-visible:outline-2 focus-visible:outline-offset-4 sm:text-sm" %>
+    </div>
+  </header>
+
+  <main class="pt-20">
+    <section class="mx-auto max-w-3xl pb-16 pt-14 sm:pb-24 sm:pt-20" aria-labelledby="landing-title">
+      <p class="mb-6 text-xs font-bold tracking-widest text-[#ba472f]">Why I built this app</p>
+      <h1 id="landing-title" class="text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.4] tracking-[-0.055em]">Looking for a meetup<br>to practice Korean?</h1>
+      <p class="mt-6 text-lg leading-9 text-[#68645b] sm:text-xl">Even if you find one, you might spend more time<br class="hidden sm:block"> checking a translator than actually talking.<br>Say something. Stop to translate. Try again.<br>When the conversation keeps stalling, it’s hard to enjoy it.</p>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">Trying to learn<br>by shadowing?</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">Listening and repeating along? I couldn’t stick with it.<br>One day in, and I was already bored.</p>
+      </div>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">Practicing Korean<br>with AI?</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">I tried that, too. Honestly, it wasn’t much fun.<br>The conversations felt stiff.<br>I wanted to talk to an actual person.</p>
+      </div>
+
+      <div class="mt-9 border-t border-[#e5ded3] pt-7 sm:mt-12 sm:pt-9">
+        <h2 class="text-2xl font-bold leading-snug tracking-[-0.04em] sm:text-3xl">An hour-long<br>conversation on video?</h2>
+        <p class="mt-5 text-lg leading-9 text-[#68645b] sm:text-xl">Could you keep a conversation going for a whole hour?<br>I found it exhausting.<br>I ran out of things to say, and there was still so much time left.</p>
+      </div>
+
+      <div class="mt-14 rounded-[2rem] border border-[#eed9ca] bg-[#fbece1] px-6 py-9 sm:mt-14 sm:px-12 sm:py-12">
+        <span class="mb-7 block h-1 w-10 rounded-full bg-[#e65e3c]" aria-hidden="true"></span>
+        <p class="text-sm font-semibold leading-7 text-[#786454] sm:text-base">So I built something myself.</p>
+        <h2 class="mt-4 text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.35] tracking-[-0.055em]">Korean.<br><span class="text-[#ba472f]">One sentence at a time.</span></h2>
+        <div class="mt-8 border-t border-[#ead1be] pt-6 sm:mt-10">
+          <%= link_to landing_install_url, class: "group flex items-center gap-3 rounded-2xl bg-[#262520] p-4 text-white transition hover:bg-[#3a382f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ba472f] sm:gap-4 sm:p-5", aria: { label: "Get the Say One Thing app" } do %>
+            <img src="/say_one_thing_icon.png" alt="" width="48" height="48" class="h-12 w-12 rounded-xl shadow-sm">
+            <span class="min-w-0 flex-1">
+              <span class="block text-lg font-extrabold tracking-tight">Say One Thing</span>
+              <span class="mt-1 block text-xs font-medium text-[#e7cbbb]">Get the app</span>
+            </span>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e65e3c] text-lg text-white" aria-hidden="true">↗</span>
+          <% end %>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl border-t border-[#e5ded3] py-12 sm:py-16" aria-labelledby="conversation-title">
+      <p class="text-sm leading-7 text-[#787267] sm:text-base">Skip getting ready, making plans, and heading to a meetup.</p>
+      <h2 id="conversation-title" class="mt-5 text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold leading-[1.35] tracking-[-0.055em]">Just open the app.<br><span class="text-[#ba472f]">Say one thing</span> in Korean.</h2>
+      <p class="mt-6 text-lg leading-9 text-[#68645b]">No need to set aside time for a Korean meetup.<br>No hour-long video call to book.<br>Just record what you want to say in Korean, like texting a friend.</p>
+
+      <div class="my-8 grid grid-cols-[2.75rem_1fr] items-center gap-x-4 rounded-2xl border border-[#eadfd4] bg-white/70 p-5 sm:my-9 sm:gap-x-5 sm:p-7">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fbece1] text-[#ba472f]" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 2V11.5a9 9 0 0 1 18 0Z"/><path d="M8 10v4m4-6v8m4-6v4"/></svg></span>
+        <div>
+          <p class="text-xl font-bold leading-snug tracking-tight sm:text-2xl">A real voice replies.</p>
+          <p class="mt-2 text-base font-bold text-[#ba472f] sm:text-lg">A real person. Not AI.</p>
+        </div>
+        <p class="col-span-2 mt-4 text-sm leading-7 text-[#68645b]">You don’t have to be online at the same time.<br>Listen to their reply and answer when it suits you.</p>
+      </div>
+      <div class="mt-8 divide-y divide-[#e5ded3]">
+        <% [
+          ["01 / Anywhere", "No trip to a meetup.", "Stay home or take a walk. Share something in your own voice, wherever you are."],
+          ["02 / Your own time", "One thought, not an hour.", "Before work or before bed. Send up to 30 seconds, then pick up the conversation when a reply arrives and you have time."],
+          ["03 / Real people", "A conversation, not a quiz.", "Someone hears what you have to say and can share a little of their own life in return."]
+        ].each do |eyebrow, title, description| %>
+          <div class="py-6 sm:grid sm:grid-cols-[10rem_1fr] sm:gap-x-6">
+            <p class="text-xs font-bold leading-7 text-[#ba472f] sm:row-span-2"><%= eyebrow %></p>
+            <h3 class="mt-2 text-xl font-bold tracking-tight sm:mt-0"><%= title %></h3>
+            <p class="mt-2 text-sm leading-7 text-[#68645b]"><%= description %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="mx-auto max-w-3xl rounded-3xl bg-[#262e25] px-6 py-9 text-[#fff7f2] sm:p-10" aria-labelledby="steps-title">
+      <p class="text-xs font-bold tracking-widest text-[#c5d7ad]">HOW IT WORKS</p>
+      <h2 id="steps-title" class="mt-4 text-3xl font-extrabold tracking-[-0.05em] sm:text-4xl">How your words reach someone.</h2>
+      <div class="mt-8 grid gap-7">
+        <% [
+          ["1", "Sign in and choose Korean", "Sign in with Google or Apple and choose Korean as the language you want to practice."],
+          ["2", "Tap record and say something", "Record up to 30 seconds. Send your message, and we deliver it to another person who uses Korean."],
+          ["3", "Keep going when they reply", "Listen to their voice message and reply with your own. That’s how one thought becomes a conversation."]
+        ].each do |number, title, description| %>
+          <div class="grid grid-cols-[2.25rem_1fr] gap-x-4"><span class="row-span-2 flex h-9 w-9 items-center justify-center rounded-full border border-[#77836a] text-sm font-bold text-[#c5d7ad]"><%= number %></span><h3 class="pt-1 text-lg font-bold"><%= title %></h3><p class="mt-2 text-sm leading-7 text-[#c7cec0]"><%= description %></p></div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl py-12 sm:py-16" aria-labelledby="faq-title">
+      <div class="grid gap-6">
+        <h2 id="faq-title" class="text-3xl font-extrabold tracking-[-0.05em]">Before your first message,<br>a few things to know.</h2>
+        <div>
+          <% [
+            ["What if my Korean isn’t very good?", "Start with a short, simple sentence. You’re sharing something in Korean, not giving a polished speech. “커피 좋아해요.” (I like coffee) can be your first message."],
+            ["Will I connect with native speakers?", "You can connect with native Korean speakers or people learning Korean. A native speaker isn’t guaranteed. The idea is to actually use Korean together."],
+            ["Do I have to talk live, like a phone call?", "No. You exchange recorded voice messages. Listen to their message, then reply when you have time to speak."],
+            ["Does the app correct my grammar or pronunciation?", "The app doesn’t offer automatic corrections or lessons. It’s a place to use the Korean you’ve learned in conversations with real people."],
+            ["What if someone makes me uncomfortable?", "You can block someone or report inappropriate content from your conversation. This service is for adults aged 18 and over."]
+          ].each do |question, answer| %>
+            <details class="group border-b border-[#e5ded3] py-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-5 text-base font-bold [&::-webkit-details-marker]:hidden"><%= question %><span class="text-xl font-normal text-[#ba472f] group-open:rotate-45" aria-hidden="true">+</span></summary>
+              <p class="mt-4 max-w-xl text-sm leading-7 text-[#68645b]"><%= answer %></p>
+            </details>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-2 pb-12 pt-4 text-center sm:pb-16 sm:pt-6" aria-labelledby="start-title">
+      <p class="text-xs font-bold text-[#865432]">Your first sentence doesn’t have to be impressive.</p>
+      <p class="mt-6 text-3xl font-semibold tracking-tight text-[#ba472f] sm:text-5xl" lang="ko">“안녕하세요. 오늘 어땠어요?”</p>
+      <p class="mt-3 text-sm text-[#787267]">“Hi. How was your day?”</p>
+      <h2 id="start-title" class="mt-5 text-lg font-bold tracking-tight sm:text-2xl">It starts when someone hears you.</h2>
+      <p class="mt-3 text-sm leading-7 text-[#785d40]">Don’t wait until your Korean is better.<br>Start a conversation with the Korean you have today.</p>
+      <%= link_to "Get the app ↗", landing_install_url, class: "mt-8 inline-flex items-center justify-center rounded-full bg-[#e65e3c] px-8 py-4 text-base font-bold text-white transition hover:bg-[#c94b2c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ba472f]" %>
+    </section>
+  </main>
+
+  <footer class="mt-16 flex flex-col justify-between gap-5 border-t border-[#e5ded3] pb-8 pt-7 text-xs leading-6 text-[#787267] sm:flex-row">
+    <p class="font-semibold">say one thing<br><span class="font-normal">© <%= Time.current.year %> say one thing Team</span></p>
+    <nav aria-label="About the service" class="flex flex-wrap gap-x-5 gap-y-2">
+      <%= link_to "Privacy ↗", privacy_path, class: "underline underline-offset-4" %>
+      <%= link_to "Support ↗", support_path, class: "underline underline-offset-4" %>
+      <%= link_to "About ↗", about_path, class: "underline underline-offset-4" %>
+    </nav>
+  </footer>
+</div>

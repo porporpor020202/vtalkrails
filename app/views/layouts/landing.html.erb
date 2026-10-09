@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>say one thing · 배운 영어를, 진짜 사람에게.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="저도 영어 회화 배우러 당근 모임에 가봤습니다. 30초 음성 메시지로 진짜 사람과 영어를 주고받으세요. 완벽한 문장보다, 당신의 첫마디부터.">
+    <meta name="theme-color" content="#fff7f2">
+    <meta property="og:title" content="저도 영어 회화 배우러 당근 모임에 가봤습니다.">
+    <meta property="og:description" content="30초 음성 메시지로 시작하는 진짜 사람과의 영어 대화. say one thing에서 첫마디를 보내보세요.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:url" content="<%= korean_landing_url %>">
+    <meta property="og:image" content="<%= request.base_url %>/say_one_thing_icon.png">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="<%= korean_landing_url %>">
+    <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
+    <%= stylesheet_link_tag :app %>
+  </head>
+  <body class="bg-[#fff7f2] font-sans text-[#262520] antialiased selection:bg-[#ffe19b]">
+    <%= yield %>
+  </body>
+</html>

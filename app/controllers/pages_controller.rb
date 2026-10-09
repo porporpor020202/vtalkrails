@@ -5,6 +5,14 @@ class PagesController < ApplicationController
 
   def support; end
 
+  def landing
+    render layout: "landing"
+  end
+
+  def landing_english
+    render layout: "landing_english"
+  end
+
   def about
     render layout: "public"
   end

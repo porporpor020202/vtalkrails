@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>say one thing · Korean. One sentence at a time.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Practice Korean with real people through short voice messages. Send one thought and reply in your own time.">
+    <meta name="theme-color" content="#fff7f2">
+    <meta property="og:title" content="Practice Korean. One sentence at a time.">
+    <meta property="og:description" content="Real people. Short voice messages. Start a Korean conversation with say one thing.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="<%= english_landing_url %>">
+    <meta property="og:image" content="<%= request.base_url %>/say_one_thing_icon.png">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="<%= english_landing_url %>">
+    <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
+    <%= stylesheet_link_tag :app %>
+  </head>
+  <body class="bg-[#fff7f2] font-sans text-[#262520] antialiased selection:bg-[#ffe19b]">
+    <%= yield %>
+  </body>
+</html>

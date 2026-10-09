@@ -40,4 +40,5 @@ class RoomsController < ApplicationController
 
     redirect_to rooms_path, status: :see_other
   end
+
 end

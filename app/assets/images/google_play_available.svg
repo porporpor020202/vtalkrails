@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="48" viewBox="0 0 152 48">
+  <rect x=".5" y=".5" width="151" height="47" rx="10" fill="#fff7f2" stroke="#decaba"/>
+  <path d="m15 12 13 12-13 12Z" fill="#4385f5"/>
+  <path d="m15 12 17 9-4 3Z" fill="#34a853"/>
+  <path d="m28 24 4-3 5 3-5 3Z" fill="#fbbc04"/>
+  <path d="m15 36 13-12 4 3Z" fill="#ea4335"/>
+  <text x="47" y="20" font-family="Arial,sans-serif" font-size="10" fill="#786454">Android · 출시</text>
+  <text x="47" y="35" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#262520">Google Play</text>
+</svg>
