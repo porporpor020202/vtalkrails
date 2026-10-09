@@ -109,8 +109,6 @@ export default class extends Controller {
     this.recordingMessageTarget.textContent = "Sending your voice…"
 
     const formData = new FormData()
-    const roomLanguage = document.querySelector("#room_language_id")
-    if (roomLanguage) formData.append("room_language_id", roomLanguage.value)
     formData.append("request_key", this.requestKey)
     formData.append("voice_message[audio]", this.audioBlob, `voice-message.${this.fileExtension(this.audioBlob.type)}`)
     formData.append("voice_message[duration_ms]", String(this.durationMs))

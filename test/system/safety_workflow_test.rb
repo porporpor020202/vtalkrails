@@ -8,13 +8,13 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     @sender = users(:english_native)
     @recipient = users(:korean_native)
     @admin = users(:japanese_native)
-    @admin.update!(admin: true, native_language: languages(:korean), learning_language: languages(:english))
+    @admin.update!(admin: true, native_language: languages(:korean))
 
     complete_onboarding(@sender)
     complete_onboarding(@recipient)
     complete_onboarding(@admin)
 
-    @room = Room.create!(host: @sender, opponent: @recipient, language: languages(:korean))
+    @room = Room.create!(host: @sender, opponent: @recipient)
     create_voice_message(room: @room, sender: @sender)
   end
 
@@ -156,15 +156,13 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
 
   def complete_onboarding(user)
     native = user.native_language.label
-    learning = user.learning_language.label
-    user.update!(native_language: nil, learning_language: nil)
+    user.update!(native_language: nil)
 
     # 각 브라우저 세션에서 정상 온보딩을 마쳐 테스트 사용자를 준비한다.
     # 이후 신고·차단 테스트가 미완료 사용자 때문에 실패하지 않게 한다.
     as_user(user) do
       sign_in(user: user)
       select native, from: "user_native_language_id"
-      select learning, from: "user_learning_language_id"
       # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
       check "user_community_rules_accepted"
       fill_in "Date of birth", with: Date.current.years_ago(20).iso8601

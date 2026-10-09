@@ -1,11 +1,13 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
-  test "r_모국어와 같은 학습 언어는 저장할 수 없다" do
+  test "모국어만 있는 사용자는 나이 확인과 완료 기록이 있으면 온보딩 완료 상태다" do
+    # 학습 언어는 온보딩 완료 판단에 사용하지 않는다.
     user = users(:english_native)
-    assert_not user.update(learning_language: user.native_language)
-    assert user.errors.added?(:learning_language, "must be different from native language")
-    assert_equal languages(:korean), user.reload.learning_language
+    assert_nil user.attributes["learning_language_id"]
+    assert user.onboarding_complete?
+    user.age_confirmed_at = nil
+    assert_not user.onboarding_complete?
   end
 
   test "닉네임의 명사에 맞는 이미지 경로를 반환한다" do

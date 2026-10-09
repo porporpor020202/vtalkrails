@@ -21,18 +21,6 @@
 
       <p data-onboarding-languages-target="nativeGuidance" class="text-sm text-slate-500">Please select your native language.</p>
 
-      <%= form.collection_select :learning_language_id, languages, :id, :label,
-            { prompt: "Select your learning language", disabled: [@user.native_language_id] },
-            { required: true,
-              data: { onboarding_languages_target: "learning", action: "change->onboarding-languages#sync" },
-              class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-900" } %>
-
-      <p data-onboarding-languages-target="learningGuidance" class="text-sm text-slate-500">Please select your learning language.</p>
-
-      <p class="text-sm text-slate-500">
-        Your native language and learning language cannot be the same.
-      </p>
-
       <button type="button" data-action="onboarding-languages#requestMicrophone" class="h-14 w-full rounded-2xl border border-slate-300 bg-white font-semibold text-slate-900">
         Allow microphone
       </button>

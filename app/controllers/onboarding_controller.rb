@@ -33,6 +33,6 @@ class OnboardingController < ApplicationController
   end
 
   def onboarding_params
-    params.require(:user).permit(:native_language_id, :learning_language_id, :date_of_birth, :microphone_confirmed, :community_rules_accepted)
+    params.require(:user).permit(:native_language_id, :date_of_birth, :microphone_confirmed, :community_rules_accepted)
   end
 end

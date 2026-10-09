@@ -7,12 +7,12 @@ class RoomReplyTurnTest < ActionDispatch::IntegrationTest
   setup do
     @host = users(:english_native)
     @recipient = users(:korean_native)
-    @room_language = languages(:korean)
-    @room = Room.create!(host: @host, opponent: @recipient, language: @room_language)
+
+    @room = Room.create!(host: @host, opponent: @recipient)
     create_voice_message(room: @room, sender: @host)
   end
 
-  test "r_수신자는 답장한 뒤 상대방이 답장하기 전에는 다시 전송할 수 없다" do
+  test "수신자는 답장한 뒤 상대방이 답장하기 전에는 다시 전송할 수 없다" do
     sign_in_as(@recipient)
 
     assert_difference -> { @room.voice_messages.count }, 1 do
@@ -33,7 +33,7 @@ class RoomReplyTurnTest < ActionDispatch::IntegrationTest
     assert_equal message_ids, @room.voice_messages.order(:id).pluck(:id)
   end
 
-  test "r_호스트는 수신자가 답하기 전에 연속으로 보낼 수 없다" do
+  test "호스트는 수신자가 답하기 전에 연속으로 보낼 수 없다" do
     sign_in_as(@host)
 
     assert_no_difference [ "VoiceMessage.count", "ActiveStorage::Attachment.count" ] do
@@ -42,8 +42,8 @@ class RoomReplyTurnTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "r_상대방이 답장하면 다시 한 번 보낼 수 있고 차례는 룸별로 독립적이다" do
-    other_room = Room.create!(host: @host, opponent: @recipient, language: @room_language)
+  test "상대방이 답장하면 다시 한 번 보낼 수 있고 차례는 룸별로 독립적이다" do
+    other_room = Room.create!(host: @host, opponent: @recipient)
     create_voice_message(room: other_room, sender: @host)
     create_voice_message(room: @room, sender: @recipient)
     sign_in_as(@host)

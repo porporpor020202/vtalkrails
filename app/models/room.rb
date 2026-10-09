@@ -1,6 +1,5 @@
 class Room < ApplicationRecord
   belongs_to :host, class_name: "User", optional: true
-  belongs_to :language
   belongs_to :opponent, class_name: "User", optional: true
   has_many :voice_messages, dependent: :destroy
   has_one :last_voice_message, -> { order(created_at: :desc, id: :desc) }, class_name: "VoiceMessage"

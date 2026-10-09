@@ -8,7 +8,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     @sender = users(:english_native)
     @recipient = users(:korean_native)
     @admin = users(:japanese_native)
-    @admin.update!(admin: true, native_language: languages(:korean), learning_language: languages(:english))
+    @admin.update!(admin: true, native_language: languages(:korean))
 
     # 모델에 가짜 완료 값을 넣는 대신 정상 온보딩 요청으로 사용자를 준비한다.
     # 따라서 이후 접근 거부가 미완료 온보딩 때문에 발생하는 것을 방지한다.
@@ -16,7 +16,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     complete_onboarding(@recipient)
     complete_onboarding(@admin)
 
-    @room = Room.create!(host: @sender, opponent: @recipient, language: languages(:korean))
+    @room = Room.create!(host: @sender, opponent: @recipient)
     @message = create_voice_message(room: @room, sender: @sender)
   end
 
@@ -74,7 +74,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     pairs = [ [ @sender, @recipient ], [ @recipient, @sender ] ]
 
     pairs.each do |sender, excluded|
-      candidates = VoiceRecipientSelector.recipients(sender: sender, language: languages(:korean))
+      candidates = VoiceRecipientSelector.recipients(sender: sender)
       assert_not_includes candidates.pluck(:id), excluded.id
     end
   end
@@ -121,7 +121,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     @recipient.reload.update!(age_confirmed_at: nil, last_active_at: Time.current)
     @admin.update!(suspended_at: Time.current, last_active_at: Time.current)
 
-    candidates = VoiceRecipientSelector.recipients(sender: @sender, language: languages(:korean))
+    candidates = VoiceRecipientSelector.recipients(sender: @sender)
 
     assert_not_includes candidates.pluck(:id), @recipient.id
     assert_not_includes candidates.pluck(:id), @admin.id
@@ -209,7 +209,6 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
 
     assert_no_difference [ "VoiceDrop.count", "VoiceMessage.count", "Room.count" ] do
       user_session.post voice_drop_path, params: {
-        room_language_id: languages(:korean).id,
         request_key: "suspended-account",
         voice_message: { audio: voice_upload, duration_ms: 2_000 }
       }
@@ -241,14 +240,12 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
 
   def complete_onboarding(user)
     native_id = user.native_language_id
-    learning_id = user.learning_language_id
-    user.update!(native_language: nil, learning_language: nil)
+    user.update!(native_language: nil)
     session = open_session
     session.sign_in_as(user)
     session.patch onboarding_path, params: {
       user: {
         native_language_id: native_id,
-        learning_language_id: learning_id,
         date_of_birth: Date.current.years_ago(20).iso8601,
       # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
       community_rules_accepted: "1",

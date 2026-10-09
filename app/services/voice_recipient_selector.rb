@@ -7,12 +7,10 @@ class VoiceRecipientSelector
     Rails.configuration.x.voice_recipient_selection.activity_window
   end
 
-  def self.recipients(sender:, language:)
+  def self.recipients(sender:)
     now = Time.current
 
-    User.where(native_language: language)
-      .or(User.where(learning_language: language))
-      .where.not(id: sender.id)
+    User.where.not(id: sender.id)
       .where.not(id: UserBlock.where(blocker: sender).select(:blocked_id))
       .where.not(id: UserBlock.where(blocked: sender).select(:blocker_id))
       .where.not(age_confirmed_at: nil)

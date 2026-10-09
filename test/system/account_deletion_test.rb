@@ -15,7 +15,7 @@ class AccountDeletionTest < ApplicationSystemTestCase
     assert_button "Delete Account"
   end
 
-  test "r_계정 삭제 확인창을 취소하면 계정과 로그인 상태를 유지한다" do
+  test "계정 삭제 확인창을 취소하면 계정과 로그인 상태를 유지한다" do
     # 복구 불가 안내가 포함된 확인창이 표시되는지 함께 확인한다.
     dismiss_confirm("Delete your account permanently? This cannot be undone.") do
       click_button "Delete Account"
@@ -31,14 +31,14 @@ class AccountDeletionTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Setting"
   end
 
-  test "r_계정을 삭제하면 대화 상대의 Room은 남고 떠나간 사용자라고 안내한다" do
+  test "계정을 삭제하면 대화 상대의 Room은 남고 떠나간 사용자라고 안내한다" do
     # 삭제 사용자가 호스트인 방과 수신자인 방을 각각 준비한다.
     # 역할에 따라 상대방의 Room까지 함께 삭제되는 구현을 방지한다.
     partners = [ users(:korean_native), users(:japanese_native) ]
     language = languages(:english)
     conversations = [
-      [ Room.create!(host: @user, opponent: partners.first, language: language), partners.first ],
-      [ Room.create!(host: partners.last, opponent: @user, language: language), partners.last ]
+      [ Room.create!(host: @user, opponent: partners.first), partners.first ],
+      [ Room.create!(host: partners.last, opponent: @user), partners.last ]
     ]
 
     conversations.each do |room, partner|
@@ -49,7 +49,7 @@ class AccountDeletionTest < ApplicationSystemTestCase
 
       using_session("account_deletion_partner_#{partner.id}") do
         sign_in(user: partner)
-        visit rooms_path(room_language_id: language.id)
+        visit rooms_path
         assert_selector "main a[href='#{room_path(room)}']"
       end
     end
@@ -65,7 +65,7 @@ class AccountDeletionTest < ApplicationSystemTestCase
     conversations.each do |room, partner|
       using_session("account_deletion_partner_#{partner.id}") do
         # 상대방에게 대화는 남기되 삭제된 사용자라고 계속 안내한다.
-        visit rooms_path(room_language_id: language.id)
+        visit rooms_path
 
         within "main a[href='#{room_path(room)}']" do
           assert_text "Former user"
@@ -88,7 +88,7 @@ class AccountDeletionTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_계정 삭제를 승인하면 계정을 삭제하고 로그인 화면으로 이동한다" do
+  test "계정 삭제를 승인하면 계정을 삭제하고 로그인 화면으로 이동한다" do
     # 다른 기기에 로그인한 세션도 계정 삭제와 함께 제거되어야 한다.
     other_session = @user.sessions.create!
 

@@ -6,14 +6,14 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
 
   setup do
     @user = users(:english_native)
-    @user.update!(native_language: nil, learning_language: nil)
+    @user.update!(native_language: nil)
     sign_in_as(@user)
   end
 
   test "필수 값이 빠진 직접 요청은 온보딩을 저장하지 않는다" do
     # 브라우저의 disabled 버튼을 우회해 필수 값을 하나씩 생략한다.
     # 하나의 조합이 잘못 저장되면 다음 조합을 진행하기 전에 실패해야 한다.
-    required_fields = [ :native_language_id, :learning_language_id, :date_of_birth, :microphone_confirmed ]
+    required_fields = [ :native_language_id, :date_of_birth, :microphone_confirmed ]
 
     required_fields.each do |field|
       attributes = valid_attributes
@@ -23,7 +23,7 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
 
       assert_response :unprocessable_entity
       assert_nil @user.reload.native_language
-      assert_nil @user.learning_language
+      assert_nil @user.attributes["learning_language_id"]
       assert_not @user.onboarding_complete?
     end
   end
@@ -42,7 +42,7 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_nil @user.reload.native_language
-    assert_nil @user.learning_language
+    assert_nil @user.attributes["learning_language_id"]
     assert_not @user.onboarding_complete?
   end
 
@@ -70,11 +70,12 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "같은 언어 두 개로는 서버에서도 완료할 수 없다" do
+  test "English 모국어도 학습 언어 없이 서버에서 온보딩을 완료한다" do
+    # 영어 원어민을 배제하거나 학습 언어를 자동 생성하지 않는다.
     patch onboarding_path, params: { user: valid_attributes.merge(native_language_id: languages(:english).id) }
-
-    assert_response :unprocessable_entity
-    assert_not @user.reload.onboarding_complete?
+    assert_redirected_to root_path
+    assert @user.reload.onboarding_complete?
+    assert_nil @user.attributes["learning_language_id"]
   end
 
   test "정상 요청으로 완료하면 나이 확인과 완료 시각을 서버에서 기록한다" do
@@ -96,7 +97,7 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
 
   test "언어만 저장된 기존 사용자도 나이 확인 전에는 루트에 접근할 수 없다" do
     # 기존 데이터에 언어가 있다는 이유만으로 나이 확인을 건너뛰지 않는다.
-    @user.update!(native_language: languages(:english), learning_language: languages(:korean))
+    @user.update!(native_language: languages(:english))
 
     get root_path
 
@@ -105,7 +106,7 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
   end
 
   test "미완료 사용자는 음성 전송 API를 직접 호출해도 전송할 수 없다" do
-    @user.update!(native_language: languages(:english), learning_language: languages(:korean))
+    @user.update!(native_language: languages(:english))
 
     # 수신 후보도 준비하여 수신자 없음 오류로 우연히 거부되지 않게 한다.
     users(:korean_native).update!(last_active_at: Time.current)
@@ -113,7 +114,6 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
     # 정상 파일과 언어를 보내서 파일 검증 오류로 우연히 통과하지 않게 한다.
     assert_no_difference [ "VoiceDrop.count", "VoiceMessage.count", "Room.count" ] do
       post voice_drop_path, params: {
-        room_language_id: languages(:korean).id,
         request_key: "incomplete-onboarding",
         voice_message: { audio: voice_upload, duration_ms: 2_000 }
       }
@@ -124,9 +124,9 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
 
   test "미완료 사용자는 기존 대화의 답장과 음성 읽기도 우회할 수 없다" do
     partner = users(:korean_native)
-    room = Room.create!(host: partner, opponent: @user, language: languages(:korean))
+    room = Room.create!(host: partner, opponent: @user)
     message = create_voice_message(room: room, sender: partner)
-    @user.update!(native_language: languages(:english), learning_language: languages(:korean))
+    @user.update!(native_language: languages(:english))
 
     assert_no_difference "VoiceMessage.count" do
       post room_voice_messages_path(room), params: { voice_message: { audio: voice_upload, duration_ms: 2_000 } }
@@ -144,7 +144,6 @@ class OnboardingAccessTest < ActionDispatch::IntegrationTest
   def valid_attributes
     {
       native_language_id: languages(:korean).id,
-      learning_language_id: languages(:english).id,
       date_of_birth: Date.current.years_ago(20).iso8601,
       # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
       community_rules_accepted: "1",

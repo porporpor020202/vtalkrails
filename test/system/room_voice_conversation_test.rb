@@ -17,19 +17,17 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     @recipient = users(:korean_native)
     @other_recipient = users(:spanish_native)
     @outsider = users(:japanese_native)
-    @room_language = languages(:korean)
+
     [ @recipient, @other_recipient ].each do |user|
-      user.update!(native_language: @room_language, learning_language: languages(:english), last_active_at: Time.current)
+      user.update!(native_language: languages(:korean), last_active_at: Time.current)
     end
   end
 
-  test "r_Say에서 녹음을 전송하면 수신자의 Say 탭에 해당 언어의 룸이 표시된다" do
+  test "Say에서 녹음을 전송하면 수신자의 Say 탭에 언어 지정 없는 룸이 표시된다" do
     previous_ids = Room.pluck(:id)
 
     as_user(@sender) do
       visit rooms_path
-      select @room_language.label, from: "room_language_id"
-      assert_select "room_language_id", selected: @room_language.label
       record_and_send("Drop a voice")
       assert_current_path rooms_path, ignore_query: true
     end
@@ -37,7 +35,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     rooms = Room.where.not(id: previous_ids)
     assert_equal [ @recipient.id, @other_recipient.id ].sort, rooms.pluck(:opponent_id).sort
     assert_equal [ @sender.id ], rooms.distinct.pluck(:host_id)
-    assert_equal [ @room_language.id ], rooms.distinct.pluck(:language_id)
+    rooms.each { |room| assert_nil room.attributes["language_id"] }
 
     [ @recipient, @other_recipient ].each do |user|
       received_room = rooms.find_by!(opponent: user)
@@ -46,8 +44,6 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
 
       as_user(user) do
         visit rooms_path
-        select @room_language.label, from: "room_language_id"
-        assert_select "room_language_id", selected: @room_language.label
         assert_selector "main a[href='#{room_path(received_room)}']"
         assert_no_selector "main a[href='#{room_path(other_recipient_room)}']"
       end
@@ -132,7 +128,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_룸 참여자가 아닌 사용자는 주소를 직접 입력해도 대화를 볼 수 없다" do
+  test "룸 참여자가 아닌 사용자는 주소를 직접 입력해도 대화를 볼 수 없다" do
     room = create_conversation(@recipient)
 
     as_user(@outsider) do
@@ -143,7 +139,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_룸 참여자가 아닌 사용자는 음성 주소로 직접 접근해도 재생할 수 없다" do
+  test "룸 참여자가 아닌 사용자는 음성 주소로 직접 접근해도 재생할 수 없다" do
     room = create_conversation(@recipient)
     audio_url = nil
 
@@ -171,15 +167,13 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
   end
 
   def create_conversation(recipient)
-    room = Room.create!(host: @sender, opponent: recipient, language: @room_language)
+    room = Room.create!(host: @sender, opponent: recipient)
     create_voice_message(room: room, sender: @sender)
     room
   end
 
   def open_conversation(room)
     visit rooms_path
-    select @room_language.label, from: "room_language_id"
-    assert_select "room_language_id", selected: @room_language.label
     find("main a[href='#{room_path(room)}']").click
     assert_current_path room_path(room)
   end

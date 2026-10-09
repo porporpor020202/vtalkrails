@@ -9,7 +9,7 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
 
   setup do
     @user = users(:english_native)
-    @user.update!(native_language: nil, learning_language: nil)
+    @user.update!(native_language: nil)
     sign_in(user: @user)
     page.driver.browser.execute_cdp("Browser.resetPermissions")
     assert_current_path onboarding_path
@@ -37,7 +37,7 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
     assert_button "Continue", disabled: true
     assert_current_path onboarding_path
     assert_nil @user.reload.native_language
-    assert_nil @user.learning_language
+    assert_nil @user.attributes["learning_language_id"]
     assert_not @user.onboarding_complete?
   end
 
@@ -87,7 +87,6 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
 
   def select_languages_and_age
     select "Korean", from: "user_native_language_id"
-    select "English", from: "user_learning_language_id"
     # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
     check "user_community_rules_accepted"
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601

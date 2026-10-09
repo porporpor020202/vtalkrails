@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_09_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,7 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000000) do
     t.bigint "deleted_by_id"
     t.bigint "dismissed_by_id"
     t.bigint "host_id"
-    t.bigint "language_id", null: false
+    t.bigint "language_id"
     t.bigint "opponent_id"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
@@ -155,7 +155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000000) do
 
   create_table "voice_drops", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "language_id", null: false
+    t.bigint "language_id"
     t.integer "recipient_count", null: false
     t.string "request_key", null: false
     t.bigint "sender_id", null: false

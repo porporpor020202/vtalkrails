@@ -23,7 +23,6 @@ class OnboardingAgeBoundaryTest < ActionDispatch::IntegrationTest
       # 다른 필수 조건은 모두 충족하여 나이 경계만 검증한다.
       patch onboarding_path, params: { user: {
         native_language_id: languages(:korean).id,
-        learning_language_id: languages(:english).id,
         date_of_birth: "2008-10-08",
       # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
       community_rules_accepted: "1",
@@ -51,7 +50,6 @@ class OnboardingAgeBoundaryTest < ActionDispatch::IntegrationTest
       # 클라이언트가 아닌 서버가 18세 미만임을 판정해야 한다.
       patch onboarding_path, params: { user: {
         native_language_id: languages(:korean).id,
-        learning_language_id: languages(:english).id,
         date_of_birth: "2008-10-09",
       # 새 동의 요건도 충족시켜 이 테스트 본래의 나이/안전 동작을 검증한다.
       community_rules_accepted: "1",

@@ -1,4 +1,4 @@
-<% content_for :title, "Languages" %>
+<% content_for :title, "Native language" %>
 
 <section class="flex min-h-full flex-1 flex-col bg-slate-50 px-5 pb-8 pt-[max(1.5rem,env(safe-area-inset-top))]">
   <header class="mb-6">
@@ -8,11 +8,11 @@
       </svg>
       Setting
     <% end %>
-    <h1 class="mt-2 text-3xl font-black tracking-[-0.035em] text-slate-950">Languages</h1>
+    <h1 class="mt-2 text-3xl font-black tracking-[-0.035em] text-slate-950">Native language</h1>
   </header>
 
   <%= form_with model: @user, url: language_setup_path, method: :patch,
-        data: { controller: "onboarding-languages", action: "submit->onboarding-languages#validate" },
+        data: { controller: "native-language", action: "submit->native-language#validate" },
         class: "space-y-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm" do |form| %>
     <% if @user.errors.any? %>
       <div role="alert" class="rounded-2xl bg-red-50 p-4 text-sm text-red-700">
@@ -25,39 +25,27 @@
     <% end %>
 
     <div>
-      <%= form.label :learning_language_id, "Learning language",
-            class: "mb-2 block text-sm font-semibold text-indigo-600" %>
-      <%= form.collection_select :learning_language_id, Language.enabled.order(:label), :id, :label,
-            { include_blank: "Select your learning language", disabled: [@user.native_language_id] },
-            data: { onboarding_languages_target: "learning" },
-            class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-950" %>
-    </div>
-
-    <div>
       <%= form.label :native_language_id, "Native language",
             class: "mb-2 block text-sm font-semibold text-slate-500" %>
       <%= form.collection_select :native_language_id, Language.enabled.order(:label), :id, :label,
             { include_blank: "Select your native language" },
-            data: { onboarding_languages_target: "native", action: "change->onboarding-languages#sync" },
+            data: { native_language_target: "select" },
             class: "h-14 w-full rounded-2xl border border-slate-300 bg-white px-4 text-base text-slate-950" %>
     </div>
-    <p class="text-sm text-slate-500">
-      Your native language and learning language cannot be the same.
-    </p>
 
     <%= form.submit "Save changes",
           class: "h-14 w-full cursor-pointer rounded-2xl bg-slate-900 font-semibold text-white",
           data: { turbo_submits_with: "Saving..." } %>
 
-    <dialog data-onboarding-languages-target="dialog"
+    <dialog data-native-language-target="dialog"
             aria-label="Language selection"
             aria-describedby="language-selection-message"
             class="m-auto w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl backdrop:bg-black/40">
       <p id="language-selection-message" class="text-sm text-slate-700">
-        Please select both your native language and learning language.
+        Please select your native language.
       </p>
       <button type="button" autofocus
-              data-action="onboarding-languages#closeDialog"
+              data-action="native-language#closeDialog"
               class="mt-5 w-full cursor-pointer rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white">
         OK
       </button>

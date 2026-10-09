@@ -7,23 +7,24 @@ class SayTabStateTest < ApplicationSystemTestCase
   setup do
     @user = users(:english_native)
     @other = users(:korean_native)
-    @room_language = languages(:korean)
+
     sign_in(user: @user)
   end
 
-  test "r_Korean을 선택하고 새로고침하면 선택과 룸 목록이 유지된다" do
-    assert_language_survives_refresh(languages(:korean), languages(:english))
+  test "언어 선택 없이 새로고침하면 룸 목록이 유지된다" do
+    # 언어 필터 없이도 새 요청에서 참여 중인 룸을 다시 조회해야 한다.
+    room = Room.create!(host: @other, opponent: @user)
+    visit rooms_path
+    page.refresh
+    assert_selector "#room-list a[href='#{room_path(room)}']"
+    assert_no_selector "#room_language_id", visible: :all
   end
 
-  test "r_English를 선택하고 새로고침하면 선택과 룸 목록이 유지된다" do
-    assert_language_survives_refresh(languages(:english), languages(:korean))
-  end
-
-  test "r_룸 목록에서 내 차례는 기본 배경으로 상대방 답장 대기는 흐린 배경으로 표시한다" do
-    my_turn_room = Room.create!(host: @other, opponent: @user, language: @room_language)
+  test "룸 목록에서 내 차례는 기본 배경으로 상대방 답장 대기는 흐린 배경으로 표시한다" do
+    my_turn_room = Room.create!(host: @other, opponent: @user)
     create_voice_message(room: my_turn_room, sender: @other)
 
-    waiting_room = Room.create!(host: @other, opponent: @user, language: @room_language)
+    waiting_room = Room.create!(host: @other, opponent: @user)
     create_voice_message(room: waiting_room, sender: @other)
     create_voice_message(room: waiting_room, sender: @user)
 
@@ -36,13 +37,13 @@ class SayTabStateTest < ApplicationSystemTestCase
     assert_current_path room_path(waiting_room)
   end
 
-  test "r_룸 링크 오른쪽의 연한 빨간색 배지에 해당 룸의 전체 음성 개수를 표시한다" do
-    room = Room.create!(host: @other, opponent: @user, language: @room_language)
+  test "룸 링크 오른쪽의 연한 빨간색 배지에 해당 룸의 전체 음성 개수를 표시한다" do
+    room = Room.create!(host: @other, opponent: @user)
     [ @other, @user, @other ].each do |sender|
       create_voice_message(room: room, sender: sender)
     end
 
-    other_room = Room.create!(host: @other, opponent: @user, language: @room_language)
+    other_room = Room.create!(host: @other, opponent: @user)
     create_voice_message(room: other_room, sender: @other)
 
     visit rooms_path
@@ -60,14 +61,12 @@ class SayTabStateTest < ApplicationSystemTestCase
     end
   end
 
-  test "룸이 100개를 넘어도 목록만 스크롤되고 언어 선택과 녹음 버튼은 제자리에 있다" do
-    101.times { Room.create!(host: @other, opponent: @user, language: @room_language) }
+  test "룸이 100개를 넘어도 목록만 스크롤되고 녹음 버튼은 제자리에 있다" do
+    101.times { Room.create!(host: @other, opponent: @user) }
     visit rooms_path
     assert_selector "#room-list a", count: 101
 
-    language = find("#room_language_id")
     recorder = find_button("Drop a voice")
-    language_top = language.evaluate_script("this.getBoundingClientRect().top")
     recorder_top = recorder.evaluate_script("this.getBoundingClientRect().top")
     list = find("#room-list")
     assert list.evaluate_script("this.scrollHeight > this.clientHeight"), "The room list itself must be scrollable."
@@ -75,32 +74,10 @@ class SayTabStateTest < ApplicationSystemTestCase
     list.execute_script("this.scrollTop = this.scrollHeight")
 
     assert_operator list.evaluate_script("this.scrollTop"), :>, 0
-    assert_in_delta language_top, language.evaluate_script("this.getBoundingClientRect().top"), 1
     assert_in_delta recorder_top, recorder.evaluate_script("this.getBoundingClientRect().top"), 1
     assert_equal 0, page.evaluate_script("document.querySelector('main').scrollTop")
     assert_equal 0, page.evaluate_script("document.scrollingElement.scrollTop")
-    [ language, recorder ].each do |element|
-      assert element.evaluate_script("this.getBoundingClientRect().top >= 0 && this.getBoundingClientRect().bottom <= innerHeight")
-    end
+    assert recorder.evaluate_script("this.getBoundingClientRect().top >= 0 && this.getBoundingClientRect().bottom <= innerHeight")
   end
 
-  private
-
-  def assert_language_survives_refresh(room_language, other_language)
-    room = Room.create!(host: @other, opponent: @user, language: room_language)
-    other_room = Room.create!(host: @other, opponent: @user, language: other_language)
-    visit rooms_path
-    # 기본값이 우연히 일치하는 경우도 확인하도록 다른 언어부터 선택한다.
-    select other_language.label, from: "room_language_id"
-    assert_selector "#room-list a[href='#{room_path(other_room)}']"
-    select room_language.label, from: "room_language_id"
-    assert_selector "#room-list a[href='#{room_path(room)}']"
-    assert_no_selector "#room-list a[href='#{room_path(other_room)}']"
-
-    page.refresh
-
-    assert_select "room_language_id", selected: room_language.label
-    assert_selector "#room-list a[href='#{room_path(room)}']"
-    assert_no_selector "#room-list a[href='#{room_path(other_room)}']"
-  end
 end

@@ -28,12 +28,8 @@ class User < ApplicationRecord
   validates :display_name, uniqueness: true, allow_nil: true
   validates :display_name, presence: true, on: :onboarding
 
-  validates :native_language, :learning_language,
-            presence: true,
-            on: [ :onboarding, :language_setup ]
-
-  validate :languages_enabled, on: [ :onboarding, :language_setup ]
-  validate :learning_language_differs_from_native_language
+  validates :native_language, presence: true, on: [ :onboarding, :language_setup ]
+  validate :native_language_enabled, on: [ :onboarding, :language_setup ]
 
   attr_accessor :date_of_birth, :microphone_confirmed, :community_rules_accepted
   validate :onboarding_requirements, on: :onboarding
@@ -51,7 +47,6 @@ class User < ApplicationRecord
   # 7. Public Methods / Custom Logic
   def onboarding_complete?
     display_name.present? && native_language.present? &&
-      learning_language.present? && native_language_id != learning_language_id &&
       age_confirmed_at.present? && onboarding_completed_at.present?
   end
 
@@ -66,7 +61,7 @@ class User < ApplicationRecord
   private
 
   def reset_incomplete_onboarding
-    if display_name.blank? || native_language_id.blank? || learning_language_id.blank?
+    if display_name.blank? || native_language_id.blank?
       self.age_confirmed_at = nil
       self.onboarding_completed_at = nil
     end
@@ -88,18 +83,7 @@ class User < ApplicationRecord
     errors.add(:microphone_confirmed, "must be allowed") unless ActiveModel::Type::Boolean.new.cast(microphone_confirmed)
   end
 
-  # TODO: 공식문서 이해하자.
-  def languages_enabled
-    [ :native_language, :learning_language ].each do |attribute|
-      language = public_send(attribute)
-      errors.add(attribute, "is not enabled") if language && !language.enable?
-    end
-  end
-
-  # TODO: 공식문서 이해하자.
-  def learning_language_differs_from_native_language
-    if learning_language_id.present? && learning_language_id == native_language_id
-      errors.add(:learning_language, "must be different from native language")
-    end
+  def native_language_enabled
+    errors.add(:native_language, "is not enabled") if native_language && !native_language.enable?
   end
 end

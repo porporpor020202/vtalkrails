@@ -8,9 +8,8 @@ class RoomSafetyTest < ApplicationSystemTestCase
   setup do
     @host = users(:english_native)
     @recipient = users(:korean_native)
-    @language = languages(:korean)
 
-    @room = Room.create!(host: @host, opponent: @recipient, language: @language)
+    @room = Room.create!(host: @host, opponent: @recipient)
     create_voice_message(room: @room, sender: @host)
     create_voice_message(room: @room, sender: @recipient)
 
@@ -19,7 +18,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
   end
 
   %i[host recipient].each do |role|
-    test "r_#{role}가 삭제를 취소하면 양쪽 Room과 음성을 유지한다" do
+    test "#{role}가 삭제를 취소하면 양쪽 Room과 음성을 유지한다" do
       actor = instance_variable_get("@#{role}")
 
       as_user(actor) do
@@ -45,7 +44,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
       assert_equal 2, @room.voice_messages.count
     end
 
-    test "r_#{role}가 삭제하면 본인 목록에서 사라지고 상대방에게 나감 안내를 표시한다" do
+    test "#{role}가 삭제하면 본인 목록에서 사라지고 상대방에게 나감 안내를 표시한다" do
       actor = instance_variable_get("@#{role}")
       partner = actor == @host ? @recipient : @host
 
@@ -92,7 +91,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
       as_user(actor) { assert_room_not_listed }
     end
 
-    test "r_#{role}가 상대방을 차단하면 양방향 매칭에서 제외한다" do
+    test "#{role}가 상대방을 차단하면 양방향 매칭에서 제외한다" do
       actor = instance_variable_get("@#{role}")
       partner = actor == @host ? @recipient : @host
 
@@ -117,12 +116,12 @@ class RoomSafetyTest < ApplicationSystemTestCase
 
       # 방금 차단한 상대를 제외하는지 양방향으로 확인한다.
       [ [ actor, partner ], [ partner, actor ] ].each do |sender, excluded|
-        candidates = VoiceRecipientSelector.recipients(sender: sender, language: @language)
+        candidates = VoiceRecipientSelector.recipients(sender: sender)
         assert_not_includes candidates.map(&:id), excluded.id
       end
     end
 
-    test "r_#{role}가 신고하면 사유를 저장하고 자동 차단하며 양쪽에 검토 안내를 표시한다" do
+    test "#{role}가 신고하면 사유를 저장하고 자동 차단하며 양쪽에 검토 안내를 표시한다" do
       reporter = instance_variable_get("@#{role}")
       reported = reporter == @host ? @recipient : @host
 
@@ -167,7 +166,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
   end
 
   %i[host recipient].each do |role|
-    test "r_상대방이 나간 후 #{role}는 전송 API를 직접 호출해도 음성을 보낼 수 없다" do
+    test "상대방이 나간 후 #{role}는 전송 API를 직접 호출해도 음성을 보낼 수 없다" do
       sender = instance_variable_get("@#{role}")
       partner = sender == @host ? @recipient : @host
 
@@ -193,7 +192,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
       end
     end
 
-    test "r_신고 후 #{role}는 전송 API를 직접 호출해도 음성을 보낼 수 없다" do
+    test "신고 후 #{role}는 전송 API를 직접 호출해도 음성을 보낼 수 없다" do
       sender = instance_variable_get("@#{role}")
       partner = sender == @host ? @recipient : @host
 
@@ -219,7 +218,7 @@ class RoomSafetyTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_신고가 접수되면 운영진 신고 목록에 사유와 대상이 자동으로 표시된다" do
+  test "신고가 접수되면 운영진 신고 목록에 사유와 대상이 자동으로 표시된다" do
     as_user(@host) do
       submit_report
       assert_selector '[role="dialog"]', text: "Your report has been submitted and is under review."
@@ -258,12 +257,12 @@ class RoomSafetyTest < ApplicationSystemTestCase
   end
 
   def assert_room_listed
-    visit rooms_path(room_language_id: @language.id)
+    visit rooms_path
     assert_selector room_link
   end
 
   def assert_room_not_listed
-    visit rooms_path(room_language_id: @language.id)
+    visit rooms_path
     assert_no_selector room_link
   end
 

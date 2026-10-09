@@ -5,14 +5,14 @@ class VoiceDispatcher
     @sender = sender
   end
 
-  def call(language:, audio:, duration_ms:, request_key:)
+  def call(audio:, duration_ms:, request_key:)
     blob = nil
 
     @sender.with_lock do
       existing = @sender.voice_drops.find_by(request_key: request_key)
       next existing if existing
 
-      recipients = VoiceRecipientSelector.recipients(sender: @sender, language: language).to_a
+      recipients = VoiceRecipientSelector.recipients(sender: @sender).to_a
       if recipients.empty?
         raise NoRecipientAvailable, "No recipients are available right now. Please try again later."
       end
@@ -24,13 +24,12 @@ class VoiceDispatcher
       )
 
       drop = @sender.voice_drops.create!(
-        language: language,
         request_key: request_key,
         recipient_count: recipients.size
       )
 
       recipients.each do |recipient|
-        room = Room.create!(host: @sender, opponent: recipient, language: language)
+        room = Room.create!(host: @sender, opponent: recipient)
         message = room.voice_messages.build(sender: @sender, voice_drop: drop, duration_ms: duration_ms)
         message.audio.attach(blob)
         message.save!

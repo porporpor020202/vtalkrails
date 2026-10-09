@@ -5,11 +5,11 @@ class CommunityPolicyAcceptanceTest < ActionDispatch::IntegrationTest
     @user = users(:english_native)
     # 온보딩이 완료된 기존 계정으로 테스트하면 동의 화면을 건너뛰므로,
     # 아직 언어 설정을 하지 않은 신규 사용자 상태로 시작한다.
-    @user.update!(native_language: nil, learning_language: nil)
+    @user.update!(native_language: nil)
     sign_in_as(@user)
   end
 
-  test "r_온보딩에서 이용정책을 읽고 직접 동의할 수 있다" do
+  test "온보딩에서 이용정책을 읽고 직접 동의할 수 있다" do
     get onboarding_path
 
     assert_response :success
@@ -19,13 +19,12 @@ class CommunityPolicyAcceptanceTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/community_rules']", minimum: 1
   end
 
-  test "r_정책에 동의하지 않은 성인은 온보딩을 완료할 수 없다" do
+  test "정책에 동의하지 않은 성인은 온보딩을 완료할 수 없다" do
     [ nil, "0" ].each do |acceptance|
       # 나이와 언어, 마이크는 모두 유효하게 보내 동의 누락만 검증한다.
       # disabled 버튼을 우회해 직접 PATCH를 보내도 서버가 거부해야 한다.
       attributes = {
         native_language_id: languages(:english).id,
-        learning_language_id: languages(:korean).id,
         date_of_birth: Date.current.years_ago(20).iso8601,
         microphone_confirmed: "1"
       }
@@ -39,7 +38,7 @@ class CommunityPolicyAcceptanceTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "r_이용정책은 로그인하지 않아도 읽을 수 있고 금지 행위와 연령 제한을 명시한다" do
+  test "이용정책은 로그인하지 않아도 읽을 수 있고 금지 행위와 연령 제한을 명시한다" do
     sign_out
     get "/community_rules"
 

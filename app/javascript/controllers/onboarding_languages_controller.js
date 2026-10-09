@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["native", "learning", "dialog", "continue", "microphoneStatus", "microphoneConfirmed", "birthday", "nativeGuidance", "learningGuidance", "ageGuidance", "rules"]
+  static targets = ["native", "continue", "microphoneStatus", "microphoneConfirmed", "birthday", "nativeGuidance", "ageGuidance", "rules"]
 
   connect() {
     this.microphoneGranted = false
@@ -26,18 +26,8 @@ export default class extends Controller {
   }
 
   validate(event) {
-    if (this.hasContinueTarget) {
-      this.sync()
-      if (this.continueTarget.disabled) event.preventDefault()
-      return
-    }
-    if (this.nativeTarget.value && this.learningTarget.value) return
-    event.preventDefault()
-    this.dialogTarget.showModal()
-  }
-
-  closeDialog() {
-    this.dialogTarget.close()
+    this.sync()
+    if (this.continueTarget.disabled) event.preventDefault()
   }
 
   formatBirthday() {
@@ -47,15 +37,7 @@ export default class extends Controller {
   }
 
   sync() {
-    const nativeLanguage = this.nativeTarget.value
-    for (const option of this.learningTarget.options) {
-      option.disabled = option.value !== "" && option.value === nativeLanguage
-    }
-    if (nativeLanguage && this.learningTarget.value === nativeLanguage) this.learningTarget.value = ""
-    if (!this.hasContinueTarget) return
-
     this.nativeGuidanceTarget.hidden = !!this.nativeTarget.value
-    this.learningGuidanceTarget.hidden = !!this.learningTarget.value
     this.microphoneStatusTarget.textContent = this.microphoneGranted ? "Microphone access allowed" : "Microphone access is denied. Please enable microphone access."
     this.microphoneConfirmedTarget.value = this.microphoneGranted ? "1" : "0"
 
@@ -68,7 +50,7 @@ export default class extends Controller {
     this.ageGuidanceTarget.hidden = adult
     this.ageGuidanceTarget.textContent = !this.birthdayTarget.value ? "Please enter your date of birth." :
       Number.isNaN(birthday.getTime()) || birthday > today ? "Please enter a valid date of birth." : "You must be at least 18 years old."
-    this.continueTarget.disabled = !(this.nativeTarget.value && this.learningTarget.value && this.microphoneGranted && adult && this.rulesTarget.checked)
+    this.continueTarget.disabled = !(this.nativeTarget.value && this.microphoneGranted && adult && this.rulesTarget.checked)
   }
 
   async requestMicrophone() {

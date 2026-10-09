@@ -5,7 +5,7 @@ class LanguageSetupsController < ApplicationController
 
   def update
     @user = current_user
-    @user.assign_attributes(params.require(:user).permit(:native_language_id, :learning_language_id))
+    @user.assign_attributes(params.require(:user).permit(:native_language_id))
 
     if @user.save(context: :language_setup)
       redirect_to settings_path, status: :see_other

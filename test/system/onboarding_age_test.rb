@@ -8,7 +8,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
 
   setup do
     @user = users(:english_native)
-    @user.update!(native_language: nil, learning_language: nil)
+    @user.update!(native_language: nil)
     sign_in(user: @user)
     page.driver.browser.execute_cdp("Browser.resetPermissions")
     assert_current_path onboarding_path
@@ -18,9 +18,9 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     page.driver.browser.execute_cdp("Browser.resetPermissions")
   end
 
-  test "r_초기 화면에서 완료에 필요한 항목을 안내한다" do
+  test "초기 화면에서 완료에 필요한 항목을 안내한다" do
     assert_text "Please select your native language."
-    assert_text "Please select your learning language."
+    assert_no_selector "#user_learning_language_id", visible: :all
     assert_text "Microphone access is denied. Please enable microphone access."
     assert_text "Please enter your date of birth."
     assert_field "Date of birth", with: ""
@@ -28,14 +28,10 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_button "Continue", disabled: true
   end
 
-  test "r_학습 언어와 관계없이 모든 신규 사용자에게 나이 확인을 요구한다" do
-    # 영어 학습자를 해외 사용자로 간주하지 않는다.
-    # 어떤 언어 조합을 선택해도 나이 확인 입력란은 유지되어야 한다.
-    language_pairs = [ [ "Korean", "English" ], [ "English", "Korean" ] ]
-
-    language_pairs.each do |native, learning|
+  test "모국어와 관계없이 모든 신규 사용자에게 나이 확인을 요구한다" do
+    # 모국어가 영어든 한국어든 만 18세 이상 확인은 필수다.
+    [ "Korean", "English" ].each do |native|
       select native, from: "user_native_language_id"
-      select learning, from: "user_learning_language_id"
 
       assert_field "Date of birth", with: ""
       assert_text "Please enter your date of birth."
@@ -44,7 +40,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   end
 
   test "언어와 마이크를 준비해도 나이를 입력하지 않으면 완료할 수 없다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
 
     assert_text "Please enter your date of birth."
     assert_button "Continue", disabled: true
@@ -53,7 +49,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   end
 
   test "18세 생일 전날인 사용자는 완료할 수 없다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
 
     # 오늘보다 생일이 하루 늦으므로 아직 만 17세이다.
     fill_in "Date of birth", with: (Date.current.years_ago(18) + 1.day).iso8601
@@ -64,7 +60,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   end
 
   test "미래 생년월일을 입력하면 올바른 날짜를 입력하도록 안내한다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
     fill_in "Date of birth", with: Date.tomorrow.iso8601
 
     assert_text "Please enter a valid date of birth."
@@ -73,13 +69,13 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   end
 
   test "18세 생일 당일부터 Continue로 저장하고 루트로 이동할 수 있다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(18).iso8601
 
     assert_button "Continue", disabled: false
     assert_current_path onboarding_path
     assert_nil @user.reload.native_language
-    assert_nil @user.learning_language
+    assert_nil @user.attributes["learning_language_id"]
     assert_not @user.onboarding_complete?
 
     # 나이 확인을 포함한 완료는 Continue를 누를 때만 저장한다.
@@ -89,14 +85,14 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     end
 
     assert_equal languages(:korean), @user.reload.native_language
-    assert_equal languages(:english), @user.learning_language
+    assert_nil @user.attributes["learning_language_id"]
     assert_not_nil @user.age_confirmed_at
     assert_not_nil @user.onboarding_completed_at
     assert @user.onboarding_complete?
   end
 
   test "나이를 입력했다가 지우면 안내와 Continue 비활성 상태로 돌아온다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
     assert_button "Continue", disabled: false
 
@@ -108,7 +104,7 @@ class OnboardingAgeTest < ApplicationSystemTestCase
   end
 
   test "완료 후 재로그인해도 나이를 다시 묻지 않는다" do
-    prepare_languages_and_microphone
+    prepare_native_language_and_microphone
     fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
     click_button "Continue"
     assert_current_path root_path, wait: 5
@@ -126,10 +122,10 @@ class OnboardingAgeTest < ApplicationSystemTestCase
     assert_current_path root_path, wait: 5
   end
 
-  test "r_온보딩 생년월일에 숫자만 입력하면 대시가 자동으로 삽입된다" do
+  test "온보딩 생년월일에 숫자만 입력하면 대시가 자동으로 삽입된다" do
     # 기존 온보딩 완료 정보를 초기화하여 실제 생년월일 입력 화면에 진입한다.
     user = users(:english_native)
-    user.update!(native_language: nil, learning_language: nil)
+    user.update!(native_language: nil)
     sign_in(user: user)
     assert_current_path onboarding_path
 
@@ -155,9 +151,8 @@ class OnboardingAgeTest < ApplicationSystemTestCase
 
   private
 
-  def prepare_languages_and_microphone
+  def prepare_native_language_and_microphone
     select "Korean", from: "user_native_language_id"
-    select "English", from: "user_learning_language_id"
     # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
     check "user_community_rules_accepted"
     page.driver.browser.execute_cdp(

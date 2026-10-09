@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 class OnboardingHistoryTest < ApplicationSystemTestCase
-  test "r_신규 사용자가 온보딩을 완료하면 뒤로가도 온보딩과 로그인 화면이 표시되지 않는다" do
+  test "신규 사용자가 온보딩을 완료하면 뒤로가도 온보딩과 로그인 화면이 표시되지 않는다" do
     user = User.create!(
       oauth_provider: "google",
       oauth_uid: SecureRandom.uuid,
@@ -15,7 +15,6 @@ class OnboardingHistoryTest < ApplicationSystemTestCase
     assert_current_path onboarding_path
 
     select "English", from: "user_native_language_id"
-    select "Korean", from: "user_learning_language_id"
     # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
     check "user_community_rules_accepted"
 

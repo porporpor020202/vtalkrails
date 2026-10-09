@@ -87,7 +87,7 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_Say 탭에서 녹음 버튼을 누르면 녹음 창이 열린다" do
+  test "Say 탭에서 녹음 버튼을 누르면 녹음 창이 열린다" do
     assert_no_selector recorder_sheet
 
     click_button "Drop a voice"
@@ -97,7 +97,7 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_녹음을 완료하면 미리듣기와 Record again 버튼이 표시된다" do
+  test "녹음을 완료하면 미리듣기와 Record again 버튼이 표시된다" do
     start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
@@ -110,60 +110,31 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_Say 탭에서 선택한 언어의 룸만 표시된다" do
-    host = users(:korean_native)
-    opponent = users(:english_native)
-
-    english_room = Room.create!(
-      host: host,
-      opponent: opponent,
-      language: languages(:english)
-    )
-
-    korean_room = Room.create!(
-      host: host,
-      opponent: opponent,
-      language: languages(:korean)
-    )
-
+  test "Say 탭에서는 언어 선택 없이 참여 중인 룸이 표시된다" do
+    # v1.2의 새 룸에는 언어가 없다. 받은 룸 모두를 목록에 표시한다.
+    user = users(:english_native)
+    other = users(:korean_native)
+    rooms = Array.new(2) { Room.create!(host: other, opponent: user) }
     visit rooms_path
-
-    select "English", from: "room_language_id"
-    assert_select "room_language_id", selected: "English"
-
-    within "main" do
-      assert_selector "a[href='#{room_path(english_room)}']"
-      assert_no_selector "a[href='#{room_path(korean_room)}']"
-    end
-
-    select "Korean", from: "room_language_id"
-    assert_select "room_language_id", selected: "Korean"
-
-    within "main" do
-      assert_selector "a[href='#{room_path(korean_room)}']"
-      assert_no_selector "a[href='#{room_path(english_room)}']"
-    end
+    rooms.each { |room| assert_selector "main a[href='#{room_path(room)}']" }
+    assert_no_selector "#room_language_id", visible: :all
   end
 
   test "Say 탭에서 내가 참여하지 않은 룸은 표시되지 않는다" do
     user = users(:english_native)
     other = users(:korean_native)
-    room_language = languages(:korean)
 
     received_room = Room.create!(
       host: other,
       opponent: user,
-      language: room_language
     )
 
     unrelated_room = Room.create!(
       host: other,
       opponent: users(:japanese_native),
-      language: room_language
     )
 
     visit rooms_path
-    assert_select "room_language_id", selected: room_language.label
 
     within "main" do
       assert_selector "a[href='#{room_path(received_room)}']"
@@ -171,23 +142,21 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_Say 탭에서 내가 호스트이고 아직 답장이 없는 룸은 표시되지 않는다" do
+  test "Say 탭에서 내가 호스트이고 아직 답장이 없는 룸은 표시되지 않는다" do
     user = users(:english_native)
     other = users(:korean_native)
-    room_language = languages(:korean)
 
-    unanswered_room = Room.create!(host: user, opponent: other, language: room_language)
+    unanswered_room = Room.create!(host: user, opponent: other)
     create_voice_message(room: unanswered_room, sender: user)
 
-    answered_room = Room.create!(host: user, opponent: other, language: room_language)
+    answered_room = Room.create!(host: user, opponent: other)
     create_voice_message(room: answered_room, sender: user)
     create_voice_message(room: answered_room, sender: other)
 
-    received_room = Room.create!(host: other, opponent: user, language: room_language)
+    received_room = Room.create!(host: other, opponent: user)
     create_voice_message(room: received_room, sender: other)
 
     visit rooms_path
-    assert_select "room_language_id", selected: room_language.label
 
     within "main" do
       assert_selector "a[href='#{room_path(answered_room)}']"
@@ -196,7 +165,7 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_Record again을 누르면 기존 녹음이 지워지고 다시 녹음할 수 있다" do
+  test "Record again을 누르면 기존 녹음이 지워지고 다시 녹음할 수 있다" do
     start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
@@ -218,7 +187,7 @@ class SayTabTest < ApplicationSystemTestCase
     end
   end
 
-  test "r_녹음 완료 후 X를 눌러 닫으면 기존 녹음이 삭제된다" do
+  test "녹음 완료 후 X를 눌러 닫으면 기존 녹음이 삭제된다" do
     start_and_finish_recording_with_click_drop_a_voice
 
     within recorder_sheet do
@@ -238,21 +207,6 @@ class SayTabTest < ApplicationSystemTestCase
       assert_button "Start recording", enable_aria_label: true
       assert_no_button "Record again"
       assert_no_button "Send voice"
-    end
-  end
-
-  test "Say 탭의 언어 목록에는 학습 언어와 모국어가 순서대로 표시된다" do
-    user = users(:english_native)
-    expected_languages = [ user.learning_language, user.native_language ]
-
-    within "header" do
-      assert_selector "#room_language_id option", count: 2, visible: :all
-      options = all("#room_language_id option", visible: :all)
-
-      # TODO: &:label 공식문서 확인하자.
-      assert_equal expected_languages.map(&:label), options.map { |option| option.text(:all) }
-      assert_equal expected_languages.map { |language| language.id.to_s }, options.map { |option| option[:value] }
-      assert_select "room_language_id", selected: user.learning_language.label
     end
   end
 

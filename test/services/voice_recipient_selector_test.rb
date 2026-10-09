@@ -5,7 +5,6 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
   setup do
     freeze_time
     @sender = users(:english_native)
-    @room_language = languages(:korean)
     @candidate_number = 0
   end
 
@@ -13,14 +12,14 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
     travel_back
   end
 
-  test "r_전송 인원은 설정 파일의 값을 사용한다" do
+  test "전송 인원은 설정 파일의 값을 사용한다" do
     configured_limit = Rails.configuration.x.voice_recipient_selection.recipient_limit
 
     assert_not_nil configured_limit
     assert_equal configured_limit, VoiceRecipientSelector.recipient_limit
   end
 
-  test "r_최근 접속 기간은 설정 파일의 값을 사용한다" do
+  test "최근 접속 기간은 설정 파일의 값을 사용한다" do
     configured_window = Rails.configuration.x.voice_recipient_selection.activity_window
 
     assert_not_nil configured_window
@@ -96,45 +95,42 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
     assert_empty recipient_ids
   end
 
-  test "Say탭에서 센더가 언어를 선택하면, 그 언어를 모국어, 또는 학습언어로 들고있는 사용자가 메시지를 받는다." do
-    [
-      [ languages(:korean), languages(:english) ],
-      [ languages(:english), languages(:korean) ]
-    ].each do |native, learning|
-      candidate = create_candidate(native_language: native, learning_language: learning)
-
-      assert_equal [ candidate.id ], recipient_ids
-
+  test "모국어와 관계없이 학습 언어가 없는 사용자도 수신자로 선택한다" do
+    # 영어 대화 앱이지만 영어 원어민만 매칭하는 앱은 아니다.
+    # 서로 다른 모국어를 가진 후보 모두 학습 언어 없이 수신할 수 있어야 한다.
+    [ :english, :korean, :spanish, :japanese ].each do |native|
+      candidate = create_candidate(native_language: languages(native))
+      assert_nil candidate.attributes["learning_language_id"]
+      assert_equal [ candidate.id ], recipient_ids, "#{native} 모국어도 수신 가능해야 한다"
       candidate.update!(last_active_at: nil)
     end
   end
 
-  test "최근 접속했어도 선택 언어가 모국어와 학습 언어 어디에도 없으면 제외한다" do
-    create_candidate(
-      native_language: languages(:english),
-      learning_language: languages(:spanish),
-      last_active_at: Time.current
-    )
-
-    assert_empty recipient_ids
+  test "발신자의 모국어도 수신자 선정에 영향을 주지 않는다" do
+    candidate = create_candidate(native_language: languages(:spanish))
+    # 발신자의 모국어를 바꿔도 동일한 수신 가능 후보가 선택되어야 한다.
+    [ :english, :korean, :japanese ].each do |native|
+      @sender.update!(native_language: languages(native))
+      assert_equal [ candidate.id ], recipient_ids
+    end
   end
 
-  test "r_발신자는 최근 접속했고 언어 조건에 맞아도 리시버에서 제외한다" do
+  test "발신자는 최근 접속했어도 수신자에서 제외한다" do
     @sender.update!(last_active_at: Time.current)
-
     assert_empty recipient_ids
   end
 
-  test "한국어 학습자가 영어로 전송하면 영어 사용자를 선택한다" do
-    assert_equal languages(:korean), @sender.learning_language
+  test "수신을 끈 사용자와 정지된 사용자와 나이 확인이 없는 사용자는 제외한다" do
+    # 언어 조건을 없애더라도 기존 수신 설정과 안전 조건은 유지해야 한다.
+    opted_out = create_candidate
+    opted_out.update!(receive_new_rooms: false)
+    suspended = create_candidate
+    suspended.update!(suspended_at: Time.current)
+    unconfirmed = create_candidate
+    unconfirmed.update!(age_confirmed_at: nil)
+    available = create_candidate
 
-    @room_language = languages(:english)
-    candidate = create_candidate(
-      native_language: languages(:spanish),
-      learning_language: languages(:english)
-    )
-
-    assert_equal [ candidate.id ], recipient_ids
+    assert_equal [ available.id ], recipient_ids
   end
 
   test "선정된 수신자는 중복되지 않는다" do
@@ -174,13 +170,13 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
   private
 
   def recipient_ids
-    VoiceRecipientSelector.recipients(sender: @sender, language: @room_language).map(&:id)
+    VoiceRecipientSelector.recipients(sender: @sender).map(&:id)
   end
 
-  def create_candidate(last_active_at: Time.current, native_language: languages(:english), learning_language: languages(:korean))
+  def create_candidate(last_active_at: Time.current, native_language: languages(:english))
     @candidate_number += 1
 
-    # 각 테스트는 접속 시각, 언어, 차단 조건을 바꿔 수신자 선정을 검증한다.
+    # 학습 언어 없이 접속 시각, 수신 설정, 안전 조건을 바꿔 선정 결과를 검증한다.
     # 나이 확인이 없으면 후보가 모두 제외되어, 제외 테스트마저 의도와 다른
     # 이유로 통과한다. 후보는 만 18세 이상 확인과 온보딩을 완료한 상태로 만든다.
     User.create!(
@@ -189,7 +185,6 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
       email_address: "voice-matching-candidate-#{@candidate_number}@example.com",
       display_name: "Voice matching candidate #{@candidate_number}",
       native_language: native_language,
-      learning_language: learning_language,
       last_active_at: last_active_at,
       age_confirmed_at: Time.current,
       onboarding_completed_at: Time.current
