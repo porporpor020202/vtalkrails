@@ -1,0 +1,104 @@
+<% content_for :title, "Read aloud settings" %>
+<% models = TextToSpeechSetting::MODELS.sort_by { |key, _model| @setting.monthly_cost_usd(key) } %>
+<section class="space-y-6">
+  <header>
+    <p class="text-xs font-bold uppercase tracking-widest text-indigo-600">Read aloud settings</p>
+    <h1 class="mt-2 text-3xl font-black">Voice models & costs</h1>
+    <p class="mt-2 text-sm text-slate-600">Choose the voice that reads English translations. Translation models and API keys are configured separately.</p>
+    <%= link_to "Google TTS Pricing", "https://cloud.google.com/text-to-speech/pricing", target: "_blank", rel: "noopener noreferrer", class: "mt-4 inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-700" %>
+  </header>
+  <% if @setting.errors.any? %>
+    <p role="alert" class="rounded-xl bg-rose-50 p-4 text-sm text-rose-700"><%= @setting.errors.full_messages.to_sentence %></p>
+  <% end %>
+  <div class="grid gap-4 sm:grid-cols-3">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5">
+      <p class="text-xs font-semibold uppercase text-slate-500">Monthly generations</p>
+      <p class="mt-2 text-3xl font-black"><%= number_with_delimiter(@setting.monthly_requests) %></p>
+      <p class="mt-2 text-xs text-slate-500"><%= number_with_delimiter(@setting.estimated_users) %> users × <%= @setting.daily_uses %> generations × 30 days</p>
+    </div>
+    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+      <p class="text-xs font-semibold uppercase text-indigo-600">Active model / month</p>
+      <p class="mt-2 text-3xl font-black"><%= number_to_currency(@setting.monthly_cost_krw(@setting.model_key), unit: "₩", precision: 0) %></p>
+      <p class="mt-2 text-xs text-slate-600"><%= TextToSpeechSetting::MODELS.fetch(@setting.model_key)[:name] %></p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5">
+      <p class="text-xs font-semibold uppercase text-slate-500">Lowest estimate / month</p>
+      <p class="mt-2 text-3xl font-black"><%= number_to_currency(@setting.monthly_cost_krw(models.first.first), unit: "₩", precision: 0) %></p>
+      <p class="mt-2 text-xs text-slate-500"><%= models.first.last[:name] %></p>
+    </div>
+  </div>
+  <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+    <section class="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 px-6 py-5">
+        <h2 class="text-lg font-bold">Compare voice models</h2>
+        <p class="mt-1 text-sm text-slate-500">Lowest estimated cost first. Every model has a separate API key field.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-5 py-3">Model / voice</th><th class="px-4 py-3">Monthly estimate</th><th class="px-4 py-3">Selection</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            <% models.each do |key, model| %>
+              <tr class="<%= @setting.model_key == key ? 'bg-indigo-50/60' : '' %>">
+                <td class="min-w-[220px] px-5 py-5 align-top">
+                  <p class="font-bold"><%= model[:name] %></p>
+                  <p class="mt-2 text-xs text-slate-500"><%= model[:description] %></p>
+                  <p class="mt-2 text-xs text-slate-500"><%= model[:voice] %></p>
+                  <% if model[:provider] == :gemini %>
+                    <% multiplier = Date.current >= Date.new(2027, 1, 1) ? 2 : 1 %>
+                    <p class="mt-1 text-xs text-slate-500">$<%= 0.5 * multiplier %> / 1M text tokens · $<%= model[:audio_output] * multiplier %> / 1M audio tokens</p>
+                    <p class="mt-1 text-xs text-slate-500">Preview prices double January 1, 2027. Estimate uses <%= @setting.audio_seconds %> seconds per generation.</p>
+                  <% else %>
+                    <p class="mt-1 text-xs text-slate-500">$<%= model[:price] %> / 1M characters</p>
+                  <% end %>
+                  <p class="mt-2 text-xs <%= @setting.api_key(key) ? 'text-emerald-700' : 'text-amber-800' %>"><%= @setting.api_key(key) ? "API key configured" : "API key missing" %></p>
+                </td>
+                <td class="whitespace-nowrap px-4 py-5 align-top">
+                  <p class="text-xl font-black"><%= number_to_currency(@setting.monthly_cost_krw(key), unit: "₩", precision: 0) %></p>
+                  <p class="mt-1 text-xs text-slate-500"><%= number_to_currency(@setting.monthly_cost_usd(key)) %> / month</p>
+                </td>
+                <td class="px-4 py-5 align-top">
+                  <% if @setting.model_key == key %>
+                    <span class="text-xs font-bold text-indigo-600">Active</span>
+                  <% else %>
+                    <%= button_to "Use model", admin_text_to_speech_setting_path, method: :patch, params: { text_to_speech_setting: { model_key: key } }, class: "whitespace-nowrap rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <div class="space-y-6">
+      <section class="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 class="text-lg font-bold">Model & API keys</h2>
+        <p class="mt-2 text-xs leading-relaxed text-slate-500">Keys are encrypted. Empty fields keep saved keys. No translation keys are reused.</p>
+        <%= form_with model: @setting, url: admin_text_to_speech_setting_path, method: :patch, class: "mt-5 space-y-4" do |form| %>
+          <%= form.label :model_key, "Active model", class: "block text-sm font-semibold" %>
+          <%= form.select :model_key, models.map { |key, model| [model[:name], key] }, {}, class: "w-full rounded-xl border border-slate-300 p-3 text-sm" %>
+          <% models.each do |key, model| %>
+            <div>
+              <%= form.label "#{key}_api_key", "#{model[:name]} API key", class: "block text-sm font-semibold" %>
+              <%= form.password_field "#{key}_api_key", value: nil, autocomplete: "new-password", placeholder: @setting.api_key(key) ? "Saved — leave blank to keep" : "Enter API key", class: "mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm" %>
+            </div>
+          <% end %>
+          <p class="text-xs leading-relaxed text-slate-500">Gemini voices use Google AI Studio API keys. WaveNet, Neural2 and Chirp require Google Cloud billing and the Cloud Text-to-Speech API. Keys remain separate for every model, even when using the same provider.</p>
+          <%= form.submit "Save model & keys", class: "w-full cursor-pointer rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white" %>
+        <% end %>
+      </section>
+      <section class="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 class="text-lg font-bold">Usage estimate</h2>
+        <%= form_with model: @setting, url: admin_text_to_speech_setting_path, method: :patch, class: "mt-5 space-y-4" do |form| %>
+          <% { estimated_users: "Read aloud users per day", daily_uses: "New audio generations per user / day", text_characters: "Average English characters per generation", audio_seconds: "Average audio seconds (Gemini estimates)", usd_to_krw: "KRW per USD" }.each do |field, label| %>
+            <div>
+              <%= form.label field, label, class: "block text-sm font-semibold" %>
+              <%= form.number_field field, min: 1, step: field == :usd_to_krw ? 0.01 : 1, required: true, class: "mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm" %>
+            </div>
+          <% end %>
+          <%= form.submit "Update estimate", class: "w-full cursor-pointer rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white" %>
+        <% end %>
+      </section>
+    </div>
+  </div>
+  <p class="text-xs leading-relaxed text-slate-500">Paid list prices checked October 10, 2026. Estimates exclude free quotas, tax, retries, hosting and translation charges. Spaces and punctuation count as characters. Gemini estimates use four English characters per text token, 30 additional style tokens and 25 audio tokens per second. Actual audio duration and token usage vary. Replaying loaded audio does not make another TTS request. <%= link_to "Gemini prices", "https://ai.google.dev/gemini-api/docs/pricing", class: "text-indigo-600" %> · <%= link_to "Google Cloud prices", "https://cloud.google.com/text-to-speech/pricing", class: "text-indigo-600" %> · <%= link_to "OpenAI TTS-1 prices", "https://developers.openai.com/api/docs/models/tts-1", class: "text-indigo-600" %></p>
+</section>

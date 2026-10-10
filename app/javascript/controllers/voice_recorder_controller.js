@@ -37,6 +37,7 @@ export default class extends Controller {
   }
 
   closeSheet() {
+    this.dispatch("closed")
     this.recordingGeneration += 1
     if (this.recorder?.state === "recording") this.recorder.stop()
     this.releaseMedia()
@@ -46,11 +47,13 @@ export default class extends Controller {
   }
 
   async startRecording() {
+    this.dispatch("recording")
+    const generation = ++this.recordingGeneration
     this.recordingMessageTarget.removeAttribute("role")
     this.recordingMessageTarget.textContent = "Recording…"
     this.recordingMessageTarget.classList.add("hidden")
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
           echoCancellation: false,
@@ -58,11 +61,15 @@ export default class extends Controller {
           autoGainControl: false
         }
       })
+      if (generation !== this.recordingGeneration) {
+        stream.getTracks().forEach(track => track.stop())
+        return
+      }
+      this.stream = stream
       this.chunks = []
       const mimeType = this.preferredMimeType()
       const options = mimeType ? { mimeType, audioBitsPerSecond: 64000 } : { audioBitsPerSecond: 64000 }
       this.recorder = new MediaRecorder(this.stream, options)
-      const generation = ++this.recordingGeneration
       this.recorder.addEventListener("dataavailable", (event) => {
         if (generation === this.recordingGeneration && event.data.size > 0) this.chunks.push(event.data)
       })
@@ -82,6 +89,7 @@ export default class extends Controller {
       this.timerInterval = window.setInterval(() => this.tick(), 100)
 
     } catch (error) {
+      if (generation !== this.recordingGeneration) return
       this.recordingMessageTarget.textContent = error.name === "NotAllowedError"
         ? "Allow microphone access in your browser or device settings, then try again."
         : "The microphone could not be started."
@@ -93,6 +101,15 @@ export default class extends Controller {
 
   stopRecording() {
     if (this.recorder?.state === "recording") this.recorder.stop()
+  }
+
+  stopForHelper() {
+    if (this.recorder?.state === "recording") {
+      this.stopRecording()
+    } else {
+      // Invalidate microphone permission requests that are still pending.
+      this.recordingGeneration += 1
+    }
   }
 
   discard() {

@@ -30,6 +30,8 @@ Rails.application.routes.draw do
     resource :block, only: :create, controller: "user_blocks"
   end
   resource :voice_drop, only: :create
+  resource :voice_helper, only: :create
+  resource :text_to_speech, only: :create, controller: "text_to_speeches"
 
   resource :language_setup, only: %i[show update]
   resource :onboarding, only: %i[show update], controller: "onboarding"
@@ -43,6 +45,9 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    root "voice_helper_settings#show"
+    resource :voice_helper_setting, only: %i[show update]
+    resource :text_to_speech_setting, only: %i[show update]
     resources :content_reports, only: %i[index show update]
     resources :voice_messages, only: [] do
       get :audio, on: :member

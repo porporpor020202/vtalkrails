@@ -1,7 +1,9 @@
 <% content_for :title, admin ? "Admin feedback" : "Feedback" %>
 
 <section class="flex min-h-full flex-col bg-slate-50 px-5 py-6">
-  <%= link_to "Back to settings", settings_path, class: "mb-5 text-sm font-semibold text-indigo-600" %>
+  <% unless admin %>
+    <%= link_to "Back to settings", settings_path, class: "mb-5 text-sm font-semibold text-indigo-600" %>
+  <% end %>
   <header class="mb-6">
     <h1 class="text-3xl font-black tracking-tight text-slate-950"><%= admin ? "All feedback" : "Feedback" %></h1>
     <p class="mt-2 text-sm text-slate-500"><%= admin ? "Read and respond to your users." : "We’d love to hear your feedback. The developer personally responds to every message within 48 hours." %></p>
