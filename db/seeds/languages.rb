@@ -2,7 +2,8 @@ languages = {
   "en" => "English",
   "ja" => "Japanese",
   "ko" => "Korean",
-  "zh" => "Chinese",
+  "zh-Hant" => "Chinese (Traditional)",
+  "zh-Hans" => "Chinese (Simplified)",
   "es" => "Spanish"
 }
 

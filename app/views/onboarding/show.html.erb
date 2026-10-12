@@ -32,10 +32,9 @@
       </label>
       <h1 id="native-language-heading" class="onboarding-title">Select your native language</h1>
       <div class="onboarding-options">
-        <% flags = { "en" => "🇬🇧", "es" => "🇪🇸", "zh" => "🇨🇳", "ja" => "🇯🇵", "ko" => "🇰🇷" } %>
-        <% Language.enabled.sort_by { |language| %w[en es zh ja].index(language.code) || 4 }.each do |language| %>
+        <% Language.enabled.sort_by { |language| %w[en es zh-Hant zh-Hans ja ko].index(language.code) || 6 }.each do |language| %>
           <button type="button" class="onboarding-option" data-onboarding-languages-target="languageOption" data-action="onboarding-languages#chooseLanguage" data-value="<%= language.id %>" data-label="<%= language.label %>">
-            <span class="onboarding-emoji" aria-hidden="true"><%= flags.fetch(language.code, "🌐") %></span><span><%= language.label %></span>
+            <span><%= language.label %></span>
           </button>
         <% end %>
       </div>
