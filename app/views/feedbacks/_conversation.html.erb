@@ -1,35 +1,38 @@
 <% content_for :title, feedback.title %>
 
-<section class="flex min-h-full flex-col bg-slate-50 px-5 py-6">
-  <%= link_to "Back to feedback", admin ? admin_feedbacks_path : feedbacks_path, class: "mb-5 text-sm font-semibold text-indigo-600" %>
+<section class="<%= admin ? "flex min-h-full flex-col bg-slate-50 px-5 py-6" : "settings-page settings-detail feedback-thread" %>">
+  <%= link_to "Back to feedback", admin ? admin_feedbacks_path : feedbacks_path, class: admin ? "mb-5 text-sm font-semibold text-indigo-600" : "settings-back" %>
 
-  <article class="rounded-2xl border border-slate-200 bg-white p-5">
-    <h1 class="break-words text-2xl font-black tracking-tight text-slate-950"><%= feedback.title %></h1>
-    <p class="mt-2 text-xs text-slate-500"><%= feedback.user.display_name %> · <%= feedback.created_at.strftime("%Y-%m-%d %H:%M") %></p>
-    <p class="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-slate-700"><%= feedback.body %></p>
+  <article class="<%= admin ? "rounded-2xl border border-slate-200 bg-white p-5" : "feedback-post" %>">
+    <% unless admin %><p class="settings-eyebrow">Your feedback</p><% end %>
+    <h1 class="<%= admin ? "break-words text-2xl font-black tracking-tight text-slate-950" : "settings-heading settings-break" %>"><%= feedback.title %></h1>
+    <div class="<%= admin ? "mt-2 text-xs text-slate-500" : "feedback-author" %>"><span><%= feedback.user.display_name %></span><time datetime="<%= feedback.created_at.iso8601 %>"><%= feedback.created_at.strftime("%b %-d, %Y · %-I:%M %p") %></time></div>
+    <p class="<%= admin ? "mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-slate-700" : "settings-message-body" %>"><%= feedback.body %></p>
     <% unless admin %>
-      <%= link_to "Edit feedback", edit_feedback_path(feedback), class: "mt-4 inline-block text-sm font-semibold text-indigo-600" %>
+      <%= link_to "Edit feedback", edit_feedback_path(feedback), class: admin ? "mt-4 inline-block text-sm font-semibold text-indigo-600" : "feedback-edit" %>
     <% end %>
   </article>
 
-  <section aria-label="Replies" class="mt-6 space-y-3">
-    <h2 class="text-sm font-bold text-slate-700">Replies</h2>
+  <section aria-label="Replies" class="<%= admin ? "mt-6 space-y-3" : "settings-replies" %>">
+    <h2 class="<%= admin ? "text-sm font-bold text-slate-700" : "settings-section-title" %>">Replies <% unless admin %><span class="feedback-reply-count"><%= feedback.feedback_replies.count %></span><% end %></h2>
     <% feedback.feedback_replies.includes(:user).order(:created_at, :id).each do |message| %>
-      <article class="rounded-2xl border p-4 <%= message.user.admin? ? 'border-indigo-100 bg-indigo-50' : 'border-slate-200 bg-white' %>">
-        <p class="text-xs font-bold text-slate-600">
-          <%= message.user.admin? ? "Team" : message.user.display_name %> · <%= message.created_at.strftime("%Y-%m-%d %H:%M") %>
-        </p>
-        <p class="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-slate-800"><%= message.body %></p>
+      <article class="<%= admin ? "rounded-2xl border p-4 #{message.user.admin? ? 'border-indigo-100 bg-indigo-50' : 'border-slate-200 bg-white'}" : "feedback-reply #{message.user.admin? ? 'feedback-reply-team' : ''}" %>">
+        <div class="<%= admin ? "text-xs font-bold text-slate-600" : "feedback-author" %>">
+          <span><%= message.user.admin? ? "Support team" : message.user.display_name %></span>
+          <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.strftime("%b %-d · %-I:%M %p") %></time>
+        </div>
+        <p class="<%= admin ? "mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-slate-800" : "settings-message-body" %>"><%= message.body %></p>
       </article>
     <% end %>
+    <% if !admin && feedback.feedback_replies.empty? %><p class="feedback-no-replies">No replies yet. Updates from our team will appear here.</p><% end %>
   </section>
 
-  <%= form_with model: reply, url: admin ? admin_feedback_feedback_replies_path(feedback) : feedback_feedback_replies_path(feedback), class: "mt-6 space-y-3" do |form| %>
+  <%= form_with model: reply, url: admin ? admin_feedback_feedback_replies_path(feedback) : feedback_feedback_replies_path(feedback), class: admin ? "mt-6 space-y-3" : "settings-form settings-reply-form" do |form| %>
     <% if reply.errors.any? %>
       <div role="alert" class="rounded-2xl bg-rose-50 p-4 text-sm text-rose-700"><%= reply.errors.full_messages.to_sentence %></div>
     <% end %>
-    <%= form.label :body, "Reply", class: "block text-sm font-bold text-slate-700" %>
-    <%= form.text_area :body, required: true, rows: 4, class: "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950" %>
-    <%= form.submit "Send reply", class: "w-full cursor-pointer rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white" %>
+    <%= form.label :body, "Reply", class: admin ? "block text-sm font-bold text-slate-700" : "settings-label" %>
+    <%= form.text_area :body, required: true, rows: 3, placeholder: "Add a reply…", class: admin ? "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950" : "settings-input" %>
+    <%= form.submit "Send reply", class: admin ? "w-full cursor-pointer rounded-2xl bg-indigo-600 px-5 py-3 font-bold text-white" : "settings-button" %>
   <% end %>
 </section>

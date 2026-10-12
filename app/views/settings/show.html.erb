@@ -1,49 +1,41 @@
-<% content_for :title, "Setting" %>
+<% content_for :voice_toolbar, true %>
+<% content_for :title, "Settings" %>
 
-<section class="flex min-h-full flex-1 flex-col bg-slate-50 px-5 pb-8 pt-[max(1.5rem,env(safe-area-inset-top))]">
-  <header class="mb-6">
-    <h1 class="mt-2 text-3xl font-black tracking-[-0.035em] text-slate-950">Setting</h1>
+<section class="settings-page">
+  <header class="settings-header">
+    <p>Your space</p>
+    <h1>Settings</h1>
   </header>
 
   <section aria-labelledby="profile-heading">
-    <h2 id="profile-heading" class="mb-3 px-1 text-sm font-extrabold tracking-tight text-slate-800">Profile</h2>
-    <%= link_to profile_path,
-          class: "group block rounded-[28px] transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500",
-          aria: { label: "Open profile" } do %>
-      <%= render "shared/profile_card", user: current_user, navigable: true %>
-    <% end %>
-  </section>
-
-  <section class="mt-6">
-    <h2 class="mb-3 px-1 text-sm font-extrabold text-slate-800">
-      Native language
-    </h2>
-
-    <%= link_to language_setup_path,
-          aria: { label: "Open language settings" },
-          class: "group flex items-center gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500" do %>
-      <div class="min-w-0 flex-1">
-        <div>
-          <p class="mb-1 text-xs font-semibold text-slate-500">Native language</p>
-          <p class="text-lg font-bold text-slate-950">
-            <%= current_user.native_language.label %>
-          </p>
-        </div>
+    <h2 id="profile-heading" class="settings-section-title">Profile</h2>
+    <%= link_to profile_path, class: "settings-profile", aria: { label: "Open profile" } do %>
+      <div class="settings-avatar" aria-hidden="true">
+        <%= image_tag current_user.profile_image_path_for, alt: "", width: 48, height: 48 %>
       </div>
-
-      <svg class="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5"
-           fill="none" viewBox="0 0 24 24" stroke="currentColor"
-           aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2" d="m9 5 7 7-7 7" />
-      </svg>
+      <div class="settings-profile-details">
+        <h3><%= current_user.display_name %></h3>
+        <p><%= current_user.email_address %></p>
+      </div>
+      <svg class="settings-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
     <% end %>
   </section>
-  <section class="mt-6">
-    <h2 class="mb-3 px-1 text-sm font-extrabold text-slate-800">Support</h2>
-    <%= link_to feedbacks_path, class: "block rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm" do %>
-      <span class="block font-bold text-slate-950">Send feedback</span>
-      <span class="mt-1 block text-sm text-slate-500">Ask a question or share an idea privately with our team.</span>
+
+  <section class="settings-group" aria-labelledby="preferences-heading">
+    <h2 id="preferences-heading" class="settings-section-title">Preferences</h2>
+    <%= link_to language_setup_path, class: "settings-row", aria: { label: "Open language settings" } do %>
+      <span class="settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><ellipse cx="12" cy="12" rx="4" ry="9" /><path d="M3 12h18" /></svg></span>
+      <span class="settings-row-details"><strong>Native language</strong><span><%= current_user.native_language.label %></span></span>
+      <svg class="settings-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+    <% end %>
+  </section>
+
+  <section class="settings-group" aria-labelledby="support-heading">
+    <h2 id="support-heading" class="settings-section-title">Support</h2>
+    <%= link_to feedbacks_path, class: "settings-row" do %>
+      <span class="settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7 8 6 8-6" /></svg></span>
+      <span class="settings-row-details"><strong>Send feedback</strong><span>Questions or ideas? Let us know.</span></span>
+      <svg class="settings-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
     <% end %>
   </section>
 </section>

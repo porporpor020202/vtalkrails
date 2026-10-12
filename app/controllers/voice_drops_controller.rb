@@ -6,7 +6,6 @@ class VoiceDropsController < ApplicationController
       request_key: params.require(:request_key)
     )
 
-    flash[:notice] = "Sent to #{drop.recipient_count} #{'listener'.pluralize(drop.recipient_count)}."
     render json: { redirect_url: rooms_path, recipient_count: drop.recipient_count, drop_id: drop.id }, status: :created
   rescue VoiceDispatcher::NoRecipientAvailable => e
     render json: { error: e.message }, status: :unprocessable_entity

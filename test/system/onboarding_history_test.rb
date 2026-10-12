@@ -14,11 +14,13 @@ class OnboardingHistoryTest < ApplicationSystemTestCase
     sign_in(user: user)
     assert_current_path onboarding_path
 
-    select "English", from: "user_native_language_id"
+    click_button "English"
+    click_button "18–24"
+    click_button "Prefer not to say"
     # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
-    check "user_community_rules_accepted"
 
-    assert_button "Continue", disabled: true
+
+    assert_no_button "Agree and start"
 
     page.execute_script(<<~JS)
       navigator.mediaDevices.getUserMedia = async () => ({
@@ -29,13 +31,13 @@ class OnboardingHistoryTest < ApplicationSystemTestCase
     JS
 
     # 생년월일로 18세 이상임을 확인한 후 온보딩을 완료한다.
-    fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
+
 
     click_button "Allow microphone"
 
-    assert_text "Microphone access allowed"
-    assert_button "Continue", disabled: false
-    click_button "Continue"
+    assert_text "A space for real conversations"
+    assert_button "Agree and start", disabled: false
+    click_button "Agree and start"
 
     assert_current_path root_path
     assert_button "Drop a voice"

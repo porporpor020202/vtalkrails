@@ -1,4 +1,8 @@
 class Room < ApplicationRecord
+  belongs_to :native_language, class_name: "Language"
+  before_validation :set_native_language, on: :create
+  attr_readonly :native_language_id
+
   belongs_to :host, class_name: "User", optional: true
   belongs_to :opponent, class_name: "User", optional: true
   has_many :voice_messages, dependent: :destroy
@@ -9,9 +13,11 @@ class Room < ApplicationRecord
   validate :participants_must_be_different
 
   scope :involving, ->(participant) { where(host_id: participant.id).or(where(opponent_id: participant.id)) }
+  scope :for_native_language, ->(participant) { where(native_language_id: participant.native_language_id) }
+  scope :accessible_to, ->(participant) { involving(participant).for_native_language(participant) }
   scope :visible_to, ->(participant) {
     replied_room_ids = VoiceMessage.where.not(sender_id: participant.id).select(:room_id)
-    involving(participant)
+    accessible_to(participant)
       .where("deleted_by_id IS NULL OR deleted_by_id != ?", participant.id)
       .where("dismissed_by_id IS NULL OR dismissed_by_id != ?", participant.id)
       .where("opponent_id = :id OR id IN (:replied) OR host_id IS NULL OR opponent_id IS NULL OR status = 'deleted'", id: participant.id, replied: replied_room_ids)
@@ -39,10 +45,15 @@ class Room < ApplicationRecord
 
   def can_reply?(participant)
     other = opponent_for(participant)
-    other.present? && last_voice_message&.sender_id == other.id
+    other.present? && participant.native_language_id == native_language_id &&
+      other.native_language_id == native_language_id && last_voice_message&.sender_id == other.id
   end
 
   private
+
+  def set_native_language
+    self.native_language ||= host&.native_language || opponent&.native_language
+  end
 
   def participants_must_be_different
     errors.add(:opponent, "must be a different user") if host_id.present? && host_id == opponent_id

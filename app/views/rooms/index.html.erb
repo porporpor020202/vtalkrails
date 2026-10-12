@@ -1,63 +1,25 @@
-<% if flash[:reception_notice].present? %>
-  <div role="status" data-controller="temporary-notice" data-turbo-temporary class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-slate-900 px-5 py-4 text-center text-sm font-semibold text-white shadow-xl">
-    <%= flash[:reception_notice] %>
-  </div>
-<% end %>
+<% content_for :voice_toolbar, true %>
 
-<section class="flex flex-1 min-h-0 flex-col bg-slate-50 px-5 pb-36 overflow-hidden" data-controller="pull-to-refresh">
-  <% if native_app? %>
-    <div class="pointer-events-none flex h-10 items-center justify-center bg-white/90 text-xs font-bold text-slate-500 shadow-sm transition-transform duration-150" data-pull-to-refresh-target="indicator">
-      <span data-pull-to-refresh-target="label">Pull to refresh</span>
-    </div>
-  <% end %>
-
-  <header class="mt-4 mb-6 flex items-center justify-end gap-3">
-    <% unless native_app? %>
-      <button type="button" class="shrink-0 rounded-xl border border-slate-300 bg-white px-3 py-3 text-xs font-semibold text-slate-600 disabled:opacity-50" data-pull-to-refresh-target="button" data-action="pull-to-refresh#refresh">Refresh</button>
-    <% end %>
+<section class="voice-inbox" data-controller="pull-to-refresh">
+  <header class="voice-inbox-header">
+    <p><span>Language:</span> <strong><%= current_user.native_language.label %></strong></p>
   </header>
-
-  <%= turbo_frame_tag "room-list", target: "_top",
-        data: { pull_to_refresh_target: "frame" },
-        class: "flex flex-1 min-h-0 flex-col overflow-y-auto" do %>
+  <div class="voice-inbox-refresh" data-pull-to-refresh-target="indicator" role="status"><span data-pull-to-refresh-target="label">Pull to refresh</span></div>
+  <%= turbo_frame_tag "room-list", target: "_top", class: "voice-inbox-list", data: { pull_to_refresh_target: "frame" } do %>
     <% if @rooms.any? %>
-      <div class="space-y-3">
-        <% @rooms.each do |room| %>
-          <%= link_to room_path(room),
-                class: "flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-5 font-semibold text-slate-950 #{room.can_reply?(current_user) ? 'bg-white' : 'bg-slate-100'}" do %>
-            <span class="min-w-0 truncate"><%= (room.opponent_for(current_user)&.display_name || "Former user") %></span>
-            <span class="shrink-0 rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700"><%= @voice_message_counts.fetch(room.id, 0) %></span>
+      <% @rooms.each_with_index do |room, index| %>
+        <%= link_to room_path(room), class: "voice-inbox-row" do %>
+          <svg class="voice-inbox-avatar" style="color: <%= %w[#9dcb7d #80947d #dca985 #b6a8b8 #9c918c #9da9a8 #b6b5c8 #b89a9a][index % 8] %>" viewBox="0 0 64 56" fill="none" aria-hidden="true">
+            <path d="M12 24v8m10-16v24m10-30v36m10-30v24m10-16v8" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+          </svg>
+          <span class="voice-inbox-name"><%= room.opponent_for(current_user)&.display_name || "Former user" %> <span class="voice-inbox-count"><%= @voice_message_counts.fetch(room.id, 0) %></span></span>
+          <% if room.last_voice_message.present? %>
+            <time class="voice-inbox-time" datetime="<%= room.last_voice_message.created_at.iso8601 %>"><%= time_ago_in_words(room.last_voice_message.created_at) %></time>
           <% end %>
         <% end %>
-      </div>
+      <% end %>
     <% else %>
-      <div class="flex flex-1 flex-col items-center justify-center rounded-[32px] border border-dashed border-slate-300 bg-white px-8 py-12 text-center">
-        <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-indigo-50 text-3xl">🎙️</div>
-        <h2 class="mt-5 text-lg font-bold text-slate-900">Send your voice</h2>
-      </div>
+      <div class="voice-inbox-empty"><p>Send your voice</p></div>
     <% end %>
   <% end %>
-</section>
-
-<section data-controller="voice-recorder" data-voice-recorder-endpoint-value=<%= voice_drop_path %> data-voice-recorder-max-duration-value="30000">
-
-  <button type="button" class="fixed bottom-[calc(var(--bottom-nav-height,0px)+1rem)] left-1/2 z-30 -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 to-red-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-rose-500/30 ring-4 ring-white" data-action="voice-recorder#openSheet">
-    <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
-      <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3z" />
-      <path d="M17 11a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11h-2z" />
-    </svg>
-    <span class="sr-only">Drop a voice</span>
-  </button>
-
-  <%= button_to room_reception_path, method: :patch, aria: { label: "Receive new rooms", pressed: current_user.receive_new_rooms?.to_s }, class: "fixed bottom-[calc(var(--bottom-nav-height,0px)+1rem)] left-[calc(50%+3rem)] z-30 flex h-12 w-24 flex-col items-center justify-center gap-1 rounded-2xl border shadow-sm transition active:scale-95 #{current_user.receive_new_rooms? ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-600'}" do %>
-    <span class="text-[10px] font-bold leading-none">New voices</span>
-    <span class="flex items-center gap-1.5" aria-hidden="true">
-      <span class="flex h-4 w-7 items-center rounded-full px-0.5 <%= current_user.receive_new_rooms? ? 'justify-end bg-emerald-600' : 'justify-start bg-slate-400' %>">
-        <svg class="h-3 w-3 text-white drop-shadow-sm" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="6" /></svg>
-      </span>
-      <span class="w-5 text-[11px] font-extrabold leading-none"><%= current_user.receive_new_rooms? ? 'On' : 'Off' %></span>
-    </span>
-  <% end %>
-  <%= render "voice_recorder_sheet" %>
-
 </section>

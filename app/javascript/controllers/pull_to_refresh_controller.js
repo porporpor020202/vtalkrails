@@ -7,7 +7,7 @@ export default class extends Controller {
     this.startY = null
     this.pullDistance = 0
     this.isRefreshing = false
-    this.scrollContainer = this.element.closest("main") || document.scrollingElement
+    this.scrollContainer = this.frameTarget
 
     this.onTouchStart = this.handleTouchStart.bind(this)
     this.onTouchMove = this.handleTouchMove.bind(this)
@@ -32,7 +32,7 @@ export default class extends Controller {
     if (this.isRefreshing || event.touches.length !== 1 || !this.isAtTop()) return
 
     const target = event.target instanceof Element ? event.target : null
-    if (target?.closest("a, button, input, textarea, select, audio")) return
+    if (target?.closest("button, input, textarea, select, audio")) return
 
     this.startY = event.touches[0].clientY
     this.pullDistance = 0
@@ -107,6 +107,6 @@ export default class extends Controller {
     if (!this.hasIndicatorTarget) return
 
     const offset = Math.max(0, Math.min(distance, 72))
-    this.indicatorTarget.style.transform = `translateY(${offset}px)`
+    this.indicatorTarget.style.height = `${offset}px`
   }
 }

@@ -7,7 +7,7 @@ class RoomsController < ApplicationController
   end
 
   def show
-    @room = Room.involving(current_user)
+    @room = Room.accessible_to(current_user)
       .includes(:host, :opponent, :last_voice_message)
       .find(params[:id])
 
@@ -16,7 +16,7 @@ class RoomsController < ApplicationController
   end
 
   def destroy
-    @room = Room.involving(current_user).find(params[:id])
+    @room = Room.accessible_to(current_user).find(params[:id])
 
     ApplicationRecord.transaction do
       @room.lock!

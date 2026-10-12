@@ -16,6 +16,7 @@ class RoomReplyTurnSystemTest < ApplicationSystemTestCase
   setup do
     @host = users(:english_native)
     @recipient = users(:korean_native)
+    @recipient.update!(native_language: @host.native_language)
 
     @room = Room.create!(host: @host, opponent: @recipient)
     @first_message = create_voice_message(room: @room, sender: @host)

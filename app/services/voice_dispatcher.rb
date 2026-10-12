@@ -24,12 +24,13 @@ class VoiceDispatcher
       )
 
       drop = @sender.voice_drops.create!(
+        native_language: @sender.native_language,
         request_key: request_key,
         recipient_count: recipients.size
       )
 
       recipients.each do |recipient|
-        room = Room.create!(host: @sender, opponent: recipient)
+        room = Room.create!(host: @sender, opponent: recipient, native_language: @sender.native_language)
         message = room.voice_messages.build(sender: @sender, voice_drop: drop, duration_ms: duration_ms)
         message.audio.attach(blob)
         message.save!

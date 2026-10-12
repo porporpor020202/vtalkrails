@@ -1,6 +1,6 @@
 class ContentReportsController < ApplicationController
   def create
-    room = Room.involving(current_user).find(params[:room_id])
+    room = Room.accessible_to(current_user).find(params[:room_id])
     report = room.content_reports.build(
       content_report_params.merge(
         reporter: current_user,

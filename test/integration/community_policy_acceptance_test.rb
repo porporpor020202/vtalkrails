@@ -15,7 +15,7 @@ class CommunityPolicyAcceptanceTest < ActionDispatch::IntegrationTest
     assert_response :success
     # 업로드 전에 사용자가 직접 동의해야 한다. 미리 체크된 체크박스나
     # 약관 링크만 보여주는 것으로 동의를 대신하지 않는다.
-    assert_select "input[type='checkbox'][name='user[community_rules_accepted]']:not([checked])", count: 1
+    assert_select "input[type='hidden'][name='user[community_rules_accepted]'][value='0']", count: 1
     assert_select "a[href='/community_rules']", minimum: 1
   end
 

@@ -7,6 +7,7 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
   setup do
     @sender = users(:english_native)
     @recipient = users(:korean_native)
+    @recipient.update!(native_language: @sender.native_language)
     @admin = users(:japanese_native)
     @admin.update!(admin: true, native_language: languages(:korean))
 
@@ -16,6 +17,8 @@ class SafetyAccessTest < ActionDispatch::IntegrationTest
     complete_onboarding(@recipient)
     complete_onboarding(@admin)
 
+    @sender.reload
+    @recipient.reload
     @room = Room.create!(host: @sender, opponent: @recipient)
     @message = create_voice_message(room: @room, sender: @sender)
   end

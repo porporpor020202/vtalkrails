@@ -19,7 +19,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     @outsider = users(:japanese_native)
 
     [ @recipient, @other_recipient ].each do |user|
-      user.update!(native_language: languages(:korean), last_active_at: Time.current)
+      user.update!(native_language: @sender.native_language, last_active_at: Time.current)
     end
   end
 
@@ -35,7 +35,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     rooms = Room.where.not(id: previous_ids)
     assert_equal [ @recipient.id, @other_recipient.id ].sort, rooms.pluck(:opponent_id).sort
     assert_equal [ @sender.id ], rooms.distinct.pluck(:host_id)
-    rooms.each { |room| assert_nil room.attributes["language_id"] }
+    rooms.each { |room| assert_equal @sender.native_language, room.native_language }
 
     [ @recipient, @other_recipient ].each do |user|
       received_room = rooms.find_by!(opponent: user)
@@ -64,8 +64,13 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
     as_user(@recipient) do
       open_conversation(room)
       assert_selector "h1", text: @sender.display_name
-      assert_selector "main article audio[controls]", count: 1
-      assert_audio_plays(find("main article audio"))
+      assert_no_selector "main article audio[controls]", visible: :all
+      assert_selector "main article .room-play", count: 1
+      click_button "Play recording", enable_aria_label: true
+      assert_selector "button[aria-label='Pause recording']"
+      click_button "Pause recording", enable_aria_label: true
+      assert_selector "button[aria-label='Play recording']"
+      assert_audio_plays(find("main article audio", visible: :all))
     end
   end
 
@@ -81,7 +86,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
       open_conversation(room)
       assert_difference -> { room.voice_messages.count }, 1 do
         record_and_send("Reply with voice")
-        assert_selector "main article audio", count: 2
+        assert_selector "main article audio", visible: :all, count: 2
       end
     end
 
@@ -90,8 +95,8 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
 
     as_user(@sender) do
       open_conversation(room)
-      assert_selector "main article audio", count: 2
-      assert_audio_plays(all("main article audio").last)
+      assert_selector "main article audio", visible: :all, count: 2
+      assert_audio_plays(all("main article audio", visible: :all).last)
     end
   end
 
@@ -107,13 +112,13 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
           as_user(@recipient) do
             open_conversation(room)
             record_and_send("Reply with voice")
-            assert_selector "main article audio", count: 2
+            assert_selector "main article audio", visible: :all, count: 2
           end
 
           as_user(@sender) do
             open_conversation(room)
             record_and_send("Reply with voice")
-            assert_selector "main article audio", count: 3
+            assert_selector "main article audio", visible: :all, count: 3
           end
         end
       end
@@ -124,7 +129,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
 
     as_user(@other_recipient) do
       open_conversation(other_room)
-      assert_selector "main article audio", count: 1
+      assert_selector "main article audio", visible: :all, count: 1
     end
   end
 
@@ -145,7 +150,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
 
     as_user(@recipient) do
       open_conversation(room)
-      audio = find("main article audio")
+      audio = find("main article audio", visible: :all)
       assert_audio_plays(audio)
       audio_url = audio[:src]
     end
@@ -184,7 +189,7 @@ class RoomVoiceConversationTest < ApplicationSystemTestCase
       click_button "Start recording", enable_aria_label: true
       assert_selector '[data-voice-recorder-target="timer"]', text: "00:02", wait: 5
       click_button "Stop recording", enable_aria_label: true
-      assert_selector 'audio[src^="blob:"]'
+      assert_selector 'audio[src^="blob:"]', visible: :all
       click_button "Send voice"
     end
     assert_no_selector '[data-voice-recorder-target="sheet"]', wait: 10

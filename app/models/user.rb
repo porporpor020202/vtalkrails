@@ -18,6 +18,9 @@ class User < ApplicationRecord
   # 2. Enums
   enum :oauth_provider, { apple: "apple", google: "google" }
 
+  AGE_GROUPS = { "under_18" => "Under 18", "18_24" => "18–24", "25_34" => "25–34", "35_44" => "35–44", "45_plus" => "45+" }.freeze
+  GENDERS = { "male" => "Male", "female" => "Female", "undisclosed" => "Prefer not to say" }.freeze
+
   # 3. Scopes
 
   # 4. Validations
@@ -74,11 +77,18 @@ class User < ApplicationRecord
   end
 
   def onboarding_requirements
-    begin
-      birthday = Date.iso8601(date_of_birth.to_s)
-      errors.add(:date_of_birth, "must be at least 18 years ago") if birthday > Date.current.years_ago(18)
-    rescue Date::Error
-      errors.add(:date_of_birth, "must be a valid date")
+    if age_group.present?
+      errors.add(:age_group, "is not valid") unless AGE_GROUPS.key?(age_group)
+      errors.add(:age_group, "requires you to be at least 18 years old") if age_group == "under_18"
+      errors.add(:gender, "must be selected") unless GENDERS.key?(gender)
+    else
+      # Keep validating birth dates from older onboarding requests.
+      begin
+        birthday = Date.iso8601(date_of_birth.to_s)
+        errors.add(:date_of_birth, "must be at least 18 years ago") if birthday > Date.current.years_ago(18)
+      rescue Date::Error
+        errors.add(:date_of_birth, "must be a valid date")
+      end
     end
     errors.add(:microphone_confirmed, "must be allowed") unless ActiveModel::Type::Boolean.new.cast(microphone_confirmed)
   end

@@ -1,0 +1,13 @@
+.sign-in-page { display: flex; flex: 1; flex-direction: column; justify-content: center; padding: max(40px, env(safe-area-inset-top)) 24px max(40px, env(safe-area-inset-bottom)); background: #faf9f6; color: #293e35; }
+.sign-in-header { margin-bottom: 36px; text-align: center; }
+.sign-in-logo { display: block; width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 16px; }
+.sign-in-title { font-size: 32px; font-weight: 600; letter-spacing: -.045em; line-height: 1.2; }
+.sign-in-description { margin-top: 12px; color: #78847a; font-size: 13px; line-height: 1.7; }
+.sign-in-notice { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 14px 16px; border: 1px solid #e0e6d9; border-radius: 14px; background: #eef1e9; color: #557565; font-size: 13px; line-height: 1.6; }
+.sign-in-alert { border-color: #e8d9d3; background: #f5ece7; color: #99554c; }
+.sign-in-notice-icon { width: 18px; height: 18px; margin-top: 1px; flex-shrink: 0; }
+.sign-in-actions { display: grid; gap: 12px; }
+.sign-in-actions :is(button, a) { height: auto; min-height: 54px; padding: 14px 16px; border: 1px solid #dce1d5; border-radius: 14px; box-shadow: none; font-weight: 500; }
+.sign-in-actions :is(button, a) span { font-size: 14px; letter-spacing: 0; }
+.sign-in-actions :is(button, a):focus-visible { outline: 2px solid #315b4e; outline-offset: 4px; }
+.sign-in-actions :is(button, a):active { opacity: .8; }

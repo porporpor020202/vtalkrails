@@ -1,4 +1,7 @@
 class VoiceDrop < ApplicationRecord
+  belongs_to :native_language, class_name: "Language"
+  attr_readonly :native_language_id
+
   belongs_to :sender, class_name: "User"
   has_many :voice_messages, dependent: :nullify
   has_many :rooms, through: :voice_messages

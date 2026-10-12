@@ -1,0 +1,33 @@
+.voice-inbox { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; background: white; }
+.voice-inbox-list { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; padding-top: 0; padding-bottom: 28px; overscroll-behavior-y: none; }
+.voice-inbox-row { display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 10px 14px; border-top: 1px solid #ededed; color: #343e38; font-size: 17px; font-weight: 400; }
+.voice-inbox-row:last-child { border-bottom: 1px solid #ededed; }
+.voice-inbox-avatar { width: 48px; height: 48px; background: #f4f5f0; border-radius: 16px; flex-shrink: 0; }
+.voice-inbox-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voice-inbox-count { color: #557f70; font-size: 13px; font-weight: 600; }
+.voice-inbox-time { margin-left: auto; flex-shrink: 0; max-width: 76px; font-size: 14px; text-align: right; }
+.voice-inbox-empty { display: flex; flex: 1; align-items: center; justify-content: center; color: #777; }
+.voice-inbox-controls { flex-shrink: 0; z-index: 30; background: #faf9f6; border-top: 1px solid #e7e5df; }
+.voice-inbox-toolbar { position: relative; display: flex; align-items: center; justify-content: space-between; min-height: 82px; padding: 10px 20px; }
+.voice-inbox-tool { display: flex; align-items: center; justify-content: center; width: 44px; height: 48px; color: #3e655b; cursor: pointer; }
+.voice-inbox-tool svg { width: 25px; height: 25px; }
+.voice-inbox-tool-paused { color: #94958f; }
+.voice-inbox-record { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border: 0; border-radius: 50%; background: #315b4e; color: white; box-shadow: 0 3px 8px rgb(49 91 78 / 12%); cursor: pointer; }
+.voice-inbox-record svg { width: 25px; height: 25px; }
+.voice-inbox-tabs { display: flex; align-items: center; gap: 8px; }
+.voice-inbox-tabs a { display: flex; align-items: center; justify-content: center; width: 40px; height: 48px; border-radius: 14px; }
+.voice-inbox-tabs a svg { width: 25px; height: 25px; }
+.voice-inbox-tabs a[aria-current="page"] { color: #315b4e; }
+.voice-inbox-tool:focus-visible, .voice-inbox-record:focus-visible, .voice-inbox-tabs a:focus-visible { outline: 2px solid #315b4e; outline-offset: 3px; }
+@supports (padding: env(safe-area-inset-bottom)) { .voice-inbox-controls { padding-bottom: env(safe-area-inset-bottom); } }
+
+.voice-inbox-notice { position: fixed; left: 50%; top: 50%; z-index: 50; transform: translate(-50%, -50%); width: max-content; max-width: calc(100% - 40px); padding: 12px 14px; border-radius: 14px; background: rgb(40 40 40 / 80%); color: white; text-align: center; font-size: 18px; font-weight: 400; line-height: 1.35; white-space: pre-line; pointer-events: none; }
+
+
+
+.voice-inbox-header { flex-shrink: 0; padding: max(24px, env(safe-area-inset-top)) 24px 20px; background: #faf9f6; border-bottom: 1px solid #e5e5dc; color: #293e35; }
+.voice-inbox-header p { font-size: 14px; line-height: 1.5; }
+.voice-inbox-header span { margin-right: 5px; color: #78847a; font-size: 12px; }
+.voice-inbox-header strong { font-weight: 600; }
+
+.voice-inbox-refresh { height: 0; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #557f70; font-size: 12px; }

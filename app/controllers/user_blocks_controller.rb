@@ -1,6 +1,6 @@
 class UserBlocksController < ApplicationController
   def create
-    room = Room.involving(current_user).find(params[:room_id])
+    room = Room.accessible_to(current_user).find(params[:room_id])
     blocked_user = room.opponent_for(current_user)
 
     ApplicationRecord.transaction do

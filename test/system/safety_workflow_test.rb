@@ -7,6 +7,7 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
   setup do
     @sender = users(:english_native)
     @recipient = users(:korean_native)
+    @recipient.update!(native_language: @sender.native_language)
     @admin = users(:japanese_native)
     @admin.update!(admin: true, native_language: languages(:korean))
 
@@ -14,6 +15,8 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     complete_onboarding(@recipient)
     complete_onboarding(@admin)
 
+    @sender.reload
+    @recipient.reload
     @room = Room.create!(host: @sender, opponent: @recipient)
     create_voice_message(room: @room, sender: @sender)
   end
@@ -28,8 +31,10 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
 
         # 별도 안전 화면으로 이동해야 차단 버튼을 찾는 구조를 방지한다.
         # 두 버튼 모두 현재 Room 화면에서 사용자에게 보여야 한다.
-        assert_button "Report user"
-        assert_button "Block user"
+        assert_link "Report or block"
+        within "header" do
+          assert_button "Block user"
+        end
         assert_current_path room_path(@room)
 
         # 버튼을 표시하는 것만으로 신고나 차단이 실행되면 안 된다.
@@ -162,18 +167,20 @@ class SafetyWorkflowTest < ApplicationSystemTestCase
     # 이후 신고·차단 테스트가 미완료 사용자 때문에 실패하지 않게 한다.
     as_user(user) do
       sign_in(user: user)
-      select native, from: "user_native_language_id"
+      click_button native
+      click_button "18–24"
+      click_button "Prefer not to say"
       # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
-      check "user_community_rules_accepted"
-      fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
+
+
       page.execute_script(<<~JS)
         navigator.mediaDevices.getUserMedia = async () => ({
           getTracks() { return [{ stop() {} }]; }
         });
       JS
       click_button "Allow microphone"
-      assert_text "Microphone access allowed"
-      click_button "Continue"
+      assert_text "A space for real conversations"
+      click_button "Agree and start"
       assert_current_path root_path, wait: 5
     end
   end

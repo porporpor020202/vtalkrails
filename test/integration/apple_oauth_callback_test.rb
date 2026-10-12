@@ -26,7 +26,7 @@ class AppleOauthCallbackTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_select "form[action='#{onboarding_path}']" do
-      assert_select "select[name='user[native_language_id]']"
+      assert_select "input[type='hidden'][name='user[native_language_id]']"
     end
   end
 

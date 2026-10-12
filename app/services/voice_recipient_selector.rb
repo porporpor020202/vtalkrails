@@ -8,9 +8,12 @@ class VoiceRecipientSelector
   end
 
   def self.recipients(sender:)
+    return User.none if sender.native_language_id.nil?
+
     now = Time.current
 
     User.where.not(id: sender.id)
+      .where(native_language_id: sender.native_language_id)
       .where.not(id: UserBlock.where(blocker: sender).select(:blocked_id))
       .where.not(id: UserBlock.where(blocked: sender).select(:blocker_id))
       .where.not(age_confirmed_at: nil)

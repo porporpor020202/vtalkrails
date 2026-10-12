@@ -43,7 +43,9 @@
         <%= yield %>
       </main>
 
-      <% unless content_for?(:hide_bottom_nav) %>
+      <% if content_for?(:voice_toolbar) || %w[profile language_setups feedbacks].include?(controller_path) || (controller_path == "pages" && action_name == "support") %>
+        <%= render "shared/voice_toolbar" %>
+      <% elsif !content_for?(:hide_bottom_nav) %>
         <%= render "shared/bottom_nav" %>
       <% end %>
     </div>

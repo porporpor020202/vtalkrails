@@ -1,19 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["native", "continue", "microphoneStatus", "microphoneConfirmed", "birthday", "nativeGuidance", "ageGuidance", "rules"]
+  static targets = ["step", "progress", "progressFill", "stepCount", "native", "age", "gender", "microphoneConfirmed", "microphoneStatus", "microphoneButton", "rules", "continue", "languageOption", "noResults", "ageError", "signOut", "form"]
 
   connect() {
-    this.microphoneGranted = false
-    this.sync()
-    if (this.hasContinueTarget && navigator.permissions) {
+    this.currentStep = 0
+    this.microphoneConfirmedTarget.value = "0"
+    this.rulesTarget.value = "0"
+    this.showStep()
+    if (navigator.permissions) {
       navigator.permissions.query({ name: "microphone" }).then(permission => {
         if (!this.element.isConnected) return
         this.permission = permission
         this.permissionChanged = () => {
           if (permission.state !== "granted") {
-            this.microphoneGranted = false
-            this.sync()
+            this.microphoneConfirmedTarget.value = "0"
+            this.microphoneStatusTarget.textContent = "Microphone access was not allowed. Enable it in your browser or device settings, then try again."
+            if (this.currentStep > 3) { this.currentStep = 3; this.showStep() }
           }
         }
         permission.addEventListener("change", this.permissionChanged)
@@ -21,49 +24,64 @@ export default class extends Controller {
     }
   }
 
-  disconnect() {
-    this.permission?.removeEventListener("change", this.permissionChanged)
+  disconnect() { this.permission?.removeEventListener("change", this.permissionChanged) }
+
+  back() {
+    if (this.currentStep === 0) { this.signOutTarget.requestSubmit(); return }
+    this.currentStep -= 1
+    this.showStep()
   }
 
-  validate(event) {
-    this.sync()
-    if (this.continueTarget.disabled) event.preventDefault()
+  next() { this.currentStep += 1; this.showStep() }
+
+  showStep() {
+    this.stepTargets.forEach((step, index) => { step.hidden = index !== this.currentStep })
+    this.progressTarget.setAttribute("aria-valuenow", String(this.currentStep + 1))
+    this.progressFillTarget.style.width = `${(this.currentStep + 1) * 20}%`
+    this.stepCountTarget.textContent = `${this.currentStep + 1} / 5`
+    this.continueTarget.disabled = this.microphoneConfirmedTarget.value !== "1"
+    if (this.currentStep > 0) this.stepTargets[this.currentStep].querySelector("h1")?.setAttribute("tabindex", "-1")
+    this.stepTargets[this.currentStep].querySelector("h1")?.focus({ preventScroll: true })
+    this.element.closest("main").scrollTop = 0
   }
 
-  formatBirthday() {
-    const digits = this.birthdayTarget.value.replace(/\D/g, "").slice(0, 8)
-    this.birthdayTarget.value = [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)].filter(Boolean).join("-")
-    this.sync()
+  chooseLanguage(event) { this.nativeTarget.value = event.currentTarget.dataset.value; this.next() }
+  chooseAge(event) {
+    this.ageTarget.value = event.currentTarget.dataset.value
+    this.ageErrorTarget.hidden = this.ageTarget.value !== "under_18"
+    if (this.ageErrorTarget.hidden) this.next()
   }
+  chooseGender(event) { this.genderTarget.value = event.currentTarget.dataset.value; this.next() }
 
-  sync() {
-    this.nativeGuidanceTarget.hidden = !!this.nativeTarget.value
-    this.microphoneStatusTarget.textContent = this.microphoneGranted ? "Microphone access allowed" : "Microphone access is denied. Please enable microphone access."
-    this.microphoneConfirmedTarget.value = this.microphoneGranted ? "1" : "0"
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const birthday = new Date(`${this.birthdayTarget.value}T00:00:00`)
-    const adultBirthday = new Date(today)
-    adultBirthday.setFullYear(today.getFullYear() - 18)
-    const adult = !Number.isNaN(birthday.getTime()) && birthday <= adultBirthday
-    this.ageGuidanceTarget.hidden = adult
-    this.ageGuidanceTarget.textContent = !this.birthdayTarget.value ? "Please enter your date of birth." :
-      Number.isNaN(birthday.getTime()) || birthday > today ? "Please enter a valid date of birth." : "You must be at least 18 years old."
-    this.continueTarget.disabled = !(this.nativeTarget.value && this.microphoneGranted && adult && this.rulesTarget.checked)
+  search(event) {
+    const query = event.target.value.trim().toLowerCase()
+    this.languageOptionTargets.forEach(option => { option.hidden = !option.dataset.label.toLowerCase().includes(query) })
+    this.noResultsTarget.hidden = this.languageOptionTargets.some(option => !option.hidden)
   }
 
   async requestMicrophone() {
-    this.microphoneGranted = false
-    this.sync()
+    this.microphoneButtonTarget.disabled = true
+    this.microphoneStatusTarget.textContent = "Waiting for microphone permission…"
+    this.microphoneConfirmedTarget.value = "0"
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      for (const track of stream.getTracks()) track.stop()
-      this.microphoneGranted = true
+      stream.getTracks().forEach(track => track.stop())
+      if (!this.element.isConnected) return
+      this.microphoneConfirmedTarget.value = "1"
+      this.microphoneStatusTarget.textContent = "Microphone access allowed."
+      if (this.currentStep === 3) this.next()
     } catch {
-      this.microphoneGranted = false
+      if (this.element.isConnected) this.microphoneStatusTarget.textContent = "Microphone access was not allowed. Enable it in your browser or device settings, then try again."
     } finally {
-      if (this.element.isConnected) this.sync()
+      if (this.element.isConnected) this.microphoneButtonTarget.disabled = false
     }
+  }
+
+  validate(event) {
+    if (this.currentStep !== 4 || !this.nativeTarget.value || !["18_24", "25_34", "35_44", "45_plus"].includes(this.ageTarget.value) || !this.genderTarget.value || this.microphoneConfirmedTarget.value !== "1") {
+      event.preventDefault()
+      return
+    }
+    this.rulesTarget.value = "1"
   }
 }

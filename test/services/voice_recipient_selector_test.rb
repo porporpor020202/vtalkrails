@@ -95,24 +95,21 @@ class VoiceRecipientSelectorTest < ActiveSupport::TestCase
     assert_empty recipient_ids
   end
 
-  test "모국어와 관계없이 학습 언어가 없는 사용자도 수신자로 선택한다" do
-    # 영어 대화 앱이지만 영어 원어민만 매칭하는 앱은 아니다.
-    # 서로 다른 모국어를 가진 후보 모두 학습 언어 없이 수신할 수 있어야 한다.
-    [ :english, :korean, :spanish, :japanese ].each do |native|
-      candidate = create_candidate(native_language: languages(native))
-      assert_nil candidate.attributes["learning_language_id"]
-      assert_equal [ candidate.id ], recipient_ids, "#{native} 모국어도 수신 가능해야 한다"
-      candidate.update!(last_active_at: nil)
-    end
+  test "같은 모국어 사용자만 수신자로 선택한다" do
+    same_language = create_candidate(native_language: languages(:english))
+    create_candidate(native_language: languages(:spanish))
+    create_candidate(native_language: languages(:japanese))
+
+    assert_equal [same_language.id], recipient_ids
   end
 
-  test "발신자의 모국어도 수신자 선정에 영향을 주지 않는다" do
-    candidate = create_candidate(native_language: languages(:spanish))
-    # 발신자의 모국어를 바꿔도 동일한 수신 가능 후보가 선택되어야 한다.
-    [ :english, :korean, :japanese ].each do |native|
-      @sender.update!(native_language: languages(native))
-      assert_equal [ candidate.id ], recipient_ids
-    end
+  test "모국어를 변경하면 새로운 언어의 수신자만 선택한다" do
+    english = create_candidate(native_language: languages(:english))
+    spanish = create_candidate(native_language: languages(:spanish))
+    assert_equal [english.id], recipient_ids
+
+    @sender.update!(native_language: languages(:spanish))
+    assert_equal [spanish.id], recipient_ids
   end
 
   test "발신자는 최근 접속했어도 수신자에서 제외한다" do

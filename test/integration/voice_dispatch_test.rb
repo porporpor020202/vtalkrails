@@ -9,7 +9,7 @@ class VoiceDispatchTest < ActionDispatch::IntegrationTest
 
     @recipients = [ users(:korean_native), users(:spanish_native) ]
     @recipients.each do |user|
-      user.update!(native_language: languages(:korean), last_active_at: Time.current)
+      user.update!(native_language: @sender.native_language, last_active_at: Time.current)
     end
     @outsider = users(:japanese_native)
     @outsider.update!(last_active_at: nil)
@@ -27,7 +27,7 @@ class VoiceDispatchTest < ActionDispatch::IntegrationTest
     rooms = Room.where.not(id: previous_ids)
     assert_equal @recipients.map(&:id).sort, rooms.pluck(:opponent_id).sort
     assert_equal [ @sender.id ], rooms.distinct.pluck(:host_id)
-    rooms.each { |room| assert_nil room.attributes["language_id"] }
+    rooms.each { |room| assert_equal @sender.native_language, room.native_language }
     assert_equal @recipients.size, response.parsed_body.fetch("recipient_count")
   end
 

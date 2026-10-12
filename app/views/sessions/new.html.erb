@@ -4,15 +4,16 @@
   <meta name="turbo-cache-control" content="no-cache">
 <% end %>
 
-<div class="flex flex-col flex-1 px-6 justify-center" data-controller="auth-history" data-action="pageshow@window->auth-history#restore">
-  <div class="mb-10 text-center">
-    <img src="/say_one_thing_icon.png" class="mx-auto mb-7 h-24 w-24 rounded-[20px]" />
-    <h1 class="mt-3 text-[2.7rem] font-black leading-[0.98] tracking-[-0.06em]">Say One Thing</h1>
+<div class="sign-in-page" data-controller="auth-history" data-action="pageshow@window->auth-history#restore">
+  <div class="sign-in-header">
+    <img src="/say_one_thing_icon.png" class="sign-in-logo" alt="" width="64" height="64" />
+    <h1 class="sign-in-title">Say One Thing</h1>
+    <p class="sign-in-description">Sign in to start a conversation.</p>
   </div>
 
   <% if notice.present? %>
-    <div class="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-      <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <div class="sign-in-notice" role="status">
+      <svg class="sign-in-notice-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
       </svg>
       <span><%= notice %></span>
@@ -20,15 +21,15 @@
   <% end %>
 
   <% if alert.present? %>
-    <div class="mb-5 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
-      <svg class="mt-0.5 h-5 w-5 shrink-0 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <div class="sign-in-notice sign-in-alert" role="alert">
+      <svg class="sign-in-notice-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <span><%= alert %></span>
     </div>
   <% end %>
 
-  <div class="space-y-3">
+  <div class="sign-in-actions">
     <%= render "shared/sign_in_with_google" %>
     <%= render "shared/sign_in_with_apple" %>
   </div>

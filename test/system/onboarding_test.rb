@@ -22,9 +22,10 @@ class OnboardingTest < ApplicationSystemTestCase
   end
 
   test "온보딩에서 모국어를 선택할 수 있다" do
-    select "Korean", from: "user_native_language_id"
+    click_button "Korean"
 
-    assert_select "user_native_language_id", selected: "Korean"
+    assert_selector "h1", text: "How old are you?"
+    assert_equal languages(:korean).id.to_s, find("#user_native_language_id", visible: :all).value
   end
 
   test "온보딩에는 학습 언어 입력이 없다" do
@@ -46,7 +47,7 @@ class OnboardingTest < ApplicationSystemTestCase
   end
 
   test "온보딩에서 Sign Out을 누르면 로그아웃된다" do
-    click_button "Sign Out"
+    click_button "Back", enable_aria_label: true
 
     assert_current_path new_session_path, wait: 5
     assert_text "You have signed out."
@@ -72,7 +73,7 @@ class OnboardingTest < ApplicationSystemTestCase
       visit onboarding_path
 
       assert_current_path onboarding_path
-      assert_selector "#user_native_language_id"
+      assert_selector "#user_native_language_id", visible: :all
 
       assert_equal 1, generated_names.size
       assert generated_names.first.present?

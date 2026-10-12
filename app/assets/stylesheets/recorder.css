@@ -1,0 +1,25 @@
+.recorder-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: 16px; background: rgb(29 45 38 / 45%); }
+.recorder-overlay.hidden { display: none; }
+.recorder-sheet { width: 100%; max-width: 398px; max-height: 85dvh; overflow-y: auto; padding: 24px 24px max(32px, env(safe-area-inset-bottom)); border: 1px solid #e5e8de; border-radius: 24px; background: #faf9f6; color: #293e35; }
+.recorder-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.recorder-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #78847a; }
+.recorder-header h2 { margin-top: 6px; font-size: 24px; font-weight: 600; letter-spacing: -.04em; }
+.recorder-close { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: #edf0e8; color: #557565; cursor: pointer; }
+.recorder-close svg { width: 20px; height: 20px; }
+.recorder-hint { margin-top: 20px; color: #78847a; font-size: 12px; line-height: 1.6; }
+.recorder-timer { margin: 32px 0 24px; text-align: center; font-size: 56px; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -.05em; line-height: 1.2; }
+.recorder-status { margin-bottom: 20px; color: #557565; font-size: 13px; line-height: 1.6; text-align: center; }
+.recorder-status[role="alert"] { color: #99554c; }
+.recorder-controls { display: flex; justify-content: center; }
+.recorder-record, .recorder-stop { display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; background: #315b4e; color: #fff; box-shadow: 0 0 0 8px #e4eade; cursor: pointer; }
+.recorder-record.hidden, .recorder-stop.hidden { display: none; }
+.recorder-stop { background: #99554c; box-shadow: 0 0 0 8px #f0e4de; }
+.recorder-controls svg { width: 30px; height: 30px; }
+.recorder-preview { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e5dc; }
+.recorder-playback { display: flex; justify-content: center; }
+.recorder-play { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: #e4eade; color: #315b4e; cursor: pointer; }
+.recorder-play svg { width: 26px; height: 26px; }
+.recorder-preview-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.recorder-sheet .recorder-again { border-color: #dce1d5; background: transparent; color: #557565; }
+.recorder-sheet button:focus-visible { outline: 2px solid #315b4e; outline-offset: 4px; }
+.recorder-sheet button:disabled { opacity: .6; cursor: wait; }

@@ -26,15 +26,15 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
 
     # getUserMedia를 교체하지 않고 실제 브라우저의 거부 결과를 검사한다.
     # 닫아야 하는 dialog 대신 다음 행동을 설명하는 텍스트를 유지한다.
-    assert_text "Microphone access is denied. Please enable microphone access."
+    assert_text "Microphone access was not allowed."
     assert_no_selector "dialog[open]"
-    assert_button "Continue", disabled: true
+    assert_no_button "Agree and start"
     assert_button "Allow microphone", disabled: false
 
     # 같은 권한 상태로 재시도해도 안내가 사라지거나 완료되면 안 된다.
     click_button "Allow microphone"
-    assert_text "Microphone access is denied. Please enable microphone access."
-    assert_button "Continue", disabled: true
+    assert_text "Microphone access was not allowed."
+    assert_no_button "Agree and start"
     assert_current_path onboarding_path
     assert_nil @user.reload.native_language
     assert_nil @user.attributes["learning_language_id"]
@@ -46,18 +46,18 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
     set_microphone_permission("denied")
     click_button "Allow microphone"
 
-    assert_text "Microphone access is denied. Please enable microphone access."
-    assert_button "Continue", disabled: true
+    assert_text "Microphone access was not allowed."
+    assert_no_button "Agree and start"
 
     # 사용자가 설정에서 차단을 해제한 상황을 같은 페이지에서 재현한다.
     set_microphone_permission("granted")
     click_button "Allow microphone"
 
-    assert_text "Microphone access allowed"
-    assert_no_text "Microphone access is denied. Please enable microphone access."
-    assert_button "Continue", disabled: false
+    assert_text "A space for real conversations"
+    assert_no_text "Microphone access was not allowed."
+    assert_button "Agree and start", disabled: false
 
-    click_button "Continue"
+    click_button "Agree and start"
 
     assert_current_path root_path, wait: 5
     assert @user.reload.onboarding_complete?
@@ -70,15 +70,15 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
     set_microphone_permission("granted")
     click_button "Allow microphone"
 
-    assert_text "Microphone access allowed"
-    assert_button "Continue", disabled: false
+    assert_text "A space for real conversations"
+    assert_button "Agree and start", disabled: false
 
     # 이전 허용 결과만 기억하면 실제 권한이 없어도 완료할 수 있다.
     # 설정 변경을 감지해 안내와 버튼 상태를 현재 권한에 맞춰 되돌려야 한다.
     set_microphone_permission("denied")
 
-    assert_text "Microphone access is denied. Please enable microphone access."
-    assert_button "Continue", disabled: true
+    assert_text "Microphone access was not allowed."
+    assert_no_button "Agree and start"
     assert_current_path onboarding_path
     assert_not @user.reload.onboarding_complete?
   end
@@ -86,10 +86,12 @@ class OnboardingMicrophonePermissionTest < ApplicationSystemTestCase
   private
 
   def select_languages_and_age
-    select "Korean", from: "user_native_language_id"
+    click_button "Korean"
+    click_button "18–24"
+    click_button "Prefer not to say"
     # 이 테스트의 정상 완료 조건에는 필수 이용정책 동의도 포함한다.
-    check "user_community_rules_accepted"
-    fill_in "Date of birth", with: Date.current.years_ago(20).iso8601
+
+
   end
 
   def set_microphone_permission(setting)

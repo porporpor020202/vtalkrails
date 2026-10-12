@@ -37,7 +37,6 @@ export default class extends Controller {
   }
 
   closeSheet() {
-    this.dispatch("closed")
     this.recordingGeneration += 1
     if (this.recorder?.state === "recording") this.recorder.stop()
     this.releaseMedia()
@@ -47,7 +46,6 @@ export default class extends Controller {
   }
 
   async startRecording() {
-    this.dispatch("recording")
     const generation = ++this.recordingGeneration
     this.recordingMessageTarget.removeAttribute("role")
     this.recordingMessageTarget.textContent = "Recording…"
@@ -103,15 +101,6 @@ export default class extends Controller {
     if (this.recorder?.state === "recording") this.recorder.stop()
   }
 
-  stopForHelper() {
-    if (this.recorder?.state === "recording") {
-      this.stopRecording()
-    } else {
-      // Invalidate microphone permission requests that are still pending.
-      this.recordingGeneration += 1
-    }
-  }
-
   discard() {
     this.recordingGeneration += 1
     this.revokePreviewURL()
@@ -161,7 +150,7 @@ export default class extends Controller {
     this.durationMs = Math.max(1, Math.round(elapsed))
     const seconds = Math.floor(elapsed / 1000)
     this.timerTarget.textContent = `00:${String(seconds).padStart(2, "0")}`
-    if (elapsed >= this.maxDurationValue) this.stop()
+    if (elapsed >= this.maxDurationValue) this.stopRecording()
   }
 
   finishRecording() {
@@ -213,6 +202,7 @@ export default class extends Controller {
   }
 
   revokePreviewURL() {
+    this.previewTarget.pause()
     if (this.previewURL) URL.revokeObjectURL(this.previewURL)
     this.previewURL = null
   }
@@ -227,6 +217,7 @@ export default class extends Controller {
     this.recordingMessageTarget.classList.add("hidden")
     this.recordingMessageTarget.textContent = "Recording…"
     this.timerTarget.textContent = "00:00"
+    this.previewTarget.pause()
     this.previewTarget.removeAttribute("src")
     this.previewAreaTarget.classList.add("hidden")
     this.sendButtonTarget.disabled = false
