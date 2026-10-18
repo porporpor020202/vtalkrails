@@ -5,8 +5,8 @@ class AppleOauthPageAccessTest < RemoteOriginTestCase
     test "r_#{origin}에서 Apple OAuth 로그인 페이지에 접속할 수 있다" do
       visit "#{origin}/session/new"
       assert_current_path "#{origin}/session/new", url: true, wait: 4
-      assert_selector "button", text: "Continue with Apple", wait: 4
-      click_button "Continue with Apple"
+      assert_selector "button", text: "애플로 시작하기", wait: 4
+      click_button "애플로 시작하기"
 
       assert_selector "h1#contentheader", text: "Use your Apple Account to sign in to Say One Thing.", normalize_ws: true, wait: 4
     end

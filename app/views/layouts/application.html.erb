@@ -1,53 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
-    <title><%= content_for(:title) || "Say One Thing" %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <% csrf_tags = csrf_meta_tags %>
-    <% if csrf_tags.present? %>
-      <%= csrf_tags %>
-    <% else %>
-      <%= tag.meta name: "csrf-token", content: form_authenticity_token %>
-    <% end %>
+    <title><%= content_for(:title) || "세이원띵 - Say One Thing · 하루 한 문장" %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="질문 하나, 영어 한 문장. 매일 짧게 말하고 나만의 연속 기록을 쌓으세요.">
+    <meta name="turbo-cache-control" content="no-cache">
+    <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/say_one_thing_icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-
-  <body class="h-dvh overflow-hidden select-none bg-slate-200">
-    <div id="app-shell" class="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#FFF7F2] [contain:layout]">
-
-      <% if dev_mode? %>
-        <div class="fixed top-4 right-3 z-[9999] pointer-events-none">
-          <span class="rounded-full border border-amber-300 bg-amber-400 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-amber-950 shadow-md">DEV</span>
-        </div>
-      <% end %>
-
-      <main class="flex-1 min-h-0 overflow-y-auto flex flex-col">
-        <% unless content_for?(:hide_flash) %>
-          <% flash.each do |type, message| %>
-            <% next if type == "reception_notice" %>
-            <p role="<%= type == "alert" ? "alert" : "status" %>" class="px-5 py-3 text-sm"><%= message %></p>
-          <% end %>
+  <body>
+    <div id="app-shell">
+      <% if dev_mode? %><span class="development-badge">DEV</span><% end %>
+      <main>
+        <% flash.each do |type, message| %>
+          <p class="flash" role="<%= type == "alert" ? "alert" : "status" %>"><%= message %></p>
         <% end %>
         <%= yield %>
       </main>
-
-      <% if content_for?(:voice_toolbar) || %w[profile language_setups feedbacks].include?(controller_path) || (controller_path == "pages" && action_name == "support") %>
-        <%= render "shared/voice_toolbar" %>
-      <% elsif !content_for?(:hide_bottom_nav) %>
-        <%= render "shared/bottom_nav" %>
-      <% end %>
     </div>
   </body>
 </html>

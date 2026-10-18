@@ -3,7 +3,6 @@ module Authentication
 
   included do
     before_action :require_authentication
-    before_action :record_user_activity
     helper_method :authenticated?, :current_user
   end
 
@@ -24,10 +23,6 @@ module Authentication
 
     def require_authentication
       resume_session || request_authentication
-    end
-
-    def record_user_activity
-      current_user.update_column(:last_active_at, Time.current) if authenticated?
     end
 
     def resume_session

@@ -3,7 +3,10 @@ require "minitest/mock"
 require "uri"
 
 class GoogleOauthCallbackTest < ActionDispatch::IntegrationTest
-  setup { Current.reset }
+  setup do
+    Current.reset
+    DailyQuestion.create!(asked_on: Date.current, question: "What made you smile today?", source: "sample")
+  end
   teardown { Current.reset }
 
   test "r_Google 콜백으로 신규 사용자를 생성하고 로그인한다-web" do
@@ -20,59 +23,20 @@ class GoogleOauthCallbackTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id].present?
     assert_redirected_to root_url
     follow_redirect!
-    assert_redirected_to onboarding_url
-
-    follow_redirect!
     assert_response :success
-    assert_select "form[action='#{onboarding_path}']" do
-      assert_select "input[type='hidden'][name='user[native_language_id]']"
-    end
+    assert_select "#daily-question"
+    assert_not User.column_names.include?("display_name")
   end
 
-  test "r_Google OAuth 가입 직후 모국어와 닉네임은 NULL이다" do
-    uid = "google-test-#{SecureRandom.hex(8)}"
-
-    complete_google_callback(uid: uid, email: "#{uid}@example.com")
-
-    user = User.find_by!(oauth_provider: "google", oauth_uid: uid)
-    assert_nil user.native_language
-    assert_nil user.display_name
-    assert_redirected_to root_url
-    follow_redirect!
-    assert_redirected_to onboarding_url
-  end
-
-  test "r_Google 재로그인 시 닉네임이나 모국어 중 하나라도 없으면 온보딩으로 이동한다" do
-    scenarios = [
-      { display_name: nil, native_language: languages(:korean) },
-      { display_name: "Calm Tiger", native_language: nil }
-    ]
-
-    scenarios.each do |scenario|
-      reset!
-      Current.reset
-
-      user = users(:korean_native)
-      user.update!(scenario)
-
-      assert_no_difference "User.count" do
-        complete_google_callback(uid: user.oauth_uid, email: user.email_address)
-      end
-
-      assert_redirected_to root_url
-      follow_redirect!
-      assert_redirected_to onboarding_url
-    end
-  end
-
-  test "r_Google 재로그인 시 모국어와 닉네임이 모두 있으면 홈으로 이동한다" do
+  test "returning users go directly to daily practice" do
     user = users(:korean_native)
-
     assert_no_difference "User.count" do
       complete_google_callback(uid: user.oauth_uid, email: user.email_address)
     end
-
     assert_redirected_to root_url
+    follow_redirect!
+    assert_response :success
+    assert_select "#daily-question"
   end
 
   private

@@ -1,44 +1,16 @@
-# Store review account setup
+# 세이원띵 스토어 심사 안내
 
-Use two real OAuth accounts. Do not add a guest login and do not commit either password to this repository.
+세이원띵 - Say One Thing은 한국어 사용자를 위한 개인 영어 말하기 연습 앱입니다. 분류는 교육이며 사용자 간 채팅이나 매칭은 없습니다.
 
-## Accounts
+## 심사 흐름
 
-| Store | Review login | App button |
-| --- | --- | --- |
-| Apple App Store | One dedicated Apple Account | Continue with Apple |
-| Google Play | One dedicated Google Account | Continue with Google |
+1. 제공된 심사 계정으로 구글 또는 애플 로그인을 합니다.
+2. 오늘의 질문과 한국어 번역을 확인합니다.
+3. '이거 영어로 뭐라 말해요?'에 한국어 답을 입력하고 영어 표현·IPA를 확인합니다.
+4. 창 안에서 마이크 권한을 허용하고 1~60초 녹음합니다.
+5. 녹음을 재생한 뒤 전송합니다.
+6. 완료 화면에서 연속 연습 일수와 다음 질문까지 남은 시간을 확인합니다.
 
-Both accounts must remain enabled for initial review and future update reviews. Each account must be used to sign in to the production app at least once so that its normal `User` record exists.
+완료는 한국 시간 기준 하루 한 번입니다. 다음 질문은 자정에 열립니다. 심사 계정 비밀번호는 저장소에 기록하지 않습니다. Apple 개발자 약관 갱신, 개인정보 거절 사유 및 Google Play 데이터 보안 고지는 콘솔에서 별도로 해결해야 합니다.
 
-The two accounts act as each other's listener. The dispatcher currently keeps all registered users eligible even when their `last_active_at` value is older than seven days, so no guest or continuously active listener account is required.
-
-## Before every submission
-
-1. Deploy the production server and confirm `https://vtalks.net/up` returns a successful response.
-2. Sign in once with the dedicated Apple review account.
-3. Sign in once with the dedicated Google review account.
-4. From one account, record and send a voice message.
-5. From the other account, open the conversation, play the message, and send a reply.
-6. Leave that conversation in place so the reviewer immediately sees working sample content.
-7. Confirm that neither OAuth provider asks for an unknown recovery method or an unavailable second factor.
-
-## App Store Connect
-
-Select **Sign-in required** and enter the dedicated Apple review account credentials.
-
-Suggested review notes:
-
-> Tap "Continue with Apple" and sign in with the review account provided above. The account has full access to the production service. A sample voice conversation is already available. Open the conversation to play the existing message, then record and send a reply. No guest login, subscription, invitation code, or location restriction is required.
-
-## Google Play Console
-
-Open **Policy and programs → App content → Sign-in details**, then add the dedicated Google review account credentials.
-
-Suggested access instructions:
-
-> Tap "Continue with Google" and select "Use another account" if an account chooser appears. Sign in with the review account provided here. The account has full access to the production service. A sample voice conversation is already available. Open the conversation to play the existing message, then record and send a reply. No guest login, subscription, invitation code, or location restriction is required.
-
-## After approval
-
-Keep both accounts available because every app update can be reviewed again. If the seven-day production activity rule is restored later, provide a separate permanent review exception before re-enabling the commented `active_since` scope.
+스크린샷과 실제 배포 서비스가 같은 기능을 제공하는지 확인한 뒤 심사를 제출합니다.

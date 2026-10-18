@@ -1,5 +1,4 @@
 class GoogleOauthSessionsController < ApplicationController
-  skip_before_action :require_onboarding
   allow_unauthenticated_access
   skip_before_action :verify_authenticity_token, only: :native_authenticate
 
@@ -50,7 +49,7 @@ class GoogleOauthSessionsController < ApplicationController
       client_id: client_id,
       redirect_uri: callback_uri,
       response_type: "code",
-      scope: "openid email profile",
+      scope: "openid email",
       state: state,
       nonce: nonce
     }.to_query

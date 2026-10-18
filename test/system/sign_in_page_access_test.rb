@@ -6,7 +6,7 @@ class SignInPageAccessTest < RemoteOriginTestCase
       visit "#{origin}/session/new"
 
       assert_current_path "#{origin}/session/new", url: true, wait: 4
-      assert_selector "h1", exact_text: "Say One Thing", wait: 4
+      assert_selector "h1", exact_text: "세이원띵", wait: 4
     end
   end
 end

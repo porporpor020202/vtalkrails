@@ -1,0 +1,8 @@
+<%= turbo_frame_tag "question-translation" do %>
+  <% if @error %>
+    <p class="help-error" role="alert"><%= @error %></p>
+    <%= render "language_helps/question_button" %>
+  <% else %>
+    <details class="question-translation" open><summary>번역 보기 / 숨기기</summary><p lang="ko"><%= @translation %></p></details>
+  <% end %>
+<% end %>

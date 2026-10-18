@@ -1,13 +1,23 @@
-.sign-in-page { display: flex; flex: 1; flex-direction: column; justify-content: center; padding: max(40px, env(safe-area-inset-top)) 24px max(40px, env(safe-area-inset-bottom)); background: #faf9f6; color: #293e35; }
-.sign-in-header { margin-bottom: 36px; text-align: center; }
-.sign-in-logo { display: block; width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 16px; }
-.sign-in-title { font-size: 32px; font-weight: 600; letter-spacing: -.045em; line-height: 1.2; }
-.sign-in-description { margin-top: 12px; color: #78847a; font-size: 13px; line-height: 1.7; }
-.sign-in-notice { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 14px 16px; border: 1px solid #e0e6d9; border-radius: 14px; background: #eef1e9; color: #557565; font-size: 13px; line-height: 1.6; }
-.sign-in-alert { border-color: #e8d9d3; background: #f5ece7; color: #99554c; }
-.sign-in-notice-icon { width: 18px; height: 18px; margin-top: 1px; flex-shrink: 0; }
+.sign-in-page { min-height: 100dvh; padding: max(44px, env(safe-area-inset-top)) 28px max(32px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; justify-content: center; }
+.sign-in-header { text-align: center; margin-bottom: 52px; }
+.sign-in-mark { position: relative; width: 100px; height: 100px; margin: 0 auto 30px; }
+.sign-in-mark > svg { width: 100%; height: 100%; transform: rotate(-7deg); }
+.sign-in-spark { position: absolute; color: #c1a15b; top: -3px; right: -17px; font-size: 23px; }
+.sign-in-title { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 35px; font-weight: 400; line-height: 1.25; color: var(--ink); letter-spacing: -1.6px; }
+.sign-in-description { margin: 17px 0 0; color: #7d8974; font-size: 13px; line-height: 1.8; letter-spacing: -.2px; }
 .sign-in-actions { display: grid; gap: 12px; }
-.sign-in-actions :is(button, a) { height: auto; min-height: 54px; padding: 14px 16px; border: 1px solid #dce1d5; border-radius: 14px; box-shadow: none; font-weight: 500; }
-.sign-in-actions :is(button, a) span { font-size: 14px; letter-spacing: 0; }
-.sign-in-actions :is(button, a):focus-visible { outline: 2px solid #315b4e; outline-offset: 4px; }
-.sign-in-actions :is(button, a):active { opacity: .8; }
+.sign-in-actions form { margin: 0; width: 100%; }
+.sign-in-actions .provider-button { position: relative; display: flex; width: 100%; min-height: 56px; align-items: center; justify-content: center; gap: 11px; padding: 16px; border: 1px solid #dde2d6; border-radius: 16px; text-decoration: none; font-size: 14px; font-weight: 500; background: #fffefa; color: #35463c; box-shadow: none; transition: background .15s, transform .15s; }
+.sign-in-actions .provider-button:active { transform: scale(.985); }
+.sign-in-actions .provider-apple { background: #293e33; border-color: #293e33; color: #fffdf7; }
+.sign-in-actions .provider-google:hover { background: #f0f3e9; }
+.sign-in-actions .provider-apple:hover { background: #34523f; }
+.sign-in-actions img, .sign-in-actions svg { flex: 0 0 19px; width: 19px; height: 19px; }
+.sign-in-privacy { margin: 25px 0 0; text-align: center; color: #8c9683; font-size: 11px; }
+.sign-in-privacy a { text-decoration: none; text-underline-offset: 4px; }
+.sign-in-privacy a:hover { text-decoration: underline; }
+@media (max-width: 350px) { .sign-in-page { padding-inline: 24px; } .sign-in-title { font-size: 31px; } }
+@media (max-height: 620px) { .sign-in-header { margin-bottom: 32px; } .sign-in-mark { width: 78px; height: 78px; margin-bottom: 22px; } }
+
+.sign-in-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 650; letter-spacing: -1.7px; }
+.sign-in-english-brand { margin: 8px 0 0; color: #7d8974; font-family: Georgia, serif; font-size: 17px; }
