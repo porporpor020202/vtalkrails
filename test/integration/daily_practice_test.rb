@@ -16,7 +16,8 @@ class DailyPracticeAccessTest < ActionDispatch::IntegrationTest
     assert_select "#daily-question", text: question_for.question
     %w[display_name gender age_group age_confirmed_at onboarding_completed_at].each { |column| assert_not User.column_names.include?(column) }
     assert_select "a[href='/profile']", count: 0
-    assert_select ".recording-controls button[aria-label='녹음 시작']", count: 1
+    assert_select ".recording-controls button[aria-label='녹음 시작'][hidden][disabled]", count: 1
+    assert_select ".record-translation-prompt", text: /먼저 한국어로/
   end
 
   test "submitting once completes today and retries do not create or replace recordings" do
@@ -109,6 +110,7 @@ class DailyPracticeAccessTest < ActionDispatch::IntegrationTest
   private
 
   def valid_params
+    prepare_recording_translation
     { question_token: question_for.signed_id(purpose: :daily_question), daily_practice: { audio: audio_upload, duration_ms: 2000 } }
   end
 end

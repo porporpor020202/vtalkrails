@@ -53,7 +53,7 @@ class AiAllowanceTest < ActionDispatch::IntegrationTest
         request_help("answer")
         assert_response :payment_required
         assert_no_difference "DailyPractice.count" do
-          submit_recording
+          submit_recording(prepare_translation: false)
           assert_response :payment_required
         end
         assert_equal 9, @calls
@@ -224,7 +224,8 @@ class AiAllowanceTest < ActionDispatch::IntegrationTest
     post language_help_path, params: { mode: mode, question_token: @question.signed_id(purpose: :daily_question), input_text: text }
   end
 
-  def submit_recording
+  def submit_recording(prepare_translation: true)
+    prepare_recording_translation(question_token: @question.signed_id(purpose: :daily_question)) if prepare_translation && @question.asked_on == Date.current
     post daily_practice_path, params: { question_token: @question.signed_id(purpose: :daily_question), daily_practice: { audio: audio_upload, duration_ms: 2000 } }, headers: { "Accept" => "application/json" }
   end
 end

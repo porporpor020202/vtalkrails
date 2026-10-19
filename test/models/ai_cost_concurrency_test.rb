@@ -1,7 +1,9 @@
 require "test_helper"
 require "minitest/mock"
+require_relative "../test_helpers/daily_practice_test_helper"
 
 class AiCostConcurrencyTest < ActiveSupport::TestCase
+  include DailyPracticeTestHelper
   self.use_transactional_tests = false
 
   test "concurrent requests reserve one training day and only one paid answer" do
@@ -62,6 +64,39 @@ class AiCostConcurrencyTest < ActiveSupport::TestCase
     end
   ensure
     threads&.each(&:join)
+    DailyQuestion.where(asked_on: date).delete_all
+  end
+
+  test "simultaneous shares create one reward per person and pay for one shared bonus question" do
+    date = Date.new(2099, 1, 2)
+    practices = [ users(:korean_native), users(:spanish_native) ].map { |user| complete_practice(user, date) }
+    gate = Queue.new
+    calls = 0
+    lock = Mutex.new
+    generator = Object.new
+    generator.define_singleton_method(:call) do |**|
+      lock.synchronize { calls += 1 }
+      sleep 0.05
+      "What is your favorite color?"
+    end
+    threads = []
+    GeminiQuestion.stub(:new, -> { generator }) do
+      threads = 6.times.map do |index|
+        Thread.new do
+          gate.pop
+          ActiveRecord::Base.connection_pool.with_connection(prevent_permanent_checkout: true) do
+            BonusPractice.unlock_for!(DailyPractice.find(practices[index % 2].id)).id
+          end
+        end
+      end
+      6.times { gate << true }
+      assert_equal 2, threads.map(&:value).uniq.size
+      assert_equal 1, calls
+      assert_equal 1, BonusPractice.where(daily_practice: practices).distinct.count(:question)
+    end
+  ensure
+    threads&.each(&:join)
+    practices&.each(&:destroy!)
     DailyQuestion.where(asked_on: date).delete_all
   end
 end

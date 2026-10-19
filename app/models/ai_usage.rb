@@ -32,15 +32,16 @@ class AiUsage < ApplicationRecord
     end
   end
 
-  def self.fetch!(usage:, mode:, input:, ip: nil, date: Date.current)
+  def self.fetch!(usage:, mode:, input:, ip: nil, date: Date.current, bonus: false)
     raise ArgumentError, "Unsupported AI help" unless HELP_MODES.include?(mode)
+    slot_name = bonus ? "bonus_#{mode}" : mode
     digest = identity("input", input)
     cached = nil
     synchronize do
       usage.reload
       usage = usage.merged_into if usage.merged_into_id.present?
       reset_help_day!(usage, date)
-      slot = usage.help_data.fetch(mode, {})
+      slot = usage.help_data.fetch(slot_name, {})
       if slot["response"].present? && slot["input_digest"] == digest
         cached = slot["response"]
         next
@@ -54,7 +55,7 @@ class AiUsage < ApplicationRecord
         raise DailyLimitExceeded if attempts >= ANONYMOUS_IP_LIMIT
         network.update!(help_data: network.help_data.merge(mode => { "attempts" => attempts + 1 }))
       end
-      usage.update!(help_data: usage.help_data.merge(mode => { "attempts" => 1, "input_digest" => digest }))
+      usage.update!(help_data: usage.help_data.merge(slot_name => { "attempts" => 1, "input_digest" => digest }))
     end
     return cached if cached
 
@@ -63,9 +64,9 @@ class AiUsage < ApplicationRecord
     synchronize do
       usage.reload
       usage = usage.merged_into if usage.merged_into_id.present?
-      slot = usage.help_data.fetch(mode, {})
+      slot = usage.help_data.fetch(slot_name, {})
       if usage.help_on == date && slot["input_digest"] == digest
-        usage.update!(help_data: usage.help_data.merge(mode => slot.merge("response" => response)))
+        usage.update!(help_data: usage.help_data.merge(slot_name => slot.merge("response" => response)))
       end
     end
     response

@@ -5,6 +5,7 @@
   <div class="settings-links">
     <%= link_to "#{t("ui.language")}: #{NativeLanguage::OPTIONS.fetch(I18n.locale.to_s)[:name]}", native_language_path %>
     <%= link_to t("ui.privacy"), privacy_path %>
+    <% unless current_user %><%= link_to t("ui.login"), new_session_path, data: { turbo: false } %><% end %>
     <% if current_user %>
     <%= button_to t("ui.logout"), session_path, method: :delete %>
     <%= link_to t("ui.delete_account"), confirm_account_deletion_path, class: "danger" %>

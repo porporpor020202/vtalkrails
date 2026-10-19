@@ -29,6 +29,9 @@ class DailyPracticeFlowTest < ApplicationSystemTestCase
     assert_selector "#daily-question"
     assert_no_text "Select your native language"
     assert_no_button "질문 듣기"
+    assert_no_button "녹음 시작", enable_aria_label: true
+    assert_selector ".record-translation-prompt", text: /먼저 한국어로/
+    translate_in_browser
     click_button "녹음 시작", enable_aria_label: true
     assert_selector '[data-daily-practice-target="timer"]', text: "00:02", wait: 5
     click_button "녹음 끝내기", enable_aria_label: true
@@ -41,6 +44,7 @@ class DailyPracticeFlowTest < ApplicationSystemTestCase
     click_button "전송"
     assert_selector "h1", text: "잘했어요!"
     assert_text "오늘 완료"
+    assert_selector ".completion-sentences p", text: "I had a good day."
     assert_selector ".completion-count", text: /연속\s+1\s*일/
     assert_equal 1, @user.daily_practices.count
     page.refresh
@@ -50,6 +54,7 @@ class DailyPracticeFlowTest < ApplicationSystemTestCase
   end
 
   test "microphone denial can be retried and never earns completion" do
+    translate_in_browser
     page.execute_script("navigator.mediaDevices.getUserMedia = async () => { throw new DOMException('Denied', 'NotAllowedError') }")
     click_button "녹음 시작", enable_aria_label: true
     assert_selector '[role="alert"]', text: "마이크 권한이 필요해요"

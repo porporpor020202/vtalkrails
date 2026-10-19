@@ -14,7 +14,7 @@
   </head>
   <body>
     <script type="application/json" id="ui-translations"><%= raw json_escape(t("ui").to_json) %></script>
-    <script type="application/json" id="language-selection-translations"><%= raw json_escape(NativeLanguage::OPTIONS.keys.index_with { |locale| I18n.t("ui", locale: locale).slice(:choose_language, :choose_hint, :continue) }.to_json) %></script>
+    <script type="application/json" id="language-selection-translations"><%= raw json_escape(NativeLanguage::OPTIONS.keys.index_with { |locale| I18n.t("ui", locale: locale).slice(:choose_language, :choose_hint, :continue, :existing_account_login) }.to_json) %></script>
     <div id="app-shell">
       <% if dev_mode? %><span class="development-badge">DEV</span><% end %>
       <main>

@@ -16,7 +16,8 @@ class NativeLanguageFlowTest < ApplicationSystemTestCase
     click_button "続ける"
     assert_selector "html[lang=ja]"
     assert_text "言いたいことを日本語で書いてください。まず英語の表現を確認して、声に出してみましょう！"
-    assert_button "録音を開始", enable_aria_label: true
+    assert_no_button "録音を開始", enable_aria_label: true
+    assert_text I18n.t("ui.translate_before_recording", locale: :ja)
     assert page.evaluate_script("document.documentElement.scrollWidth <= innerWidth")
     click_link "設定", enable_aria_label: true
     click_link "母語: 日本語"
@@ -28,6 +29,7 @@ class NativeLanguageFlowTest < ApplicationSystemTestCase
     assert_no_selector ".language-page"
     assert_selector "html[lang=es]"
     page.save_screenshot(Rails.root.join("tmp/native-language-spanish.png"))
+    translate_in_browser
     page.execute_script("navigator.mediaDevices.getUserMedia = async () => { throw new DOMException('Denied', 'NotAllowedError') }")
     click_button "Grabar", enable_aria_label: true
     assert_text "Permite el micrófono en los ajustes del navegador o dispositivo y vuelve a intentarlo."
@@ -42,8 +44,10 @@ class NativeLanguageFlowTest < ApplicationSystemTestCase
     assert_selector "h1", text: "你使用什麼語言？"
     click_button "繼續"
     assert_selector "html[lang=zh-TW]"
-    assert_button "開始錄音", enable_aria_label: true
+    assert_no_button "開始錄音", enable_aria_label: true
+    assert_text I18n.t("ui.translate_before_recording", locale: :"zh-TW")
     assert_text "用繁體中文寫下你想說的話。先看看英語怎麼說，再大膽說出來！"
+    translate_in_browser
     page.execute_script("navigator.mediaDevices.getUserMedia = async () => { throw new DOMException('Denied', 'NotAllowedError') }")
     click_button "開始錄音", enable_aria_label: true
     assert_text "請在瀏覽器或裝置設定中允許麥克風權限後重試。"

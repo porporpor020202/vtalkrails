@@ -4,6 +4,7 @@
     <div class="language-mark" aria-hidden="true"><span>A</span><span>あ</span></div>
     <h1 data-native-language-target="title"><%= t("ui.choose_language") %></h1>
     <p data-native-language-target="hint"><%= t("ui.choose_hint") %></p>
+    <% unless current_user %><%= link_to t("ui.existing_account_login"), new_session_path, class: "existing-account-login", data: { turbo: false, native_language_target: "login" } %><% end %>
   </header>
   <%= form_with url: native_language_path, method: :patch, class: "language-form", data: { turbo: false } do |form| %>
     <fieldset class="language-options">

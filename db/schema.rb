@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,11 +54,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_040000) do
     t.index ["merged_into_id"], name: "index_ai_usages_on_merged_into_id"
   end
 
+  create_table "bonus_practices", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.bigint "daily_practice_id", null: false
+    t.integer "duration_ms"
+    t.text "english_sentence"
+    t.string "question", null: false
+    t.datetime "shared_at", null: false
+    t.string "source", null: false
+    t.datetime "updated_at", null: false
+    t.index ["daily_practice_id"], name: "index_bonus_practices_on_daily_practice_id", unique: true
+  end
+
   create_table "daily_practices", force: :cascade do |t|
     t.datetime "completed_at", null: false
     t.datetime "created_at", null: false
     t.bigint "daily_question_id", null: false
     t.integer "duration_ms", null: false
+    t.text "english_sentence"
     t.date "practiced_on", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
@@ -100,6 +114,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_040000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_usages", "ai_usages", column: "merged_into_id"
+  add_foreign_key "bonus_practices", "daily_practices"
   add_foreign_key "daily_practices", "daily_questions"
   add_foreign_key "daily_practices", "users"
   add_foreign_key "sessions", "users"

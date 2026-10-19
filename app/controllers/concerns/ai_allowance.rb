@@ -1,4 +1,6 @@
 module AiAllowance
+  class TranslationRequired < StandardError; end
+
   private
 
   def training_usage
@@ -16,7 +18,16 @@ module AiAllowance
     visitor_id
   end
 
+  def recording_english_sentence!(bonus: false)
+    usage = training_usage.reload
+    sentence = usage.help_data.dig(bonus ? "bonus_answer" : "answer", "response", "english")
+    unless usage.help_on == Date.current && sentence.is_a?(String) && sentence.strip.present? && sentence.length <= 2000
+      raise TranslationRequired
+    end
+    sentence.strip
+  end
+
   def fetch_daily_ai!(mode:, text:, &block)
-    AiUsage.fetch!(usage: training_usage, mode: mode, input: "#{I18n.locale}:#{text}", ip: current_user ? nil : request.remote_ip, &block)
+    AiUsage.fetch!(usage: training_usage, mode: mode, input: "#{I18n.locale}:#{text}", ip: current_user ? nil : request.remote_ip, bonus: @bonus_mode == true, &block)
   end
 end

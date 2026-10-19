@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :daily_practices, dependent: :destroy
+  has_many :bonus_practices, through: :daily_practices
 
   validates :oauth_provider, inclusion: { in: %w[apple google] }
   validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }

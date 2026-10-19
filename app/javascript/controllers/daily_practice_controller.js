@@ -2,14 +2,25 @@ import { translate } from "helpers/translations"
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["hint", "status", "recordButton", "micIcon", "stopIcon", "timer", "previewArea", "preview", "submitButton", "discardButton"]
+  static targets = ["hint", "translationPrompt", "status", "recordButton", "micIcon", "stopIcon", "timer", "previewArea", "preview", "submitButton", "discardButton"]
   static values = { endpoint: String, token: String }
 
-  connect() { this.generation = 0; this.sending = false }
+  connect() { this.generation = 0; this.sending = false; this.syncTranslationGate() }
   disconnect() { this.cleanup() }
+
+  syncTranslationGate() {
+    this.translationReady = !!this.element.querySelector(".english-answer")?.textContent.trim()
+    if (!this.hasRecordButtonTarget) return
+    const recording = this.recorder?.state === "recording"
+    this.recordButtonTarget.disabled = !this.translationReady && !recording
+    this.recordButtonTarget.hidden = !!this.blob || (!this.translationReady && !recording)
+    if (this.hasTranslationPromptTarget) this.translationPromptTarget.hidden = this.translationReady || recording || !!this.blob
+    if (this.hasHintTarget) this.hintTarget.hidden = !this.translationReady || !!this.startedAt
+  }
 
   async toggleRecording() {
     if (this.recorder?.state === "recording") { this.stop(); return }
+    if (!this.translationReady) { this.syncTranslationGate(); if (!this.translationReady) return }
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { this.showError(translate("unsupported")); return }
     const generation = ++this.generation
     this.recordButtonTarget.disabled = true
@@ -114,8 +125,8 @@ export default class extends Controller {
   releaseStream() { this.stream?.getTracks().forEach(track => track.stop()); this.stream = null }
   revokePreview() { if (this.hasPreviewTarget) { this.previewTarget.pause(); this.previewTarget.removeAttribute("src") }; if (this.previewURL) URL.revokeObjectURL(this.previewURL); this.previewURL = null }
   resetControls() {
-    this.recordButtonTarget.disabled = false
-    this.recordButtonTarget.hidden = false
+    this.recordButtonTarget.disabled = !this.translationReady
+    this.recordButtonTarget.hidden = !this.translationReady
     this.recordButtonTarget.classList.remove("is-recording")
     this.recordButtonTarget.setAttribute("aria-label", translate("record_start"))
     this.micIconTarget.removeAttribute("hidden")

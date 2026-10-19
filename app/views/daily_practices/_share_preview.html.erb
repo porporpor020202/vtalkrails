@@ -1,0 +1,13 @@
+<dialog class="share-card-dialog" data-practice-share-target="dialog" data-action="click->practice-share#dismissBackdrop cancel->practice-share#cancelPreview" aria-labelledby="share-card-title">
+  <header class="share-card-header">
+    <h2 id="share-card-title"><%= t("ui.card_preview_title") %></h2>
+    <button type="button" class="share-card-close" data-action="practice-share#close" aria-label="<%= t("ui.card_close") %>">×</button>
+  </header>
+  <div class="share-card-frame">
+    <p data-practice-share-target="loading"><%= t("ui.card_preparing") %></p>
+    <img hidden class="share-card-image" data-practice-share-target="cardImage" alt="<%= t("ui.card_alt") %>" width="1080" height="1350">
+  </div>
+  <button type="button" class="primary-button celebration-share-button share-card-send" disabled data-action="practice-share#share" data-practice-share-target="sendButton"><%= t("ui.card_share") %></button>
+  <a class="share-card-download" hidden data-practice-share-target="download" download="say-one-thing.png"><%= t("ui.card_download") %></a>
+  <p class="share-card-status" role="status" aria-live="polite" data-practice-share-target="cardStatus"></p>
+</dialog>

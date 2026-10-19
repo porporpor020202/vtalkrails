@@ -4,6 +4,9 @@ class DailyPracticesController < ApplicationController
   before_action :resume_session, only: %i[show create]
   rescue_from AiUsage::TrialExpired, with: :trial_expired
   rescue_from AiUsage::LoginRequired, with: :training_login_required
+  rescue_from AiAllowance::TranslationRequired do
+    render json: { error: t("ui.translate_before_recording") }, status: :unprocessable_entity
+  end
   rate_limit to: 10, within: 1.minute, only: :create
 
   def show
@@ -18,8 +21,9 @@ class DailyPracticesController < ApplicationController
     @practice = @guest ? DailyPractice.find_by(id: session[:guest_practice_id], user_id: nil, practiced_on: @today) : current_user.daily_practices.find_by(practiced_on: @today)
     @result = training_usage.help_data.dig("answer", "response")
     @saved = session.delete(:practice_saved)
-    @streak = @guest ? (@practice ? 1 : 0) : current_user.streak(today: @today)
+    @streak = current_user&.streak(today: @today)
     if @practice
+      @bonus = @practice.bonus_practice unless @guest
       @resets_at = @today.next_day.in_time_zone
       @week = (@today.beginning_of_week..@today.end_of_week).to_a
       @completed_dates = @guest ? [ @practice.practiced_on ] : current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
@@ -37,7 +41,7 @@ class DailyPracticesController < ApplicationController
     training_usage
     unless current_user
       unless DailyPractice.exists?(id: session[:guest_practice_id], user_id: nil, practiced_on: date)
-        practice = DailyPractice.new(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms])
+        practice = DailyPractice.new(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms], english_sentence: recording_english_sentence!)
         practice.audio.attach(recording_params[:audio])
         practice.save!
         session[:guest_practice_id] = practice.id
@@ -49,7 +53,7 @@ class DailyPracticesController < ApplicationController
 
     current_user.with_lock do
       unless current_user.daily_practices.exists?(practiced_on: date)
-        practice = current_user.daily_practices.build(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms])
+        practice = current_user.daily_practices.build(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms], english_sentence: recording_english_sentence!)
         practice.audio.attach(recording_params[:audio])
         practice.save!
       end

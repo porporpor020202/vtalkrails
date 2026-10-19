@@ -45,7 +45,7 @@ class MobileScrollingTest < ApplicationSystemTestCase
   test "expanded translations and a small keyboard viewport keep the input and microphone reachable" do
     sign_in(user: users(:korean_native))
     translator = Object.new
-    translator.define_singleton_method(:call) { |**| { "translation" => "오늘 무엇이 당신을 웃게 했나요? " * 30 } }
+    translator.define_singleton_method(:call) { |mode:, **| mode == "answer" ? { "english" => "I had a good day.", "ipa" => "/aɪ/" } : { "translation" => "오늘 무엇이 당신을 웃게 했나요? " * 30 } }
     GeminiTranslation.stub(:new, -> { translator }) do
       click_button "번역 보기"
       assert_selector ".question-translation p"
@@ -55,6 +55,7 @@ class MobileScrollingTest < ApplicationSystemTestCase
       assert_equal "16px", page.evaluate_script("getComputedStyle(document.querySelector('textarea')).fontSize")
       assert_equal "contain", page.evaluate_script("getComputedStyle(document.querySelector('textarea')).overscrollBehaviorY")
       assert_scrollable
+      translate_in_browser
       find_button("녹음 시작", enable_aria_label: true).scroll_to(:center)
       assert_button "녹음 시작", enable_aria_label: true
     end

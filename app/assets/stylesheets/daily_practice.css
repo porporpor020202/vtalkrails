@@ -17,6 +17,9 @@ main > .flash { flex: none; }
 .flash { margin: 0; padding: 14px 24px; font-size: 13px; background: #e7efdf; }
 .daily-page { padding: max(20px, env(safe-area-inset-top)) 24px max(30px, env(safe-area-inset-bottom)); min-height: 0; display: flex; flex-direction: column; }
 .daily-header { display: flex; align-items: center; justify-content: space-between; }
+.daily-header-actions { display: flex; align-items: center; gap: 10px; }
+.header-login { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 13px; font-weight: 650; text-decoration: none; }
+.existing-account-login { display: inline-block; margin: 8px 0 0; padding: 8px 0; font-size: 13px; color: #58735e; text-underline-offset: 4px; }
 .wordmark { font-size: 20px; font-weight: 750; letter-spacing: -.9px; text-decoration: none; }
 .icon-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; color: #547064; background: #efeee7; border: 0; }
 .icon-button svg { width: 22px; height: 22px; }
@@ -133,6 +136,7 @@ main > .flash { flex: none; }
 .first-practice-hint span { display: inline-block; margin-left: 3px; }
 
 .language-page { flex: none; width: 100%; max-width: 460px; margin: 0 auto; padding: 44px 24px 24px; }
+.language-page:has(.existing-account-login) { padding-top: 28px; }
 .language-heading { text-align: center; margin-bottom: 30px; }
 .language-mark { display: flex; justify-content: center; align-items: center; margin-bottom: 24px; color: #345b48; }
 .language-mark span { display: grid; place-items: center; width: 56px; height: 56px; border: 2px solid #cdddc5; border-bottom-width: 5px; border-radius: 18px; background: #edf3e8; font-size: 28px; font-weight: 800; transform: rotate(-9deg); }
@@ -157,3 +161,73 @@ main > .flash { flex: none; }
 .trial-ended .question-label { justify-content: center; margin-bottom: 20px; }
 .trial-ended h1 { font-size: 27px; line-height: 1.45; }
 .trial-coming-soon { border: 1px solid #dce4d5; border-radius: 18px; padding: 20px; color: #6e8164; font-size: 14px; }
+
+.completion-celebration { flex: 1; display: flex; flex-direction: column; margin: 0; padding: 20px 0 0; }
+.celebration-hero { margin: auto 0 20px; }
+.alpaca-scene { position: relative; display: grid; place-items: center; width: 230px; height: 210px; margin: 0 auto 12px; }
+.alpaca-scene::before { content: ""; position: absolute; inset: 26px 24px 12px; border-radius: 50%; background: #f6ead7; }
+.celebration-alpaca { position: relative; width: 220px; height: 220px; object-fit: contain; animation: alpaca-arrive .65s cubic-bezier(.2,.8,.3,1) both; }
+.celebration-spark { position: absolute; z-index: 1; color: #d9a14c; }
+.spark-one { top: 24px; left: 16px; font-size: 25px; transform: rotate(-15deg); }
+.spark-two { top: 48px; right: 6px; font-size: 31px; }
+.spark-three { bottom: 30px; left: 8px; font-size: 14px; color: #81a88c; }
+.completion-celebration h1 { font-size: 31px; font-weight: 800; letter-spacing: -1.3px; }
+.completion-celebration .completion-praise { margin: 10px 0 0; font-size: 14px; line-height: 1.65; color: #708176; }
+.completion-celebration .completion-streak { border: 2px solid #e6e9df; border-radius: 23px; background: #fffefb; padding: 15px 18px 17px; }
+.completion-celebration .completion-label { font-size: 11px; color: #6c8571; }
+.completion-celebration .completion-count { margin: 4px 0 12px; gap: 7px; font-size: 15px; color: #5f776a; }
+.completion-celebration .completion-count strong { font-size: 46px; font-weight: 800; letter-spacing: -2px; color: #2e5948; }
+.completion-celebration .completion-week { border-top: 1px solid #eef0e8; padding-top: 13px; gap: 5px; }
+.completion-celebration .completion-day { gap: 9px; font-size: 10px; }
+.completion-celebration .completion-dot { width: 27px; height: 27px; background: #f0f1e9; color: #c4cabb; font-size: 17px; }
+.completion-celebration .completion-dot.is-done { background: #537f64; color: white; font-size: 14px; }
+.completion-celebration .completion-day.is-today .completion-dot { outline-color: #9cba97; outline-offset: 2px; }
+.celebration-actions { margin-top: auto; padding-top: 20px; }
+.share-incentive { margin: 0 0 12px; font-size: 13px; line-height: 1.65; font-weight: 500; color: #61776b; text-wrap: balance; }
+.celebration-share-button { width: 100%; min-height: 58px; border-radius: 17px; border-bottom: 5px solid #1f4034; background: #3b7257; color: #fffef9; font-size: 16px; font-weight: 750; transition: transform .12s; }
+.celebration-share-button:active { transform: translateY(3px); border-bottom-width: 2px; }
+.celebration-share-button svg { width: 21px; height: 21px; }
+.share-status { margin: 10px 0 0; color: #6c7c6b; font-size: 12px; line-height: 1.7; }
+.share-status:empty { display: none; }
+.completion-celebration .next-practice { margin-top: 17px; padding: 0; }
+.completion-celebration .next-practice-heading { justify-content: center; font-size: 10px; gap: 8px; color: #8a9688; }
+.completion-celebration .next-practice-clock { margin-top: 5px; font-size: 13px; color: #718374; letter-spacing: 1px; }
+.completion-celebration .guest-save { margin: 22px 0 0; }
+.bonus-back { display: block; align-self: flex-start; margin-top: 20px; font-size: 12px; color: #748772; text-underline-offset: 4px; }
+@keyframes alpaca-arrive { from { opacity: 0; transform: translateY(16px) scale(.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-height: 750px) {
+  .completion-celebration { padding-top: 12px; }
+  .celebration-hero { margin-bottom: 15px; }
+  .alpaca-scene { width: 185px; height: 145px; margin-bottom: 9px; }
+  .celebration-alpaca { width: 170px; height: 170px; }
+  .alpaca-scene::before { inset: 18px 24px 0; }
+  .completion-celebration h1 { font-size: 28px; }
+  .completion-celebration .completion-streak { padding-block: 12px; }
+  .completion-celebration .completion-count strong { font-size: 39px; }
+  .completion-celebration .completion-count { margin-bottom: 9px; }
+  .celebration-actions { padding-top: 15px; }
+}
+
+.share-card-dialog { width: min(410px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); padding: 16px; border: 0; border-radius: 25px; background: #faf9f5; color: var(--ink); overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 28px 90px #102f2840; }
+.share-card-dialog::backdrop { background: #183c329e; backdrop-filter: blur(5px); }
+.share-card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; }
+.share-card-header h2 { margin: 0 0 0 4px; font-size: 17px; font-weight: 750; }
+.share-card-close { display: grid; place-items: center; flex: none; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #edece4; color: #6b7b6e; font-size: 27px; }
+.share-card-frame { display: flex; align-items: center; justify-content: center; min-height: 120px; }
+.share-card-frame > p { font-size: 14px; color: #768771; }
+.share-card-image { display: block; width: 100%; height: auto; max-height: 61dvh; object-fit: contain; border-radius: 18px; }
+.share-card-send { margin-top: 17px; }
+.share-card-download { display: block; margin: 15px auto 2px; width: fit-content; color: #788671; font-size: 13px; text-underline-offset: 4px; }
+.share-card-status { margin: 12px 4px 0; color: #768571; font-size: 12px; line-height: 1.65; }
+.share-card-status:empty { display: none; }
+@media (max-height: 650px) { .share-card-dialog { padding: 12px; } .share-card-image { max-height: 54dvh; } .share-card-send { min-height: 48px; margin-top: 12px; } }
+
+.completion-celebration > .completion-label { align-self: center; }
+
+.record-translation-prompt { max-width: 300px; margin: 0; text-align: center; text-wrap: balance; color: #667c60; font-size: 14px; line-height: 1.75; }
+.completion-sentences { width: 100%; margin: 0 0 15px; text-align: left; overflow-wrap: anywhere; }
+.completion-sentences h2 { margin: 0 0 7px; font-size: 11px; font-weight: 500; color: #7c8a74; }
+.completion-sentences p { margin: 0; color: #315844; font-family: Georgia, serif; font-size: 19px; line-height: 1.45; }
+.completion-sentences p + p { margin-top: 7px; }
+.completion-celebration:has(.completion-sentences) .alpaca-scene { width: 180px; height: 150px; }
+.completion-celebration:has(.completion-sentences) .celebration-alpaca { width: 165px; height: 165px; }

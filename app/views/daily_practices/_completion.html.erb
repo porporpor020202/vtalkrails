@@ -1,0 +1,58 @@
+<section class="daily-complete completion-celebration" aria-label="<%= t("ui.complete_label") %>">
+  <div class="celebration-hero">
+    <div class="alpaca-scene" aria-hidden="true">
+      <span class="celebration-spark spark-one">✦</span><span class="celebration-spark spark-two">✧</span>
+      <%= image_tag "alpaca-celebrate.png", class: "celebration-alpaca", alt: "", width: 240, height: 240 %>
+      <span class="celebration-spark spark-three">✦</span>
+    </div>
+    <h1><%= t("ui.praise") %></h1>
+    <p class="completion-praise"><%= @bonus&.completed? ? t("ui.bonus_praise") : t("ui.completion_encouragement") %></p>
+  </div>
+  <% if completed_practice_sentences.any? %>
+    <section class="completion-sentences" aria-label="<%= t("ui.practiced_sentence") %>">
+      <h2><%= t("ui.practiced_sentence") %></h2>
+      <% completed_practice_sentences.each do |sentence| %><p lang="en"><%= sentence %></p><% end %>
+    </section>
+  <% end %>
+  <% unless @guest %>
+  <div class="completion-streak">
+    <span class="completion-label"><span aria-hidden="true">✓</span> <%= t("ui.done_today") %></span>
+    <p class="completion-count"><%= t("ui.streak_html", count: content_tag(:strong, @streak)) %></p>
+    <div class="completion-week" aria-label="<%= t("ui.week") %>">
+      <% @week.each do |date| %>
+        <% done = @completed_dates.include?(date) %>
+        <div class="completion-day <%= 'is-today' if date == @today %>">
+          <span><%= t("ui.short_days")[date.wday] %></span>
+          <span class="completion-dot <%= 'is-done' if done %>" aria-label="<%= date.iso8601 %> <%= done ? t("ui.done") : t("ui.not_done") %>"><%= done ? '✓' : '·' %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <% end %>
+  <% if @guest %>
+    <span class="completion-label"><span aria-hidden="true">✓</span> <%= t("ui.done_today") %></span>
+    <div class="guest-save">
+      <%= link_to t("ui.save_record"), new_session_path, class: "primary-button celebration-share-button", data: { turbo: false } %>
+      <p><%= t("ui.save_hint") %></p>
+    </div>
+  <% else %>
+    <div class="celebration-actions" data-controller="practice-share" data-practice-share-endpoint-value="<%= bonus_practice_path %>" data-practice-share-token-value="<%= @practice.signed_id(purpose: :share_bonus, expires_in: [(@resets_at - Time.current).to_i, 1].max.seconds) %>" data-practice-share-text-value="<%= t("ui.share_text", count: @streak) %>" data-practice-share-card-value="<%= practice_share_card_data.to_json %>">
+      <p class="share-incentive"><%= @bonus&.completed? ? t("ui.bonus_done") : t("ui.share_incentive") %></p>
+      <% if @bonus && !@bonus.completed? %>
+        <%= link_to t("ui.continue_bonus"), bonus_practice_path, class: "primary-button celebration-share-button" %>
+      <% else %>
+        <button class="primary-button celebration-share-button" type="button" data-action="practice-share#open" data-practice-share-target="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+          <%= t("ui.share_button") %>
+        </button>
+      <% end %>
+      <p class="share-status" role="status" aria-live="polite" data-practice-share-target="status"></p>
+      <% unless @bonus && !@bonus.completed? %><%= render "daily_practices/share_preview" %><% end %>
+    </div>
+    <div class="next-practice" data-controller="reset-countdown" data-reset-countdown-at-value="<%= @resets_at.iso8601 %>" data-reset-countdown-now-value="<%= Time.current.iso8601 %>" data-action="visibilitychange@document->reset-countdown#tick">
+      <div class="next-practice-heading"><span><%= t("ui.next") %></span><span><%= t("ui.reset_time") %></span></div>
+      <time class="next-practice-clock" datetime="<%= @resets_at.iso8601 %>" data-reset-countdown-target="clock" role="timer" aria-label="<%= t("ui.remaining") %>" aria-live="off"><%= Time.at([(@resets_at - Time.current).to_i, 0].max).utc.strftime("%H:%M:%S") %></time>
+      <%= link_to t("ui.open_question"), root_path, class: "translation-button", hidden: true, data: { reset_countdown_target: "ready" } %>
+    </div>
+  <% end %>
+</section>

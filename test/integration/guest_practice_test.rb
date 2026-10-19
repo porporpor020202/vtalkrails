@@ -14,6 +14,9 @@ class GuestPracticeTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     assert_select "#daily-question"
+    assert_select ".streak-pill", count: 0
+    assert_select ".daily-meta", text: "하루, 한 문장"
+    assert_select ".header-login[href=?]", new_session_path, text: "로그인"
     assert_select "a[href=?]", settings_path, count: 1
     assert_difference "DailyPractice.count", 1 do
       2.times { submit_recording; assert_response :created }
@@ -21,6 +24,8 @@ class GuestPracticeTest < ActionDispatch::IntegrationTest
     assert_nil DailyPractice.last.user_id
     get root_path
     assert_select "h1", text: "잘했어요!"
+    assert_select ".completion-count, .completion-week", count: 0
+    assert_select ".completion-label", text: /오늘 완료/
     assert_select "a[href=?]", new_session_path, text: "이 기록을 저장할까요?"
     get new_session_path
     assert_select ".sign-in-description", text: "첫 연습 기록을 저장하세요."
@@ -41,6 +46,43 @@ class GuestPracticeTest < ActionDispatch::IntegrationTest
     assert_select ".completion-count", text: /연속\s+1\s*일/
     ExpireGuestPracticeJob.perform_now(practice.id)
     assert DailyPractice.exists?(practice.id)
+  end
+
+  test "a returning user can sign in without recording and recover the existing streak" do
+    user = users(:korean_native)
+    records = [ complete_practice(user, Date.yesterday), complete_practice(user) ]
+    blob_ids = records.map { |practice| practice.audio.blob.id }
+    get root_path
+    assert_select ".header-login[href=?]", new_session_path
+    assert_select ".streak-pill", count: 0
+    assert_no_difference "DailyPractice.count" do
+      get new_session_path
+      assert_select ".sign-in-page"
+      login(user)
+      follow_redirect!
+    end
+    assert_select ".completion-count", text: /연속\s+2\s*일/
+    assert_select "a.header-login", count: 0
+    assert_equal blob_ids, records.map { |practice| practice.reload.audio.blob.id }
+  end
+
+  test "a linked visitor with an expired session is asked to sign in instead of starting again" do
+    user = users(:korean_native)
+    complete_practice(user, Date.yesterday)
+    complete_practice(user)
+    login(user)
+    follow_redirect!
+    user.sessions.destroy_all
+    assert_no_difference "DailyPractice.count" do
+      get root_path
+      assert_redirected_to new_session_path
+      follow_redirect!
+      assert_select ".sign-in-page"
+      assert_select "#daily-question", count: 0
+      login(user)
+      follow_redirect!
+    end
+    assert_select ".completion-count", text: /연속\s+2\s*일/
   end
 
   test "a different browser cannot claim or listen to a guest recording" do
@@ -104,6 +146,7 @@ class GuestPracticeTest < ActionDispatch::IntegrationTest
   private
 
   def submit_recording
+    prepare_recording_translation
     post daily_practice_path, params: { question_token: question_for.signed_id(purpose: :daily_question), daily_practice: { audio: audio_upload, duration_ms: 2000 } }
   end
 

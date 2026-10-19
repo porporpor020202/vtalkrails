@@ -14,6 +14,15 @@
           <span>녹음 파일 없음</span>
         <% end %>
       </article>
+      <% if (bonus = practice.bonus_practice)&.completed? %>
+        <article class="admin-recording">
+          <div class="admin-recording-content">
+            <time datetime="<%= bonus.completed_at.iso8601 %>"><%= admin_time(bonus.completed_at) %> · 공유 보너스 · <%= (bonus.duration_ms / 1000.0).round(1) %>초</time>
+            <p lang="en"><%= bonus.question %></p>
+          </div>
+          <%= render "shared/recording_player", preview: false, audio_url: bonus_audio_admin_user_path(@user, practice_id: bonus.id), duration_ms: bonus.duration_ms %>
+        </article>
+      <% end %>
     <% end %>
     <% if @practices.empty? %><p class="admin-note">아직 저장된 녹음이 없습니다.</p><% end %>
   </div>

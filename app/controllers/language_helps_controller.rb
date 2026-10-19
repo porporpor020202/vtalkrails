@@ -7,15 +7,22 @@ class LanguageHelpsController < ApplicationController
 
   def create
     @question = DailyQuestion.find_signed(params[:question_token], purpose: :daily_question)
+    unless @question
+      @question = BonusPractice.find_signed(params[:question_token], purpose: :bonus_practice)
+      @bonus_mode = true
+      @question = nil unless current_user && @question&.user_id == current_user.id && !@question.completed?
+    end
     unless @question && @question.asked_on == Date.current
       render_help_error(t("ui.refresh_question"), :unprocessable_entity)
       return
     end
     training_usage
+    @question_token = params[:question_token]
     if %w[question example].include?(params[:mode])
       mode = params[:mode]
       cache_name = mode == "question" ? "question-translation" : "question-example"
-      translation = Rails.cache.fetch([ cache_name, I18n.locale, @question.id, @question.updated_at.to_i ], expires_in: 7.days) do
+      question_key = @bonus_mode ? "bonus-#{@question.id}" : @question.id
+      translation = Rails.cache.fetch([ cache_name, I18n.locale, question_key, @question.updated_at.to_i ], expires_in: 7.days) do
         fetch_daily_ai!(mode: mode, text: @question.question) do
           GeminiTranslation.new.call(text: @question.question, mode: mode)
         end.fetch("translation")
