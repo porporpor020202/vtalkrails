@@ -6,7 +6,7 @@ class MarketingEventsController < ApplicationController
   def create
     name = params[:name].to_s
     return head :unprocessable_entity unless MarketingEvent::CLIENT_NAMES.include?(name)
-    return head :no_content if current_user&.admin?
+    return head :no_content if current_user&.marketing_internal?
 
     context = "daily"
     unless name == "app_open"

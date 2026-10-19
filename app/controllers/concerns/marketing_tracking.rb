@@ -31,7 +31,7 @@ module MarketingTracking
     different_campaign = attributed_entry && visit && %w[source medium campaign content].any? { |key| visit.public_send(key).to_s != attribution[key.to_sym].to_s }
     different_account = visit&.user_id.present? && visit.user_id != current_user&.id
     if !visit || visit.last_seen_at < 30.minutes.ago || different_campaign || different_account
-      visit = MarketingVisit.create!(**attribution, visitor_key: visitor_key, user: current_user, internal: current_user&.admin? || false, started_at: Time.current, last_seen_at: Time.current)
+      visit = MarketingVisit.create!(**attribution, visitor_key: visitor_key, user: current_user, internal: current_user&.marketing_internal? || false, started_at: Time.current, last_seen_at: Time.current)
       marketing_cookie(:marketing_visit_id, visit.id)
     elsif visit.last_seen_at < 1.minute.ago
       visit.update!(last_seen_at: Time.current)
@@ -58,8 +58,8 @@ module MarketingTracking
     visit = marketing_visit
     return unless visit
 
-    visit.update!(user: user, internal: user.admin?)
-    if user.admin?
+    visit.update!(user: user, internal: user.marketing_internal?)
+    if user.marketing_internal?
       MarketingVisit.where(visitor_key: visit.visitor_key, user_id: [ nil, user.id ]).update_all(internal: true)
       return
     end

@@ -8,7 +8,7 @@ class MarketingEvent < ApplicationRecord
   validates :occurred_at, :deduplication_key, presence: true
 
   def self.capture(name:, deduplication_key:, user: nil, visit: nil, context: "daily", occurred_at: Time.current, authenticated: user.present?)
-    return if user&.admin? || visit&.internal?
+    return if user&.marketing_internal? || visit&.internal?
 
     create_or_find_by!(deduplication_key: deduplication_key) do |event|
       event.assign_attributes(name: name, user: user, marketing_visit: visit, context: context, occurred_at: occurred_at, authenticated: authenticated)

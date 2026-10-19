@@ -11,7 +11,7 @@
     <%= f.submit "조회" %>
   <% end %>
   <div class="marketing-periods"><%= link_to "최근 7일", admin_marketing_path(from: Date.current - 6, through: Date.current, source: @report.source, campaign: @report.campaign) %><%= link_to "최근 30일", admin_marketing_path(from: Date.current - 29, through: Date.current, source: @report.source, campaign: @report.campaign) %><span>최대 90일씩 조회</span></div>
-  <p class="admin-note"><%= @report.collection_started_at ? "수집 시작: #{admin_time(@report.collection_started_at)}" : "아직 방문 기록이 없습니다. 반영 후 실제 방문부터 수집합니다." %> · 과거의 유입·버튼 사용은 소급할 수 없습니다. 관리자 자신의 사용과 일반적인 봇·링크 미리보기 요청은 제외합니다.</p>
+  <p class="admin-note"><%= @report.collection_started_at ? "수집 시작: #{admin_time(@report.collection_started_at)}" : "아직 방문 기록이 없습니다. 반영 후 실제 방문부터 수집합니다." %> · 과거의 유입·버튼 사용은 소급할 수 없습니다. 관리자와 알려진 스토어 테스트 계정, 일반적인 봇·링크 미리보기 요청은 제외합니다.</p>
 
   <div class="admin-metrics marketing-metrics">
     <div><span>방문한 기기</span><strong><%= @summary[:visitors] %></strong><small>쿠키 기준으로 중복을 제거한 수</small></div>

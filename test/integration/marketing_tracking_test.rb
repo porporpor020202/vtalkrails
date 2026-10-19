@@ -158,6 +158,19 @@ class MarketingTrackingTest < ActionDispatch::IntegrationTest
     assert_not MarketingEvent.where(marketing_visit: first_visit, user: second).exists?
   end
 
+  test "store automation accounts are excluded from metrics but never gain admin access" do
+    get root_path
+    tester = User.create!(email_address: "robo@cloudtestlabaccounts.com", oauth_provider: "google", oauth_uid: "store-robo", native_language: "ko")
+    assert_not MarketingEvent.where(user: tester, name: "signup").exists?
+    get authenticate_by_token_google_oauth_sessions_path(token: tester.signed_id(purpose: :native_auth))
+    get root_path
+    assert_equal 0, MarketingVisit.external.count
+    assert_equal 0, MarketingReport.new(from: Date.current, through: Date.current).summary[:new_accounts]
+    assert_not tester.admin?
+    get admin_marketing_path
+    assert_response :forbidden
+  end
+
   test "Apple cross site callback preserves campaign as well as guest recording" do
     https!
     get root_path, params: { utm_source: "instagram", utm_campaign: "apple-post" }

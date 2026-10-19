@@ -17,6 +17,10 @@ class User < ApplicationRecord
     email_address == ADMIN_EMAIL
   end
 
+  def marketing_internal?
+    admin? || email_address.end_with?("@cloudtestlabaccounts.com")
+  end
+
   def streak(today: Date.current)
     dates = daily_practices.where.not(completed_at: nil).where("practiced_on <= ?", today).order(practiced_on: :desc).pluck(:practiced_on)
     expected = dates.first == today ? today : today.yesterday

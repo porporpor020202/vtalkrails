@@ -7,7 +7,7 @@
     <meta name="turbo-cache-control" content="no-cache">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <% unless controller_path.start_with?("admin/") || current_user&.admin? %><meta name="marketing-events-url" content="<%= marketing_events_path %>"><% end %>
+    <% unless controller_path.start_with?("admin/") || current_user&.marketing_internal? %><meta name="marketing-events-url" content="<%= marketing_events_path %>"><% end %>
     <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/say_one_thing_icon.png">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
