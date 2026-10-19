@@ -7,6 +7,7 @@
     <meta name="turbo-cache-control" content="no-cache">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <% unless controller_path.start_with?("admin/") || current_user&.admin? %><meta name="marketing-events-url" content="<%= marketing_events_path %>"><% end %>
     <link rel="icon" href="/say_one_thing_icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/say_one_thing_icon.png">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -15,7 +16,7 @@
   <body>
     <script type="application/json" id="ui-translations"><%= raw json_escape(t("ui").to_json) %></script>
     <script type="application/json" id="language-selection-translations"><%= raw json_escape(NativeLanguage::OPTIONS.keys.index_with { |locale| I18n.t("ui", locale: locale).slice(:choose_language, :choose_hint, :continue, :existing_account_login) }.to_json) %></script>
-    <div id="app-shell">
+    <div id="app-shell" data-controller="marketing" data-action="visibilitychange@document->marketing#resume">
       <% if dev_mode? %><span class="development-badge">DEV</span><% end %>
       <main>
         <% flash.each do |type, message| %>

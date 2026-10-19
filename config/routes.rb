@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   root "daily_practices#show"
   resource :native_language, only: %i[show update]
   get "admin" => "admin/users#index", as: :admin
+  get "admin/marketing" => "admin/marketing#show", as: :admin_marketing
+  resources :marketing_events, only: :create
   get "admin/users/:id" => "admin/users#show", as: :admin_user
   get "admin/users/:id/recordings/:practice_id" => "admin/users#audio", as: :audio_admin_user
   resource :daily_practice, only: [:show, :create] do

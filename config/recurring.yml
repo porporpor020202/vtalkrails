@@ -17,3 +17,7 @@ production:
   clear_old_ai_responses:
     command: "AiUsage.clear_old_responses!"
     schedule: every day at 12:15am Asia/Seoul
+
+  clear_old_marketing_events:
+    command: "MarketingEvent.prune!"
+    schedule: every day at 3:30am Asia/Seoul

@@ -2,7 +2,7 @@
 <section class="simple-page">
   <header class="simple-header"><%= link_to "‹", root_path, aria: { label: t("ui.back") } %><h1><%= t("ui.privacy") %></h1></header>
   <p><%= t("pages.privacy_intro") %></p>
-  <% %w[data ai guest delete].each do |section| %>
+  <% %w[data ai guest analytics delete].each do |section| %>
     <h2><%= t("pages.#{section}_heading") %></h2><p><%= t("pages.#{section}_body") %></p>
   <% end %>
   <p><%= t("ui.contact") %> <a href="mailto:privacy@sayonething.net">privacy@sayonething.net</a></p>

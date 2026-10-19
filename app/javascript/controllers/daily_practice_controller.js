@@ -1,5 +1,6 @@
 import { translate } from "helpers/translations"
 import { Controller } from "@hotwired/stimulus"
+import { trackMarketingEvent } from "helpers/marketing_events"
 
 export default class extends Controller {
   static targets = ["hint", "translationPrompt", "status", "recordButton", "micIcon", "stopIcon", "timer", "previewArea", "preview", "submitButton", "discardButton"]
@@ -38,6 +39,7 @@ export default class extends Controller {
       this.recorder.onerror = () => { this.cleanup(); if (this.element.isConnected) { this.resetControls(); this.showError(translate("interrupted")) } }
       this.startedAt = performance.now()
       this.recorder.start(250)
+      trackMarketingEvent("recording_started", { question_token: this.tokenValue })
       if (this.hasHintTarget) this.hintTarget.hidden = true
       this.recordButtonTarget.disabled = false
       this.recordButtonTarget.classList.add("is-recording")
@@ -76,6 +78,7 @@ export default class extends Controller {
     this.releaseStream()
     this.resetControls()
     if (!this.blob.size || this.durationMs < 1000) { this.blob = null; this.showError(translate("too_short")); return }
+    trackMarketingEvent("recording_completed", { question_token: this.tokenValue })
     this.previewURL = URL.createObjectURL(this.blob)
     this.previewTarget.dataset.durationMs = String(this.durationMs)
     this.previewTarget.src = this.previewURL

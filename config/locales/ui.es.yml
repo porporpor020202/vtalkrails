@@ -150,6 +150,8 @@
       "ai_body": "Gemini usa preguntas recientes para generar preguntas en inglés. Para traducir o ayudar con expresiones, enviamos la pregunta o tu texto y el idioma elegido a Gemini. No enviamos correos ni grabaciones a Gemini ni guardamos los textos de ayuda en nuestra base de datos. Las grabaciones no se comparten con otros usuarios. Los operadores pueden acceder a ellas desde administración para operaciones y soporte. La tarjeta compartida incluye la frase en inglés que confirmaste mediante la traducción.",
       "guest_heading": "Práctica antes de iniciar sesión",
       "guest_body": "Las grabaciones previas al inicio de sesión se conservan temporalmente hasta 24 horas. Al iniciar sesión se guardan en tu cuenta; de lo contrario, se eliminan.",
+      "analytics_heading": "Análisis del uso",
+      "analytics_body": "Para mejorar el servicio y medir la promoción, distinguimos dispositivos mediante una cookie propia válida durante 180 días y guardamos etiquetas de origen, dominio de referencia, tipo de dispositivo y horas de visita, traducción, inicio y fin de grabación, envío y registro durante un máximo de 180 días. Al iniciar sesión, vinculamos la actividad previa de esa visita con la cuenta. No añadimos el texto escrito, el audio, las URL de referencia completas ni las direcciones IP a estos registros, ni los enviamos a servicios externos de análisis publicitario. Al eliminar la cuenta, también eliminamos los registros de análisis vinculados.",
       "delete_heading": "Eliminación",
       "delete_body": "Al eliminar tu cuenta en Ajustes, se eliminan la cuenta, las grabaciones y el historial de práctica.",
       "support": "Soporte",

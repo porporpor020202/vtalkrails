@@ -1,6 +1,4 @@
-class Admin::UsersController < ApplicationController
-  before_action :require_admin
-
+class Admin::UsersController < Admin::BaseController
   def index
     response.headers["Cache-Control"] = "private, no-store"
     @query = params[:q].to_s.strip.first(200)
@@ -24,6 +22,7 @@ class Admin::UsersController < ApplicationController
     @page = [ params[:page].to_i, 1 ].max
     @total = @user.daily_practices.count
     @practices = @user.daily_practices.includes(:daily_question, { bonus_practice: { audio_attachment: :blob } }, audio_attachment: :blob).order(practiced_on: :desc).offset((@page - 1) * 30).limit(30)
+    @marketing_events = @user.marketing_events.includes(:marketing_visit).order(occurred_at: :desc).limit(50)
   end
 
   def audio
@@ -42,11 +41,5 @@ class Admin::UsersController < ApplicationController
     response.headers["Cache-Control"] = "private, no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
     send_data practice.audio.download, type: practice.audio.content_type, disposition: :inline
-  end
-
-  private
-
-  def require_admin
-    head :forbidden unless current_user.admin?
   end
 end

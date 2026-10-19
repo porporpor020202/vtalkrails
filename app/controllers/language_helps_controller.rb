@@ -32,6 +32,7 @@ class LanguageHelpsController < ApplicationController
       else
         @translation = translation
         render partial: "language_helps/question"
+        track_marketing("question_translation_used", context: @bonus_mode ? "bonus" : "daily")
       end
     else
       @input = params[:input_text].to_s.strip
@@ -43,6 +44,7 @@ class LanguageHelpsController < ApplicationController
         GeminiTranslation.new.call(text: @input, mode: "answer")
       end
       render partial: "language_helps/answer"
+      track_marketing("answer_translation_used", context: @bonus_mode ? "bonus" : "daily")
     end
   rescue AiUsage::DailyLimitExceeded => error
     @result = error.response if params[:mode] == "answer"

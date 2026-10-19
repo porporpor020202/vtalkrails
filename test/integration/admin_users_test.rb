@@ -7,11 +7,16 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
   test "only the exact administrator email can access either provider" do
     get admin_path
     assert_redirected_to new_session_path
+    get admin_marketing_path
+    assert_redirected_to new_session_path
     %w[google apple].each do |provider|
       user = users(:english_native)
       user.update!(email_address: "porporpor020202@gmail.com", oauth_provider: provider)
       sign_in_as(user)
       get admin_path
+      assert_response :success
+      assert_equal "private, no-store", response.headers["Cache-Control"]
+      get admin_marketing_path
       assert_response :success
       assert_equal "private, no-store", response.headers["Cache-Control"]
       get settings_path
@@ -25,6 +30,8 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
       get admin_path
       assert_response :forbidden
       assert_not_includes response.body, "사용자 현황"
+      get admin_marketing_path
+      assert_response :forbidden
     end
   end
 

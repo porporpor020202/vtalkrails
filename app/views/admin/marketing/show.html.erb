@@ -1,0 +1,74 @@
+<% content_for :title, "마케팅 지표 · 세이원띵" %>
+<section class="admin-page marketing-page">
+  <header class="admin-header"><%= link_to "‹ 앱으로", root_path %><h1>마케팅 지표</h1><p>유입 → 번역 → 녹음 → 가입 → 다음 날 사용. 모든 날짜와 시간은 한국 시간입니다.</p></header>
+  <nav class="admin-tabs" aria-label="관리자 메뉴"><%= link_to "사용자 현황", admin_path %><%= link_to "마케팅 지표", admin_marketing_path, aria: { current: "page" } %></nav>
+
+  <%= form_with url: admin_marketing_path, method: :get, class: "marketing-filters" do |f| %>
+    <label>시작일<%= f.date_field :from, value: @report.from, max: Date.current %></label>
+    <label>종료일<%= f.date_field :through, value: @report.through, max: Date.current %></label>
+    <label>유입 경로<%= f.select :source, @report.filter_options.map { |value| [marketing_source_label(value), value] }, { include_blank: "전체", selected: @report.source } %></label>
+    <label>홍보 글 이름<%= f.text_field :campaign, value: @report.campaign, placeholder: "전체 글", maxlength: 120 %></label>
+    <%= f.submit "조회" %>
+  <% end %>
+  <div class="marketing-periods"><%= link_to "최근 7일", admin_marketing_path(from: Date.current - 6, through: Date.current, source: @report.source, campaign: @report.campaign) %><%= link_to "최근 30일", admin_marketing_path(from: Date.current - 29, through: Date.current, source: @report.source, campaign: @report.campaign) %><span>최대 90일씩 조회</span></div>
+  <p class="admin-note"><%= @report.collection_started_at ? "수집 시작: #{admin_time(@report.collection_started_at)}" : "아직 방문 기록이 없습니다. 반영 후 실제 방문부터 수집합니다." %> · 과거의 유입·버튼 사용은 소급할 수 없습니다. 관리자 자신의 사용과 일반적인 봇·링크 미리보기 요청은 제외합니다.</p>
+
+  <div class="admin-metrics marketing-metrics">
+    <div><span>방문한 기기</span><strong><%= @summary[:visitors] %></strong><small>쿠키 기준으로 중복을 제거한 수</small></div>
+    <div><span>신규 가입 계정</span><strong><%= @summary[:new_accounts] %></strong><small>이 기간 생성 · 유입 연결 전 <%= @summary[:unattributed_signups] %>개</small></div>
+    <div><span>녹음 후 가입률</span><strong><%= marketing_rate(@summary[:recorded_then_signup], @summary[:guest_recorders]) %></strong><small>비로그인 녹음 기기 <%= @summary[:guest_recorders] %>개 중 <%= @summary[:recorded_then_signup] %>개</small></div>
+    <div><span>첫 녹음 계정 저장</span><strong><%= @summary[:saved_after_login] %></strong><small>녹음 뒤 로그인하여 저장한 기기</small></div>
+  </div>
+
+  <section class="admin-section marketing-panel">
+    <h2>방문 후 어떤 기능을 썼나요?</h2>
+    <p class="admin-note">선택 기간에 들어온 기기의 행동을 종료일까지 집계합니다. 각 비율은 전체 방문 기기 대비 해당 기능의 사용률입니다.</p>
+    <div class="marketing-stages">
+      <% { question_translation: "질문 번역 보기", answer_translation: "답변을 영어로 번역", recording_started: "녹음 시작", recording_completed: "기기에서 녹음 완료", practice_completed: "녹음 전송 완료", signup_visitors: "신규 가입으로 연결" }.each do |key, label| %>
+        <% count = @summary[key]; percent = @summary[:visitors].positive? ? count * 100.0 / @summary[:visitors] : 0 %>
+        <div class="marketing-stage"><span><%= label %></span><div class="marketing-bar" aria-hidden="true"><i style="width: <%= [percent, 100].min.round(2) %>%"></i></div><strong><%= count %></strong><small><%= marketing_rate(count, @summary[:visitors]) %></small></div>
+      <% end %>
+    </div>
+    <p class="admin-note">녹음 시작·완료는 기기 보고 기준이며, 전송 완료는 서버에 실제 저장된 기록입니다. 전송이 확인되면 녹음에도 포함합니다. 자동으로 표시되는 답변 예시는 번역 사용에 포함하지 않습니다.</p>
+    <p class="marketing-insight">비로그인으로 녹음한 기기 중 <strong><%= @summary[:guest_recorders] - @summary[:recorded_then_signup] %>개</strong>는 종료일까지 신규 가입으로 이어지지 않았습니다. 기존 계정 로그인은 신규 가입과 구분합니다.</p>
+  </section>
+
+  <section class="admin-section">
+    <h2>어느 글에서 들어왔나요?</h2>
+    <p class="admin-note">방문 당시 경로로 집계합니다. 신규 가입은 가입 당시 방문에 표시하고, 위의 녹음 후 가입률은 같은 기기의 이후 방문까지 연결합니다. 한 기기가 여러 글로 들어오면 각 행에 포함됩니다. 상위 100개 조합을 표시합니다.</p>
+    <div class="admin-table-wrap"><table class="admin-table marketing-sources"><thead><tr><th>유입 경로 / 매체</th><th>글 / 링크 구분</th><th>방문 기기</th><th>답변 번역</th><th>녹음 완료</th><th>전송 완료</th><th>신규 가입</th></tr></thead><tbody>
+      <% @report.sources.each do |row| %><tr><td><strong><%= marketing_source_label(row[:source]) %></strong><small><%= row[:medium] %></small></td><td><%= row[:campaign].presence || "글 구분 없음" %><small><%= row[:content] %></small></td><td><%= row[:visitors] %></td><% %i[translated recorded saved signed_up].each do |key| %><td><%= row[key] %><small><%= marketing_rate(row[key], row[:visitors]) %></small></td><% end %></tr><% end %>
+      <% if @summary[:visitors].zero? %><tr><td colspan="7">이 조건의 방문 기록이 없습니다.</td></tr><% end %>
+    </tbody></table></div>
+    <p class="admin-note">추적 링크가 없거나 앱·브라우저가 경로를 전달하지 않으면 어느 글인지 확인할 수 없습니다. 스토어를 거쳐 설치한 앱의 유입 경로는 현재 추적하지 않습니다.</p>
+  </section>
+
+  <section class="admin-section marketing-panel">
+    <h2>가입하고 다음 날에도 썼나요?</h2>
+    <p class="admin-note">선택 기간에 가입한 계정을 기준으로, 가입 다음 한국 날짜의 방문과 연습 완료를 확인합니다. 종료일 뒤에 발생한 다음 날 사용도 포함합니다. 다음 날이 끝난 계정만 비율에 반영합니다.</p>
+    <div class="marketing-retention">
+      <div><span>다음 날 재방문율</span><strong><%= marketing_rate(@retention[:returned], @retention[:signups]) %></strong><small><%= @retention[:signups] %>명 중 <%= @retention[:returned] %>명</small></div>
+      <div><span>다음 날 연습 완료율</span><strong><%= marketing_rate(@retention[:practiced], @retention[:signups]) %></strong><small><%= @retention[:signups] %>명 중 <%= @retention[:practiced] %>명</small></div>
+      <div><span>아직 집계 중</span><strong><%= @retention[:pending] %>명</strong><small>오늘·어제 가입한 계정</small></div>
+    </div>
+    <div class="admin-table-wrap"><table class="admin-table marketing-cohorts"><thead><tr><th>가입일</th><th>신규 가입</th><th>다음 날 재방문</th><th>다음 날 연습 완료</th><th>집계 상태</th></tr></thead><tbody>
+      <% @report.retention.each do |row| %><tr><td><%= row[:date].strftime("%Y.%m.%d") %></td><td><%= row[:signups] %>명</td><td><%= row[:returned] %>명<small><%= marketing_rate(row[:returned], row[:signups]) if row[:mature] %></small></td><td><%= row[:practiced] %>명<small><%= marketing_rate(row[:practiced], row[:signups]) if row[:mature] %></small></td><td><%= row[:mature] ? "집계 완료" : "집계 중" %></td></tr><% end %>
+      <% if @report.retention.empty? %><tr><td colspan="5">이 조건에 수집된 신규 가입 기록이 없습니다.</td></tr><% end %>
+    </tbody></table></div>
+    <p class="admin-note">로그인 상태의 방문과 이후 로그인으로 연결된 방문을 계정 단위로 확인합니다. 수집 이전의 재방문 여부는 알 수 없습니다.</p>
+  </section>
+
+  <section class="admin-section marketing-panel" data-controller="campaign-link" data-campaign-link-base-value="https://sayonething.net/">
+    <h2>글별 추적 링크 만들기</h2>
+    <p class="admin-note">홍보 글마다 다른 이름을 붙이고, 만들어진 링크를 글에 넣으세요. 아래 입력은 링크를 만들 뿐이며 글을 게시하지는 않습니다.</p>
+    <div class="marketing-link-fields" data-action="input->campaign-link#update">
+      <label for="campaign-source">올리는 곳<input id="campaign-source" value="youtube" maxlength="120" data-campaign-link-target="source"></label>
+      <label for="campaign-medium">매체<input id="campaign-medium" value="social" maxlength="120" data-campaign-link-target="medium"></label>
+      <label for="campaign-name">글 이름<input id="campaign-name" value="<%= Date.current.iso8601 %>-post" placeholder="예: 2026-10-20-short1" maxlength="120" data-campaign-link-target="campaign"></label>
+      <label for="campaign-content">링크 구분 · 선택<input id="campaign-content" placeholder="예: description, comment" maxlength="120" data-campaign-link-target="content"></label>
+    </div>
+    <div class="marketing-link-result"><input aria-label="추적 링크" readonly data-campaign-link-target="url"><button type="button" data-action="campaign-link#copy">링크 복사</button></div>
+    <p role="status" aria-live="polite" class="admin-note" data-campaign-link-target="status"></p>
+  </section>
+  <p class="admin-note">방문 기기는 쿠키 기준이므로 쿠키 삭제·다른 기기는 별도로 집계됩니다. 계정 기준 재방문은 같은 계정의 기기를 합칩니다. 분석에는 유입 태그·참조 사이트 도메인·행동 시각만 저장하며, 입력 문장과 녹음 내용은 추가 수집하지 않습니다. 분석 기록은 최대 180일 보관합니다.</p>
+</section>

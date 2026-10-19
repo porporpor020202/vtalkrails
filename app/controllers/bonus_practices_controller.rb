@@ -32,6 +32,7 @@ class BonusPracticesController < ApplicationController
     @guest = false
     @streak = current_user.streak
     @result = training_usage.help_data.dig("bonus_answer", "response")
+    track_marketing("question_viewed", context: "bonus")
     render "daily_practices/show"
   end
 
@@ -49,6 +50,7 @@ class BonusPracticesController < ApplicationController
         bonus.save!
       end
     end
+    track_marketing("practice_completed", context: "bonus", key: "bonus:#{bonus.id}", at: bonus.completed_at)
     render json: { redirect_url: root_path }, status: :created
   rescue ActiveRecord::RecordInvalid
     render json: { error: t("ui.invalid_recording") }, status: :unprocessable_entity

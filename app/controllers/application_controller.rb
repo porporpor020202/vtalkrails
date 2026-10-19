@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   include Authentication
   around_action :use_native_language
   before_action :track_user_activity
+  include MarketingTracking
   stale_when_importmap_changes
   helper_method :native_app?, :android_app?, :ios_app?, :selected_native_language
 

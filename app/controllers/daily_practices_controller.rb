@@ -27,6 +27,8 @@ class DailyPracticesController < ApplicationController
       @resets_at = @today.next_day.in_time_zone
       @week = (@today.beginning_of_week..@today.end_of_week).to_a
       @completed_dates = @guest ? [ @practice.practiced_on ] : current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
+    else
+      track_marketing("question_viewed")
     end
   end
 
@@ -40,24 +42,29 @@ class DailyPracticesController < ApplicationController
 
     training_usage
     unless current_user
-      unless DailyPractice.exists?(id: session[:guest_practice_id], user_id: nil, practiced_on: date)
+      practice = DailyPractice.find_by(id: session[:guest_practice_id], user_id: nil, practiced_on: date)
+      unless practice
         practice = DailyPractice.new(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms], english_sentence: recording_english_sentence!)
         practice.audio.attach(recording_params[:audio])
         practice.save!
         session[:guest_practice_id] = practice.id
         ExpireGuestPracticeJob.set(wait: 24.hours).perform_later(practice.id)
       end
+      track_marketing("practice_completed", key: "practice:#{practice.id}", at: practice.completed_at)
       render json: { redirect_url: root_path }, status: :created
       return
     end
 
     current_user.with_lock do
-      unless current_user.daily_practices.exists?(practiced_on: date)
+      practice = current_user.daily_practices.find_by(practiced_on: date)
+      unless practice
         practice = current_user.daily_practices.build(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms], english_sentence: recording_english_sentence!)
         practice.audio.attach(recording_params[:audio])
         practice.save!
       end
+      @completed_practice = practice
     end
+    track_marketing("practice_completed", key: "practice:#{@completed_practice.id}", at: @completed_practice.completed_at)
     render json: { redirect_url: root_path }, status: :created
   rescue ActiveRecord::RecordInvalid
     render json: { error: t("ui.invalid_recording") }, status: :unprocessable_entity

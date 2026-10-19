@@ -1,6 +1,7 @@
 <% content_for :title, "사용자 현황 · 세이원띵" %>
 <section class="admin-page">
   <header class="admin-header"><div><%= link_to "‹ 앱으로", root_path %><h1>사용자 현황</h1><p>모든 날짜와 시간은 한국 시간입니다.</p></div></header>
+  <nav class="admin-tabs" aria-label="관리자 메뉴"><%= link_to "사용자 현황", admin_path, aria: { current: "page" } %><%= link_to "마케팅 지표", admin_marketing_path %></nav>
   <div class="admin-metrics">
     <div><span>전체 가입</span><strong><%= @total_users %>명</strong></div>
     <div><span>오늘 가입</span><strong><%= @today_users %>명</strong></div>

@@ -49,9 +49,11 @@ module Authentication
         user.update!(native_language: cookies[:native_language])
       end
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
-        claim_guest_practice(user, training_usage: training_usage)
+        claimed_practice = claim_guest_practice(user, training_usage: training_usage)
         Current.session = session
         cookies.encrypted.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        link_marketing_account(user, session_record: session)
+        track_marketing("guest_recording_claimed", key: "claim:#{claimed_practice.id}") if claimed_practice
       end
     end
 
@@ -59,6 +61,7 @@ module Authentication
       id = session[:guest_practice_id] || cookies.encrypted[:apple_guest_practice_id]
       return unless id
 
+      claimed_practice = nil
       user.with_lock do
         practice = DailyPractice.find_by(id: id, user_id: nil)
         practice&.with_lock do
@@ -69,12 +72,14 @@ module Authentication
             practice.destroy!
           else
             practice.update!(user: user)
+            claimed_practice = practice
             session[:practice_saved] = true
           end
         end
       end
       session.delete(:guest_practice_id)
       cookies.delete(:apple_guest_practice_id, same_site: :none, secure: Rails.env.production? || request.ssl?)
+      claimed_practice
     end
 
     def terminate_session

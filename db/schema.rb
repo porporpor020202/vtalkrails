@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -90,6 +90,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
     t.index ["asked_on"], name: "index_daily_questions_on_asked_on", unique: true
   end
 
+  create_table "marketing_events", force: :cascade do |t|
+    t.boolean "authenticated", default: false, null: false
+    t.string "context", default: "daily", null: false
+    t.string "deduplication_key", null: false
+    t.bigint "marketing_visit_id"
+    t.string "name", null: false
+    t.datetime "occurred_at", null: false
+    t.bigint "user_id"
+    t.index ["deduplication_key"], name: "index_marketing_events_on_deduplication_key", unique: true
+    t.index ["marketing_visit_id"], name: "index_marketing_events_on_marketing_visit_id"
+    t.index ["name", "occurred_at"], name: "index_marketing_events_on_name_and_occurred_at"
+    t.index ["user_id", "occurred_at"], name: "index_marketing_events_on_user_id_and_occurred_at"
+    t.index ["user_id"], name: "index_marketing_events_on_user_id"
+  end
+
+  create_table "marketing_visits", force: :cascade do |t|
+    t.string "campaign"
+    t.string "content"
+    t.boolean "internal", default: false, null: false
+    t.string "landing_path", null: false
+    t.datetime "last_seen_at", null: false
+    t.string "medium", null: false
+    t.string "platform", null: false
+    t.string "referrer_host"
+    t.string "source", null: false
+    t.datetime "started_at", null: false
+    t.bigint "user_id"
+    t.string "visitor_key", null: false
+    t.index ["last_seen_at"], name: "index_marketing_visits_on_last_seen_at"
+    t.index ["started_at", "source", "campaign"], name: "index_marketing_visits_on_started_at_and_source_and_campaign"
+    t.index ["user_id"], name: "index_marketing_visits_on_user_id"
+    t.index ["visitor_key", "started_at"], name: "index_marketing_visits_on_visitor_key_and_started_at"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -117,5 +151,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
   add_foreign_key "bonus_practices", "daily_practices"
   add_foreign_key "daily_practices", "daily_questions"
   add_foreign_key "daily_practices", "users"
+  add_foreign_key "marketing_events", "marketing_visits"
+  add_foreign_key "marketing_events", "users"
+  add_foreign_key "marketing_visits", "users"
   add_foreign_key "sessions", "users"
 end
