@@ -128,3 +128,8 @@ main { min-height: 100dvh; }
   .completion-week { padding-top: 17px; }
   .next-practice { margin-top: 16px; padding-top: 14px; }
 }
+
+.guest-save { width: 100%; margin: 26px 0; }
+.guest-save .primary-button { display: flex; justify-content: center; text-decoration: none; }
+.guest-save p { color: #7c8b70; font-size: 14px; margin-top: 12px; }
+.practice-saved { background: #e6eddf; color: #234b3d; border-radius: 18px; padding: 16px 22px; margin: 22px 0; font-weight: 600; }

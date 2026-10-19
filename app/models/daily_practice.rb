@@ -1,9 +1,10 @@
 class DailyPractice < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :daily_question
   has_one_attached :audio, dependent: :purge_later
 
-  validates :practiced_on, presence: true, uniqueness: { scope: :user_id }
+  validates :practiced_on, presence: true
+  validates :practiced_on, uniqueness: { scope: :user_id }, if: -> { user_id.present? }
   validates :completed_at, presence: true
   validates :duration_ms, numericality: { only_integer: true, greater_than_or_equal_to: 1000, less_than_or_equal_to: 60000 }
   validates :audio, presence: true

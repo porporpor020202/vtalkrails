@@ -45,9 +45,30 @@ module Authentication
 
     def start_new_session_for(user)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+        claim_guest_practice(user)
         Current.session = session
         cookies.encrypted.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
       end
+    end
+
+    def claim_guest_practice(user)
+      id = session[:guest_practice_id]
+      return unless id
+
+      user.with_lock do
+        practice = DailyPractice.find_by(id: id, user_id: nil)
+        practice&.with_lock do
+          next if practice.user_id.present?
+
+          if user.daily_practices.exists?(practiced_on: practice.practiced_on)
+            practice.destroy!
+          else
+            practice.update!(user: user)
+            session[:practice_saved] = true
+          end
+        end
+      end
+      session.delete(:guest_practice_id)
     end
 
     def terminate_session

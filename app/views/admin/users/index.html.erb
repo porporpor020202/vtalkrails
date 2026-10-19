@@ -1,0 +1,25 @@
+<% content_for :title, "사용자 현황 · 세이원띵" %>
+<section class="admin-page">
+  <header class="admin-header"><div><%= link_to "‹ 앱으로", root_path %><h1>사용자 현황</h1><p>모든 날짜와 시간은 한국 시간입니다.</p></div></header>
+  <div class="admin-metrics">
+    <div><span>전체 가입</span><strong><%= @total_users %>명</strong></div>
+    <div><span>오늘 가입</span><strong><%= @today_users %>명</strong></div>
+    <div><span>연습한 사용자</span><strong><%= @practiced_users %>명</strong></div>
+    <div><span>오늘 연습 완료</span><strong><%= @today_practices %>명</strong></div>
+  </div>
+  <%= form_with url: admin_path, method: :get, class: "admin-search" do |f| %>
+    <%= f.search_field :q, value: @query, placeholder: "이메일 검색", aria: { label: "이메일 검색" } %><%= f.submit "검색" %>
+  <% end %>
+  <p class="admin-note">최근 활동은 로그인한 상태의 앱 이용 시각입니다(최대 5분 간격). 도입 이전은 남아 있는 로그인·연습 기록을 기준으로 표시합니다. 현재 스트릭은 오늘 또는 어제까지 이어진 연속 연습 일수입니다.</p>
+  <div class="admin-table-wrap"><table class="admin-table">
+    <thead><tr><th>사용자</th><th>가입일</th><th>최근 활동</th><th>연습 일수</th><th>최근 연습일</th><th>현재 스트릭</th><th>오늘</th><th>녹음</th></tr></thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <% dates = @dates.fetch(user.id, []); active = [user.created_at, user.last_active_at, @last_practice[user.id], @last_login[user.id]].compact.max %>
+        <tr><td><strong><%= link_to user.email_address, admin_user_path(user) %></strong><small>#<%= user.id %> · <%= user.oauth_provider == 'apple' ? 'Apple' : 'Google' %></small></td><td><%= admin_time(user.created_at) %></td><td><%= admin_time(active) %></td><td><%= dates.size %>일</td><td><%= dates.first&.strftime('%Y.%m.%d') || '—' %></td><td><%= admin_streak(dates) %>일</td><td><%= dates.include?(Date.current) ? '완료 ✓' : '—' %></td><td><%= link_to '녹음 보기', admin_user_path(user) %></td></tr>
+      <% end %>
+      <% if @users.empty? %><tr><td colspan="8">사용자가 없습니다.</td></tr><% end %>
+    </tbody>
+  </table></div>
+  <nav class="admin-pagination" aria-label="사용자 페이지"><span>총 <%= @total %>명 · <%= @page %>페이지</span><% if @page > 1 %><%= link_to "이전", admin_path(q: @query, page: @page - 1) %><% end %><% if @page * 50 < @total %><%= link_to "다음", admin_path(q: @query, page: @page + 1) %><% end %></nav>
+</section>

@@ -1,5 +1,8 @@
 class LanguageHelpsController < ApplicationController
-  rate_limit to: 20, within: 1.minute, by: -> { current_user.id }, with: -> { render_help_error("잠시 쉬었다가 다시 시도해주세요.", :too_many_requests) }
+  allow_unauthenticated_access
+  before_action :resume_session
+
+  rate_limit to: 20, within: 1.minute, by: -> { current_user&.id || request.remote_ip }, with: -> { render_help_error("잠시 쉬었다가 다시 시도해주세요.", :too_many_requests) }
 
   def create
     if %w[question example].include?(params[:mode])

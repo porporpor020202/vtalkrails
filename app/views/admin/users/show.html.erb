@@ -1,0 +1,21 @@
+<% content_for :title, "사용자 녹음 · 세이원띵" %>
+<section class="admin-page">
+  <header class="admin-header"><%= link_to "‹ 사용자 현황", admin_path %><h1>연습 녹음</h1><p><%= @user.email_address %> · 총 <%= @total %>일 연습</p><p>모든 날짜와 시간은 한국 시간입니다.</p></header>
+  <div class="admin-recordings">
+    <% @practices.each do |practice| %>
+      <article class="admin-recording">
+        <div class="admin-recording-content">
+          <time datetime="<%= practice.completed_at.iso8601 %>"><%= admin_time(practice.completed_at) %> · <%= (practice.duration_ms / 1000.0).round(1) %>초</time>
+          <p lang="en"><%= practice.daily_question.question %></p>
+        </div>
+        <% if practice.audio.attached? %>
+          <%= render "shared/recording_player", preview: false, audio_url: audio_admin_user_path(@user, practice_id: practice.id), duration_ms: practice.duration_ms %>
+        <% else %>
+          <span>녹음 파일 없음</span>
+        <% end %>
+      </article>
+    <% end %>
+    <% if @practices.empty? %><p class="admin-note">아직 저장된 녹음이 없습니다.</p><% end %>
+  </div>
+  <nav class="admin-pagination" aria-label="녹음 페이지"><span><%= @page %>페이지</span><% if @page > 1 %><%= link_to "이전", admin_user_path(@user, page: @page - 1) %><% end %><% if @page * 30 < @total %><%= link_to "다음", admin_user_path(@user, page: @page + 1) %><% end %></nav>
+</section>

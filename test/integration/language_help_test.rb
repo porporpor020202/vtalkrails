@@ -74,9 +74,13 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     assert response.parsed_body["error"].present?
   end
 
-  test "sign in is required" do
+  test "visitors can request answer help before login" do
     sign_out
-    post language_help_path, params: { mode: "answer", input_text: "안녕하세요" }
-    assert_redirected_to new_session_path
+    translator = Object.new
+    translator.define_singleton_method(:call) { |**| { "english" => "Hello.", "ipa" => "/həˈloʊ/" } }
+    GeminiTranslation.stub(:new, -> { translator }) do
+      post language_help_path, params: { mode: "answer", input_text: "안녕하세요" }
+      assert_response :success
+    end
   end
 end

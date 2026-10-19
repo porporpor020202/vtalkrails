@@ -7,7 +7,7 @@
     </div>
     <h1 class="sign-in-title">세이원띵</h1>
     <p class="sign-in-english-brand" lang="en">Say One Thing</p>
-    <p class="sign-in-description">하루 한 질문, 영어 한 문장.</p>
+    <p class="sign-in-description"><%= session[:guest_practice_id] ? "첫 연습 기록을 저장하세요." : "하루 한 질문, 영어 한 문장." %></p>
   </div>
   <div class="sign-in-actions">
     <%= render "shared/sign_in_with_google" %>

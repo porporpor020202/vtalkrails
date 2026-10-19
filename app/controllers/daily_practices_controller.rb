@@ -1,13 +1,19 @@
 class DailyPracticesController < ApplicationController
+  allow_unauthenticated_access only: %i[show create]
+  before_action :resume_session, only: %i[show create]
+  rate_limit to: 10, within: 1.minute, only: :create
+
   def show
     @today = Date.current
     @question = DailyQuestion.for_date(@today)
-    @practice = current_user.daily_practices.find_by(practiced_on: @today)
-    @streak = current_user.streak(today: @today)
+    @guest = current_user.nil?
+    @practice = @guest ? DailyPractice.find_by(id: session[:guest_practice_id], user_id: nil) : current_user.daily_practices.find_by(practiced_on: @today)
+    @saved = session.delete(:practice_saved)
+    @streak = @guest ? (@practice ? 1 : 0) : current_user.streak(today: @today)
     if @practice
       @resets_at = @today.next_day.in_time_zone
       @week = (@today.beginning_of_week..@today.end_of_week).to_a
-      @completed_dates = current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
+      @completed_dates = @guest ? [@practice.practiced_on] : current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
     end
   end
 
@@ -16,6 +22,18 @@ class DailyPracticesController < ApplicationController
     question = DailyQuestion.find_signed(params[:question_token], purpose: :daily_question)
     unless question&.asked_on == date
       render json: { error: "새로운 하루가 시작됐어요. 오늘의 질문을 다시 열어주세요.", redirect_url: root_path }, status: :conflict
+      return
+    end
+
+    unless current_user
+      unless DailyPractice.exists?(id: session[:guest_practice_id], user_id: nil)
+        practice = DailyPractice.new(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms])
+        practice.audio.attach(recording_params[:audio])
+        practice.save!
+        session[:guest_practice_id] = practice.id
+        ExpireGuestPracticeJob.set(wait: 24.hours).perform_later(practice.id)
+      end
+      render json: { redirect_url: root_path }, status: :created
       return
     end
 

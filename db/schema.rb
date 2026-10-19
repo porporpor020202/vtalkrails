@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_000000) do
     t.integer "duration_ms", null: false
     t.date "practiced_on", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.index ["daily_question_id"], name: "index_daily_practices_on_daily_question_id"
     t.index ["user_id", "practiced_on"], name: "index_daily_practices_on_user_id_and_practiced_on", unique: true
     t.index ["user_id"], name: "index_daily_practices_on_user_id"
@@ -76,9 +76,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_000000) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
+    t.datetime "last_active_at"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false
+    t.index ["last_active_at"], name: "index_users_on_last_active_at"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
   end
 

@@ -2,10 +2,15 @@
 <section class="daily-page" data-controller="daily-practice" data-daily-practice-endpoint-value="<%= daily_practice_path %>" data-daily-practice-token-value="<%= @question.signed_id(purpose: :daily_question) %>" data-action="turbo:before-cache@document->daily-practice#cleanup language-help:open->daily-practice#openHelp language-help:close->daily-practice#closeHelp">
   <header class="daily-header">
     <span class="header-date"><%= @today.strftime("%m.%d") %><span><%= %w[일요일 월요일 화요일 수요일 목요일 금요일 토요일][@today.wday] %></span></span>
+    <% unless @guest %>
     <%= link_to settings_path, class: "icon-button", aria: { label: "설정" } do %>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/></svg>
     <% end %>
+    <% end %>
   </header>
+  <% if @saved %>
+    <p class="practice-saved" role="status"><span aria-hidden="true">✓</span> 첫 연습 기록이 저장됐어요.</p>
+  <% end %>
   <% if @practice %>
     <section class="daily-complete" aria-label="오늘의 연습 완료">
       <div class="completion-medal" aria-hidden="true">
@@ -14,6 +19,12 @@
       </div>
       <h1>잘했어요!</h1>
       <p class="completion-praise">오늘도 한 문장, 해냈네요.</p>
+      <% if @guest %>
+        <div class="guest-save">
+          <%= link_to "이 기록을 저장할까요?", new_session_path, class: "primary-button", data: { turbo: false } %>
+          <p>로그인하면 첫 기록부터 이어갈 수 있어요.</p>
+        </div>
+      <% end %>
       <div class="completion-streak">
         <span class="completion-label"><span aria-hidden="true">✓</span> 오늘 완료</span>
         <p class="completion-count">연속 <strong><%= @streak %></strong>일</p>
@@ -27,11 +38,13 @@
           <% end %>
         </div>
       </div>
+      <% unless @guest %>
       <div class="next-practice" data-controller="reset-countdown" data-reset-countdown-at-value="<%= @resets_at.iso8601 %>" data-reset-countdown-now-value="<%= Time.current.iso8601 %>" data-action="visibilitychange@document->reset-countdown#tick">
         <div class="next-practice-heading"><span>다음 한 문장</span><span>내일 00:00 · 한국 시간</span></div>
         <time class="next-practice-clock" datetime="<%= @resets_at.iso8601 %>" data-reset-countdown-target="clock" role="timer" aria-label="다음 질문까지 남은 시간" aria-live="off"><%= Time.at([(@resets_at - Time.current).to_i, 0].max).utc.strftime("%H:%M:%S") %></time>
         <%= link_to "새 질문 열기", root_path, class: "primary-button", hidden: true, data: { reset_countdown_target: "ready" } %>
       </div>
+      <% end %>
     </section>
   <% else %>
     <div class="daily-meta"><span>하루, 한 문장</span><span class="streak-pill">연속 <%= @streak %>일</span></div>

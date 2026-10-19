@@ -3,6 +3,7 @@
   <header class="simple-header"><%= link_to "‹", root_path, aria: { label: "오늘의 질문으로" } %><h1>설정</h1></header>
   <p class="settings-email"><%= current_user.email_address %></p>
   <div class="settings-links">
+    <% if current_user.admin? %><%= link_to "사용자 현황", admin_path %><% end %>
     <%= link_to "개인정보 처리방침", privacy_path %>
     <%= button_to "로그아웃", session_path, method: :delete %>
     <%= link_to "계정 삭제", confirm_account_deletion_path, class: "danger" %>
