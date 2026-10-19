@@ -15,7 +15,7 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_equal "private, no-store", response.headers["Cache-Control"]
       get settings_path
-      assert_select "a[href=?]", admin_path, text: "사용자 현황"
+      assert_select "a[href=?]", admin_path, count: 0
       sign_out
     end
     %w[porporpor020202@gmail.com.attacker.net someone@privaterelay.appleid.com other@gmail.com].each do |email|

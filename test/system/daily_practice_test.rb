@@ -66,51 +66,43 @@ class DailyPracticeFlowTest < ApplicationSystemTestCase
   test "question translation and Korean answer help work inside Turbo frames" do
     translator = Object.new
     translator.define_singleton_method(:call) do |text:, mode:|
-      mode == "answer" ? { "english" => "I like warm lattes.", "ipa" => "/aɪ laɪk wɔrm ˈlɑteɪz/" } : { "korean" => mode == "example" ? "친구의 농담에 웃었어요." : "오늘 무엇이 당신을 웃게 했나요?" }
+      mode == "answer" ? { "english" => "I like warm lattes.", "ipa" => "/aɪ laɪk wɔrm ˈlɑteɪz/" } : { "translation" => mode == "example" ? "친구의 농담에 웃었어요." : "오늘 무엇이 당신을 웃게 했나요?" }
     end
     GeminiTranslation.stub(:new, -> { translator }) do
+      visit root_path
       click_button "번역 보기"
       assert_text "오늘 무엇이 당신을 웃게 했나요?"
-      click_button "이거 영어로 뭐라 말해요?"
-      within "dialog[open]" do
-        assert_selector 'textarea[placeholder="예: 친구의 농담에 웃었어요."]'
-        fill_in "하고 싶은 말을 한국어로 적어주세요.", with: "따뜻한 라테를 좋아해요."
-        click_button "영어로 알아보기"
-        assert_selector ".english-answer", text: "I like warm lattes."
-        assert_selector ".ipa-answer", text: "/aɪ laɪk wɔrm ˈlɑteɪz/"
-        assert_no_button "발음 듣기"
-        assert_text "What made you smile today?"
-        page.save_screenshot(Rails.root.join("tmp/daily-language-help.png"))
-        click_button "녹음 시작", enable_aria_label: true
-        assert_selector ".english-answer", text: "I like warm lattes."
-        assert_button "녹음 끝내기", enable_aria_label: true
-        assert_selector '[data-daily-practice-target="timer"]', text: "00:02", wait: 5
-        click_button "녹음 끝내기", enable_aria_label: true
-        assert_button "녹음 재생", enable_aria_label: true
-        assert_no_selector "audio[controls]"
-        click_button "녹음 재생", enable_aria_label: true
-        assert_button "녹음 정지", enable_aria_label: true
-        assert_selector '[data-recording-player-target="stop"]'
-        assert_no_selector '[data-recording-player-target="play"]'
-        assert_selector ".playback-gauge" do |gauge|
-          gauge["aria-valuenow"].to_i >= 25
-        end
-        click_button "녹음 정지", enable_aria_label: true
-        assert_selector '.playback-gauge[aria-valuenow="0"]'
-        click_button "녹음 재생", enable_aria_label: true
-        assert_selector '.playback-gauge[aria-valuenow="100"]', wait: 5
-        assert_button "녹음 재생", enable_aria_label: true
-        page.save_screenshot(Rails.root.join("tmp/recording-inside-help.png"))
-        click_button "도움말 닫기", enable_aria_label: true
-      end
-      assert_no_selector "dialog[open]"
+      assert_no_selector "dialog"
+      assert_no_button "이거 영어로 뭐라 말해요?"
+      assert_selector 'textarea[placeholder="예: 친구의 농담에 웃었어요."]'
+      fill_in "하고 싶은 말을 한국어로 적어주세요. 영어로 먼저 확인하고 내뱉어보세요!", with: "따뜻한 라테를 좋아해요."
+      click_button "영어로 알아보기"
+      assert_selector ".english-answer", text: "I like warm lattes."
+      assert_selector ".ipa-answer", text: "/aɪ laɪk wɔrm ˈlɑteɪz/"
+      assert_no_button "발음 듣기"
+      assert_text "What made you smile today?"
+      page.save_screenshot(Rails.root.join("tmp/daily-language-help.png"))
+      click_button "녹음 시작", enable_aria_label: true
+      assert_selector ".english-answer", text: "I like warm lattes."
+      assert_button "녹음 끝내기", enable_aria_label: true
+      assert_selector '[data-daily-practice-target="timer"]', text: "00:02", wait: 5
+      click_button "녹음 끝내기", enable_aria_label: true
       assert_button "녹음 재생", enable_aria_label: true
-      click_button "이거 영어로 뭐라 말해요?"
-      within "dialog[open]" do
-        assert_selector ".english-answer", text: "I like warm lattes."
-        assert_button "녹음 재생", enable_aria_label: true
-        click_button "전송"
+      assert_no_selector "audio[controls]"
+      click_button "녹음 재생", enable_aria_label: true
+      assert_button "녹음 정지", enable_aria_label: true
+      assert_selector '[data-recording-player-target="stop"]'
+      assert_no_selector '[data-recording-player-target="play"]'
+      assert_selector ".playback-gauge" do |gauge|
+        gauge["aria-valuenow"].to_i >= 25
       end
+      click_button "녹음 정지", enable_aria_label: true
+      assert_selector '.playback-gauge[aria-valuenow="0"]'
+      click_button "녹음 재생", enable_aria_label: true
+      assert_selector '.playback-gauge[aria-valuenow="100"]', wait: 5
+      assert_button "녹음 재생", enable_aria_label: true
+      page.save_screenshot(Rails.root.join("tmp/recording-inside-help.png"))
+      click_button "전송"
       assert_selector "h1", text: "잘했어요!"
       assert_equal 1, @user.daily_practices.count
     end

@@ -1,16 +1,13 @@
+import { translate } from "helpers/translations"
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dialog"]
   static values = { endpoint: String, token: String }
 
-  open() { this.dialogTarget.showModal(); this.dispatch("open", { detail: { slot: this.dialogTarget.querySelector("[data-recording-slot]") } }); this.loadExample() }
-  close() { this.dialogTarget.close() }
-  closed() { this.dispatch("close") }
-  backdrop(event) { if (event.target === this.dialogTarget) this.close() }
+  connect() { this.loadExample() }
   restoreExample() {
-    const input = this.dialogTarget.querySelector("textarea")
-    if (input && this.example) input.placeholder = `예: ${this.example}`
+    const input = this.element.querySelector("textarea")
+    if (input && this.example) input.placeholder = translate("example", { text: this.example })
   }
   async loadExample() {
     if (this.example || this.loadingExample) return
@@ -26,5 +23,4 @@ export default class extends Controller {
     } catch { /* Keep the plain placeholder when examples are unavailable. */ }
     finally { this.loadingExample = false }
   }
-  disconnect() { if (this.dialogTarget.open) this.dialogTarget.close() }
 }

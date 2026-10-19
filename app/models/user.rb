@@ -4,6 +4,7 @@ class User < ApplicationRecord
 
   validates :oauth_provider, inclusion: { in: %w[apple google] }
   validates :oauth_uid, presence: true, uniqueness: { scope: :oauth_provider }
+  validates :native_language, inclusion: { in: NativeLanguage::OPTIONS.keys }, allow_nil: true
   validates :email_address, presence: true
   normalizes :email_address, with: ->(email) { email&.strip&.downcase }
 

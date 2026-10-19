@@ -1,2 +1,2 @@
-<% content_for :title, "계정 삭제 안내 · 세이원띵" %>
-<section class="simple-page"><h1>계정 삭제 안내</h1><p>로그인 후 설정 → 계정 삭제에서 계정, 녹음, 연습 기록을 영구 삭제할 수 있습니다.</p><%= link_to "계정 삭제하기", confirm_account_deletion_path, class: "primary-button" %><p>로그인할 수 없으면 privacy@vtalks.net으로 문의해주세요.</p></section>
+<% content_for :title, t("pages.delete_guide") %>
+<section class="simple-page"><h1><%= t("pages.delete_guide") %></h1><p><%= t("pages.delete_help_body") %></p><%= link_to t("pages.delete_action"), confirm_account_deletion_path, class: "primary-button" %><p><%= t("pages.cant_login") %></p></section>

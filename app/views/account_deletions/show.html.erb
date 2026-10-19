@@ -1,8 +1,8 @@
-<% content_for :title, "계정 삭제 · 세이원띵" %>
+<% content_for :title, t("ui.delete_account") %>
 <section class="simple-page">
-  <header class="simple-header"><%= link_to "‹", settings_path, aria: { label: "설정으로" } %><h1>계정 삭제</h1></header>
+  <header class="simple-header"><%= link_to "‹", settings_path, aria: { label: t("ui.back_settings") } %><h1><%= t("ui.delete_account") %></h1></header>
   <p><%= current_user.email_address %></p>
-  <p>계정을 삭제하면 저장한 녹음과 연속 기록, 로그인 정보가 삭제됩니다. 되돌릴 수 없어요.</p>
-  <%= button_to "계정과 기록 영구 삭제", account_path, method: :delete, class: "primary-button", form: { data: { turbo_confirm: "계정과 모든 녹음, 연속 기록을 영구 삭제할까요?" } } %>
-  <%= link_to "취소", settings_path, class: "secondary-button" %>
+  <p><%= t("ui.delete_warning") %></p>
+  <%= button_to t("ui.delete_all"), account_path, method: :delete, class: "primary-button", form: { data: { turbo_confirm: t("ui.delete_confirm") } } %>
+  <%= link_to t("ui.cancel"), settings_path, class: "secondary-button" %>
 </section>

@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   root "daily_practices#show"
+  resource :native_language, only: %i[show update]
   get "admin" => "admin/users#index", as: :admin
   get "admin/users/:id" => "admin/users#show", as: :admin_user
   get "admin/users/:id/recordings/:practice_id" => "admin/users#audio", as: :audio_admin_user

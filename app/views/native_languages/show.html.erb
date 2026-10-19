@@ -1,0 +1,22 @@
+<% content_for :title, t("ui.choose_language") %>
+<section class="language-page" data-controller="native-language">
+  <header class="language-heading">
+    <div class="language-mark" aria-hidden="true"><span>A</span><span>あ</span></div>
+    <h1 data-native-language-target="title"><%= t("ui.choose_language") %></h1>
+    <p data-native-language-target="hint"><%= t("ui.choose_hint") %></p>
+  </header>
+  <%= form_with url: native_language_path, method: :patch, class: "language-form", data: { turbo: false } do |form| %>
+    <fieldset class="language-options">
+      <legend class="visually-hidden"><%= t("ui.language") %></legend>
+      <% NativeLanguage::OPTIONS.each do |code, language| %>
+        <label class="language-option" lang="<%= code %>">
+          <%= form.radio_button :native_language, code, checked: selected_native_language == code, required: true, data: { action: "native-language#select" } %>
+          <span class="language-letter" aria-hidden="true"><%= language[:badge] %></span>
+          <span class="language-name"><%= language[:name] %><small><%= language[:english] %></small></span>
+          <span class="language-check" aria-hidden="true">✓</span>
+        </label>
+      <% end %>
+    </fieldset>
+    <div class="language-footer"><%= form.submit t("ui.continue"), class: "language-continue", disabled: selected_native_language.nil?, data: { native_language_target: "continue" } %></div>
+  <% end %>
+</section>

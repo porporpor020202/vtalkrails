@@ -1,3 +1,4 @@
+import { translate } from "helpers/translations"
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -11,7 +12,7 @@ export default class extends Controller {
     const playing = !this.audioTarget.paused && !this.audioTarget.ended
     this.playTarget.toggleAttribute("hidden", playing)
     this.stopTarget.toggleAttribute("hidden", !playing)
-    this.buttonTarget.setAttribute("aria-label", playing ? "녹음 정지" : "녹음 재생")
+    this.buttonTarget.setAttribute("aria-label", playing ? translate("stop_play") : translate("play"))
     cancelAnimationFrame(this.animation)
     this.progress()
     if (playing) this.animate()
@@ -27,6 +28,6 @@ export default class extends Controller {
     this.progress()
     if (!this.audioTarget.paused && !this.audioTarget.ended) this.animation = requestAnimationFrame(() => this.animate())
   }
-  error() { this.errorTarget.textContent = "재생하지 못했어요. 다시 눌러주세요."; this.errorTarget.hidden = false; this.update() }
+  error() { this.errorTarget.textContent = translate("play_error"); this.errorTarget.hidden = false; this.update() }
   disconnect() { cancelAnimationFrame(this.animation); this.audioTarget.pause() }
 }

@@ -12,7 +12,7 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     translator = Object.new
     translator.define_singleton_method(:call) do |text:, mode:|
       raise "Wrong question" unless text == "What do you like to drink?" && mode == "question"
-      { "korean" => "어떤 음료를 좋아하세요?" }
+      { "translation" => "어떤 음료를 좋아하세요?" }
     end
     GeminiTranslation.stub(:new, -> { translator }) do
       post language_help_path, params: { mode: "question", question_token: @question.signed_id(purpose: :daily_question) }
@@ -62,7 +62,7 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     translator = Object.new
     translator.define_singleton_method(:call) do |text:, mode:|
       raise "Wrong context" unless text == "What do you like to drink?" && mode == "example"
-      { "korean" => "저는 따뜻한 차를 좋아해요." }
+      { "translation" => "저는 따뜻한 차를 좋아해요." }
     end
     GeminiTranslation.stub(:new, -> { translator }) do
       post language_help_path, params: { mode: "example", question_token: @question.signed_id(purpose: :daily_question), input_text: "ignored" }

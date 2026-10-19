@@ -4,7 +4,7 @@ class GoogleOauthSessionsController < ApplicationController
 
   def native_authenticate
     if params[:identity_token].blank? || params[:nonce].blank?
-      render json: { error: "Missing identity token or nonce" }, status: :bad_request
+      render json: { error: t("ui.signin_error") }, status: :bad_request
       return
     end
 
@@ -24,11 +24,11 @@ class GoogleOauthSessionsController < ApplicationController
         token: user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
       }
     else
-      render json: { error: "Unable to create or find user" }, status: :unprocessable_entity
+      render json: { error: t("ui.signin_error") }, status: :unprocessable_entity
     end
   rescue GoogleOauthClient::AuthenticationError => error
     Rails.logger.error "Native Google authentication failed: #{error.message}"
-    render json: { error: "Authentication failed" }, status: :unprocessable_entity
+    render json: { error: t("ui.signin_error") }, status: :unprocessable_entity
   end
 
   def new
@@ -62,17 +62,17 @@ class GoogleOauthSessionsController < ApplicationController
     session_state = session.delete(:google_oauth_state)
     session_nonce = session.delete(:google_oauth_nonce)
     unless request_state.present? && session_state.present? && ActiveSupport::SecurityUtils.secure_compare(request_state, session_state)
-      redirect_to new_session_path, alert: "Invalid request. Please try again."
+      redirect_to new_session_path, alert: t("ui.invalid_request")
       return
     end
 
     if params[:error].present? || params[:code].blank?
-      redirect_to new_session_path, alert: "Sign in was not completed. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_cancelled")
       return
     end
 
     if session_nonce.blank?
-      redirect_to new_session_path, alert: "Invalid request. Please try again."
+      redirect_to new_session_path, alert: t("ui.invalid_request")
       return
     end
 
@@ -90,7 +90,7 @@ class GoogleOauthSessionsController < ApplicationController
     )
     unless @user.persisted?
       Rails.logger.error "Google OAuth user creation failed: #{@user.errors.full_messages}"
-      redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_error")
       return
     end
 
@@ -104,10 +104,10 @@ class GoogleOauthSessionsController < ApplicationController
     end
   rescue GoogleOauthClient::AuthenticationError => e
     Rails.logger.error "Google OAuth authentication error: #{e.message}"
-    redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+    redirect_to new_session_path, alert: t("ui.signin_error")
   rescue => e
     Rails.logger.error "Google OAuth callback error: #{e.class} - #{e.message}"
-    redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+    redirect_to new_session_path, alert: t("ui.signin_error")
   end
 
   def authenticate_by_token
@@ -116,7 +116,7 @@ class GoogleOauthSessionsController < ApplicationController
     if user
       sign_in_and_redirect_user(user)
     else
-      redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_error")
     end
   end
 

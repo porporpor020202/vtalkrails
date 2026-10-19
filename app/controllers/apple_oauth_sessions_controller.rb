@@ -9,7 +9,7 @@ class AppleOauthSessionsController < ApplicationController
     identity_token = params[:identity_token]
     nonce = params[:nonce]
     if identity_token.blank? || nonce.blank?
-      render json: { error: "Missing identity token or nonce" }, status: :bad_request
+      render json: { error: t("ui.signin_error") }, status: :bad_request
       return
     end
 
@@ -20,7 +20,7 @@ class AppleOauthSessionsController < ApplicationController
       email = user_info["email"]
 
       if uid.blank?
-        render json: { error: "Invalid identity token: missing sub" }, status: :unprocessable_entity
+        render json: { error: t("ui.signin_error") }, status: :unprocessable_entity
         return
       end
 
@@ -34,11 +34,11 @@ class AppleOauthSessionsController < ApplicationController
         token = user.signed_id(purpose: :native_auth, expires_in: 5.minutes)
         render json: { token: token }
       else
-        render json: { error: "Unable to create or find user: #{user.errors.full_messages.join(', ')}" }, status: :unprocessable_entity
+        render json: { error: t("ui.signin_error") }, status: :unprocessable_entity
       end
     rescue => e
       Rails.logger.error "Native Apple Auth failed: #{e.class} - #{e.message}"
-      render json: { error: "Authentication failed" }, status: :unprocessable_entity
+      render json: { error: t("ui.signin_error") }, status: :unprocessable_entity
     end
   end
 
@@ -85,14 +85,14 @@ class AppleOauthSessionsController < ApplicationController
 
   def callback
     if params[:error].present? || params[:code].blank?
-      redirect_to new_session_path, alert: "Sign in was not completed. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_cancelled")
       return
     end
 
     user_info = authenticate_with_apple
     user = create_user(user_info)
     unless user.persisted?
-      redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_error")
       return
     end
 
@@ -106,10 +106,10 @@ class AppleOauthSessionsController < ApplicationController
     end
   rescue AppleOauthClient::AuthenticationError => e
     Rails.logger.error "Apple OAuth authentication error: #{e.message}"
-    redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+    redirect_to new_session_path, alert: t("ui.signin_error")
   rescue => e
     Rails.logger.error "Apple OAuth callback error: #{e.class} - #{e.message}"
-    redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+    redirect_to new_session_path, alert: t("ui.signin_error")
   end
 
   def authenticate_by_token
@@ -118,7 +118,7 @@ class AppleOauthSessionsController < ApplicationController
     if user
       sign_in_and_redirect_user(user)
     else
-      redirect_to new_session_path, alert: "Unable to sign in. Please try again."
+      redirect_to new_session_path, alert: t("ui.signin_error")
     end
   end
 
@@ -145,13 +145,13 @@ class AppleOauthSessionsController < ApplicationController
     stored_state = cookies.encrypted[:apple_oauth_state]
     cookies.delete(:apple_oauth_state)
     unless stored_state.present? && params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state], stored_state)
-      redirect_to new_session_path, alert: "Invalid request. Please try again."
+      redirect_to new_session_path, alert: t("ui.invalid_request")
     end
   end
 
   def verify_oauth_nonce
     unless stored_nonce.present?
-      redirect_to new_session_path, alert: "Invalid request. Please try again."
+      redirect_to new_session_path, alert: t("ui.invalid_request")
     end
   end
 

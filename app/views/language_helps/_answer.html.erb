@@ -1,16 +1,16 @@
 <%= turbo_frame_tag "answer-helper" do %>
   <%= form_with url: language_help_path, class: "answer-help-form" do |form| %>
     <%= form.hidden_field :mode, value: "answer" %>
-    <%= form.label :input_text, "하고 싶은 말을 한국어로 적어주세요." %>
-    <%= form.text_area :input_text, value: @input, placeholder: "말하고 싶은 답을 적어주세요.", required: true, maxlength: 300, rows: 3 %>
-    <%= form.submit "영어로 알아보기", class: "primary-button", data: { turbo_submits_with: "표현을 찾고 있어요…" } %>
+    <%= form.label :input_text, t("ui.input_label") %>
+    <%= form.text_area :input_text, value: @input, placeholder: t("ui.input_placeholder"), required: true, maxlength: 300, rows: 3 %>
+    <%= form.submit t("ui.translate_answer"), class: "primary-button", data: { turbo_submits_with: t("ui.finding") } %>
   <% end %>
   <% if @error %><p class="help-error" role="alert"><%= @error %></p><% end %>
   <% if @result %>
-    <section class="answer-help-result" aria-label="영어 표현과 발음">
-      <p class="question-label">이렇게 말해보세요</p>
+    <section class="answer-help-result" aria-label="<%= t("ui.answer_label") %>">
+      <p class="question-label"><%= t("ui.try_saying") %></p>
       <p class="english-answer" lang="en"><%= @result.fetch("english") %></p>
-      <p class="ipa-answer" lang="en" aria-label="미국 영어 발음기호"><%= @result.fetch("ipa") %></p>
+      <p class="ipa-answer" lang="en" aria-label="<%= t("ui.ipa_label") %>"><%= @result.fetch("ipa") %></p>
     </section>
   <% end %>
 <% end %>

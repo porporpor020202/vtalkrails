@@ -1,10 +1,21 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  around_action :use_native_language
   before_action :track_user_activity
   stale_when_importmap_changes
-  helper_method :native_app?, :android_app?, :ios_app?
+  helper_method :native_app?, :android_app?, :ios_app?, :selected_native_language
 
   private
+
+  def selected_native_language
+    resume_session
+    language = current_user&.native_language.presence || cookies[:native_language]
+    language if NativeLanguage.supported?(language)
+  end
+
+  def use_native_language(&action)
+    I18n.with_locale(selected_native_language || :ko, &action)
+  end
 
   def track_user_activity
     return unless authenticated?

@@ -13,10 +13,14 @@ class GuestPracticeFlowTest < ApplicationSystemTestCase
   test "first practice comes before login and its recording survives authentication" do
     question_for
     visit root_path
+    choose "한국어", allow_label_click: true
+    click_button "계속하기"
     assert_selector "#daily-question"
     assert_no_selector ".sign-in-page"
+    assert_selector ".first-practice-hint", text: "아래 녹음 버튼을 눌러"
     click_button "녹음 시작", enable_aria_label: true
     assert_selector '[data-daily-practice-target="timer"]', text: "00:02", wait: 5
+    assert_no_selector ".first-practice-hint"
     click_button "녹음 끝내기", enable_aria_label: true
     click_button "전송"
     assert_selector "h1", text: "잘했어요!"

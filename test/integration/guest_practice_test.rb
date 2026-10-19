@@ -5,13 +5,16 @@ require_relative "../test_helpers/daily_practice_test_helper"
 class GuestPracticeTest < ActionDispatch::IntegrationTest
   include DailyPracticeTestHelper
 
-  setup { question_for }
+  setup do
+    question_for
+    patch native_language_path, params: { native_language: "ko" }
+  end
 
   test "a visitor starts with the question and can complete before signing in" do
     get root_path
     assert_response :success
     assert_select "#daily-question"
-    assert_select "a[href=?]", settings_path, count: 0
+    assert_select "a[href=?]", settings_path, count: 1
     assert_difference "DailyPractice.count", 1 do
       2.times { submit_recording; assert_response :created }
     end

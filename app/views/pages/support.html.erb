@@ -1,10 +1,10 @@
-<% content_for :title, "고객지원 · 세이원띵" %>
+<% content_for :title, t("pages.support") %>
 <section class="simple-page">
-  <header class="simple-header"><%= link_to "‹", root_path, aria: { label: "돌아가기" } %><h1>고객지원</h1></header>
-  <p>세이원띵 - Say One Thing은 하루 한 문장 영어 말하기 연습 앱입니다.</p>
-  <h2>다음 질문은 언제 열리나요?</h2><p>한국 시간 기준 매일 자정에 새로운 질문이 열립니다.</p>
-  <h2>녹음이 안 되나요?</h2><p>기기의 설정에서 세이원띵의 마이크 사용을 허용해주세요.</p>
-  <h2>계정을 삭제하려면</h2><p>로그인 후 설정에서 계정을 삭제하면 녹음과 연습 기록도 함께 삭제됩니다.</p>
-  <p>문의: <a href="mailto:privacy@vtalks.net">privacy@vtalks.net</a></p>
-  <%= link_to "개인정보 처리방침", privacy_path %>
+  <header class="simple-header"><%= link_to "‹", root_path, aria: { label: t("ui.back") } %><h1><%= t("pages.support") %></h1></header>
+  <p><%= t("pages.privacy_intro") %></p>
+  <h2><%= t("pages.reset_heading") %></h2><p><%= t("pages.reset_body") %></p>
+  <h2><%= t("pages.mic_heading") %></h2><p><%= t("pages.mic_body") %></p>
+  <h2><%= t("pages.delete_help") %></h2><p><%= t("pages.delete_help_body") %></p>
+  <p><%= t("ui.contact") %> <a href="mailto:privacy@sayonething.net">privacy@sayonething.net</a></p>
+  <%= link_to t("ui.privacy"), privacy_path %>
 </section>

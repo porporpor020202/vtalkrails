@@ -1,11 +1,13 @@
-<% content_for :title, "설정 · 세이원띵" %>
+<% content_for :title, t("ui.settings") %>
 <section class="simple-page">
-  <header class="simple-header"><%= link_to "‹", root_path, aria: { label: "오늘의 질문으로" } %><h1>설정</h1></header>
-  <p class="settings-email"><%= current_user.email_address %></p>
+  <header class="simple-header"><%= link_to "‹", root_path, aria: { label: t("ui.back_question") } %><h1><%= t("ui.settings") %></h1></header>
+  <p class="settings-email"><%= current_user&.email_address %></p>
   <div class="settings-links">
-    <% if current_user.admin? %><%= link_to "사용자 현황", admin_path %><% end %>
-    <%= link_to "개인정보 처리방침", privacy_path %>
-    <%= button_to "로그아웃", session_path, method: :delete %>
-    <%= link_to "계정 삭제", confirm_account_deletion_path, class: "danger" %>
+    <%= link_to "#{t("ui.language")}: #{NativeLanguage::OPTIONS.fetch(I18n.locale.to_s)[:name]}", native_language_path %>
+    <%= link_to t("ui.privacy"), privacy_path %>
+    <% if current_user %>
+    <%= button_to t("ui.logout"), session_path, method: :delete %>
+    <%= link_to t("ui.delete_account"), confirm_account_deletion_path, class: "danger" %>
+    <% end %>
   </div>
 </section>

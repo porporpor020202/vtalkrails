@@ -1,79 +1,74 @@
-<% content_for :title, @practice ? "오늘 완료 · 세이원띵" : "오늘의 한 문장 · 세이원띵" %>
-<section class="daily-page" data-controller="daily-practice" data-daily-practice-endpoint-value="<%= daily_practice_path %>" data-daily-practice-token-value="<%= @question.signed_id(purpose: :daily_question) %>" data-action="turbo:before-cache@document->daily-practice#cleanup language-help:open->daily-practice#openHelp language-help:close->daily-practice#closeHelp">
+<% content_for :title, @practice ? t("ui.complete_title") : t("ui.today_title") %>
+<section class="daily-page" data-controller="daily-practice" data-daily-practice-endpoint-value="<%= daily_practice_path %>" data-daily-practice-token-value="<%= @question.signed_id(purpose: :daily_question) %>" data-action="turbo:before-cache@document->daily-practice#cleanup">
   <header class="daily-header">
-    <span class="header-date"><%= @today.strftime("%m.%d") %><span><%= %w[일요일 월요일 화요일 수요일 목요일 금요일 토요일][@today.wday] %></span></span>
-    <% unless @guest %>
-    <%= link_to settings_path, class: "icon-button", aria: { label: "설정" } do %>
+    <span class="header-date"><%= @today.strftime("%m.%d") %><span><%= t("ui.days")[@today.wday] %></span></span>
+    <%= link_to settings_path, class: "icon-button", aria: { label: t("ui.settings") } do %>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/></svg>
-    <% end %>
     <% end %>
   </header>
   <% if @saved %>
-    <p class="practice-saved" role="status"><span aria-hidden="true">✓</span> 첫 연습 기록이 저장됐어요.</p>
+    <p class="practice-saved" role="status"><span aria-hidden="true">✓</span> <%= t("ui.saved") %></p>
   <% end %>
   <% if @practice %>
-    <section class="daily-complete" aria-label="오늘의 연습 완료">
+    <section class="daily-complete" aria-label="<%= t("ui.complete_label") %>">
       <div class="completion-medal" aria-hidden="true">
         <svg viewBox="0 0 100 100" fill="none"><path d="m50 5 9 9 13-1 5 12 12 5-1 13 9 9-9 9 1 13-12 5-5 12-13-1-9 9-9-9-13 1-5-12-12-5 1-13-9-9 9-9-1-13 12-5 5-12 13 1 9-9Z" fill="#e9c97c"/><circle cx="50" cy="52" r="29" stroke="#c69b48" stroke-width="1"/><path d="m36 52 10 10 19-21" stroke="#72532b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="medal-spark medal-spark-one">✦</span><span class="medal-spark medal-spark-two">✧</span>
       </div>
-      <h1>잘했어요!</h1>
-      <p class="completion-praise">오늘도 한 문장, 해냈네요.</p>
+      <h1><%= t("ui.praise") %></h1>
+      <p class="completion-praise"><%= t("ui.praise_detail") %></p>
       <% if @guest %>
         <div class="guest-save">
-          <%= link_to "이 기록을 저장할까요?", new_session_path, class: "primary-button", data: { turbo: false } %>
-          <p>로그인하면 첫 기록부터 이어갈 수 있어요.</p>
+          <%= link_to t("ui.save_record"), new_session_path, class: "primary-button", data: { turbo: false } %>
+          <p><%= t("ui.save_hint") %></p>
         </div>
       <% end %>
       <div class="completion-streak">
-        <span class="completion-label"><span aria-hidden="true">✓</span> 오늘 완료</span>
-        <p class="completion-count">연속 <strong><%= @streak %></strong>일</p>
-        <div class="completion-week" aria-label="이번 주 연습 기록">
+        <span class="completion-label"><span aria-hidden="true">✓</span> <%= t("ui.done_today") %></span>
+        <p class="completion-count"><%= t("ui.streak_html", count: content_tag(:strong, @streak)) %></p>
+        <div class="completion-week" aria-label="<%= t("ui.week") %>">
           <% @week.each do |date| %>
             <% done = @completed_dates.include?(date) %>
             <div class="completion-day <%= 'is-today' if date == @today %>">
-              <span><%= %w[일 월 화 수 목 금 토][date.wday] %></span>
-              <span class="completion-dot <%= 'is-done' if done %>" aria-label="<%= date.strftime('%m월 %d일') %> <%= done ? '완료' : '미완료' %>"><%= done ? '✓' : '·' %></span>
+              <span><%= t("ui.short_days")[date.wday] %></span>
+              <span class="completion-dot <%= 'is-done' if done %>" aria-label="<%= date.iso8601 %> <%= done ? t("ui.done") : t("ui.not_done") %>"><%= done ? '✓' : '·' %></span>
             </div>
           <% end %>
         </div>
       </div>
       <% unless @guest %>
       <div class="next-practice" data-controller="reset-countdown" data-reset-countdown-at-value="<%= @resets_at.iso8601 %>" data-reset-countdown-now-value="<%= Time.current.iso8601 %>" data-action="visibilitychange@document->reset-countdown#tick">
-        <div class="next-practice-heading"><span>다음 한 문장</span><span>내일 00:00 · 한국 시간</span></div>
-        <time class="next-practice-clock" datetime="<%= @resets_at.iso8601 %>" data-reset-countdown-target="clock" role="timer" aria-label="다음 질문까지 남은 시간" aria-live="off"><%= Time.at([(@resets_at - Time.current).to_i, 0].max).utc.strftime("%H:%M:%S") %></time>
-        <%= link_to "새 질문 열기", root_path, class: "primary-button", hidden: true, data: { reset_countdown_target: "ready" } %>
+        <div class="next-practice-heading"><span><%= t("ui.next") %></span><span><%= t("ui.reset_time") %></span></div>
+        <time class="next-practice-clock" datetime="<%= @resets_at.iso8601 %>" data-reset-countdown-target="clock" role="timer" aria-label="<%= t("ui.remaining") %>" aria-live="off"><%= Time.at([(@resets_at - Time.current).to_i, 0].max).utc.strftime("%H:%M:%S") %></time>
+        <%= link_to t("ui.open_question"), root_path, class: "primary-button", hidden: true, data: { reset_countdown_target: "ready" } %>
       </div>
       <% end %>
     </section>
   <% else %>
-    <div class="daily-meta"><span>하루, 한 문장</span><span class="streak-pill">연속 <%= @streak %>일</span></div>
+    <div class="daily-meta"><span><%= t("ui.one_day") %></span><span class="streak-pill"><%= t("ui.streak", count: @streak) %></span></div>
     <section class="question-card" aria-labelledby="daily-question">
-      <span class="question-label"><span class="question-dot"></span><%= @question.source == 'gemini' ? '오늘의 질문' : '샘플 질문' %></span>
+      <span class="question-label"><span class="question-dot"></span><%= @question.source == 'gemini' ? t("ui.today_question") : t("ui.sample_question") %></span>
       <h2 id="daily-question" lang="en"><%= @question.question %></h2>
       <%= turbo_frame_tag "question-translation" do %>
         <%= render "language_helps/question_button" %>
       <% end %>
     </section>
     <div class="language-help" data-controller="language-help" data-language-help-endpoint-value="<%= language_help_path %>" data-language-help-token-value="<%= @question.signed_id(purpose: :daily_question) %>" data-action="turbo:frame-load->language-help#restoreExample">
-      <button type="button" class="help-open-button" data-action="language-help#open">이거 영어로 뭐라 말해요?</button>
-      <dialog class="language-help-dialog" data-language-help-target="dialog" data-action="click->language-help#backdrop close->language-help#closed">
-        <div class="help-dialog-header"><h2>이거 영어로 뭐라 말해요?</h2><button type="button" class="icon-button" data-action="language-help#close" aria-label="도움말 닫기">×</button></div>
-        <p class="help-question" lang="en"><%= @question.question %></p>
-        <%= render "language_helps/answer" %>
-        <div data-recording-slot></div>
-      </dialog>
+      <%= render "language_helps/answer" %>
     </div>
-    <div data-daily-practice-target="recorderHome">
-      <div data-daily-practice-target="recorder">
+    <div>
+      <div>
+        <% if @guest || !current_user.daily_practices.exists? %>
+          <p class="first-practice-hint" data-daily-practice-target="hint"><%= t("ui.record_hint") %> <span aria-hidden="true">↓</span></p>
+        <% end %>
         <p class="recording-status" role="status" aria-live="polite" data-daily-practice-target="status"></p>
         <div class="recording-controls">
-          <button type="button" class="record-button" data-action="daily-practice#toggleRecording" data-daily-practice-target="recordButton" aria-label="녹음 시작"><svg data-daily-practice-target="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-3 0h6"/></svg><span class="stop-icon" hidden data-daily-practice-target="stopIcon"></span></button>
+          <button type="button" class="record-button" data-action="daily-practice#toggleRecording" data-daily-practice-target="recordButton" aria-label="<%= t("ui.record_start") %>"><svg data-daily-practice-target="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-3 0h6"/></svg><span class="stop-icon" hidden data-daily-practice-target="stopIcon"></span></button>
           <span class="record-timer" hidden data-daily-practice-target="timer">00:00</span>
         </div>
-        <section class="recording-preview" hidden data-daily-practice-target="previewArea" aria-label="녹음 확인">
+        <section class="recording-preview" hidden data-daily-practice-target="previewArea" aria-label="<%= t("ui.record_check") %>">
           <%= render "shared/recording_player", preview: true %>
-          <div class="preview-actions"><button type="button" class="secondary-button" data-action="daily-practice#discard" data-daily-practice-target="discardButton">다시 녹음</button><button type="button" class="primary-button" data-action="daily-practice#submit" data-daily-practice-target="submitButton">전송</button></div>
+          <div class="preview-actions"><button type="button" class="secondary-button" data-action="daily-practice#discard" data-daily-practice-target="discardButton"><%= t("ui.record_again") %></button><button type="button" class="primary-button" data-action="daily-practice#submit" data-daily-practice-target="submitButton"><%= t("ui.send") %></button></div>
         </section>
       </div>
     </div>

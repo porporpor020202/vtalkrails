@@ -1,17 +1,17 @@
-<% content_for :title, "세이원띵 - Say One Thing · 하루 한 문장" %>
+<% content_for :title, t("ui.today_title") %>
 <div class="sign-in-page" data-controller="auth-history" data-action="pageshow@window->auth-history#restore">
   <div class="sign-in-header">
     <div class="sign-in-mark" aria-hidden="true">
       <svg viewBox="0 0 96 96" fill="none"><rect x="3" y="3" width="90" height="90" rx="30" fill="#e6eddf"/><circle cx="48" cy="48" r="30" fill="#345b48"/><path d="M31 45v6m8-16v26m9-34v42m9-34v26m8-16v6" stroke="#f6f3e8" stroke-width="4" stroke-linecap="round"/></svg>
       <span class="sign-in-spark">✦</span>
     </div>
-    <h1 class="sign-in-title">세이원띵</h1>
+    <h1 class="sign-in-title"><%= I18n.locale == :ko ? "세이원띵" : "Say One Thing" %></h1>
     <p class="sign-in-english-brand" lang="en">Say One Thing</p>
-    <p class="sign-in-description"><%= session[:guest_practice_id] ? "첫 연습 기록을 저장하세요." : "하루 한 질문, 영어 한 문장." %></p>
+    <p class="sign-in-description"><%= session[:guest_practice_id] ? t("ui.save_first") : t("ui.tagline") %></p>
   </div>
   <div class="sign-in-actions">
     <%= render "shared/sign_in_with_google" %>
     <%= render "shared/sign_in_with_apple" %>
   </div>
-  <p class="sign-in-privacy"><%= link_to "개인정보 처리방침", privacy_path %></p>
+  <p class="sign-in-privacy"><%= link_to t("ui.privacy"), privacy_path %></p>
 </div>

@@ -21,6 +21,8 @@ module Vtalk
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
+    config.i18n.available_locales = %i[ko ja zh zh-TW es]
+    config.i18n.default_locale = :ko
     config.time_zone = "Seoul"
     ActiveSupport.on_load(:active_record_postgresqladapter) do
       self.datetime_type = :timestamptz

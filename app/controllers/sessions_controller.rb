@@ -7,6 +7,6 @@ class SessionsController < ApplicationController
 
   def destroy
     terminate_session
-    redirect_to new_session_path, notice: "로그아웃했어요.", status: :see_other
+    redirect_to new_session_path, notice: t("ui.logged_out"), status: :see_other
   end
 end

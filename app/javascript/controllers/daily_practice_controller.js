@@ -1,32 +1,19 @@
+import { translate } from "helpers/translations"
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["recorder", "recorderHome", "status", "recordButton", "micIcon", "stopIcon", "timer", "previewArea", "preview", "submitButton", "discardButton"]
+  static targets = ["hint", "status", "recordButton", "micIcon", "stopIcon", "timer", "previewArea", "preview", "submitButton", "discardButton"]
   static values = { endpoint: String, token: String }
 
   connect() { this.generation = 0; this.sending = false }
   disconnect() { this.cleanup() }
 
-  openHelp(event) {
-    event.detail.slot.append(this.recorderTarget)
-  }
-
-  closeHelp() {
-    if (this.recorder?.state === "recording") this.stop()
-    else if (this.recordButtonTarget.disabled && !this.sending) {
-      ++this.generation
-      this.resetControls()
-      this.statusTarget.textContent = ""
-    }
-    this.recorderHomeTarget.append(this.recorderTarget)
-  }
-
   async toggleRecording() {
     if (this.recorder?.state === "recording") { this.stop(); return }
-    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { this.showError("이 기기에서는 녹음을 지원하지 않아요. 최신 브라우저에서 열어주세요."); return }
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { this.showError(translate("unsupported")); return }
     const generation = ++this.generation
     this.recordButtonTarget.disabled = true
-    this.statusTarget.textContent = "마이크를 준비하고 있어요…"
+    this.statusTarget.textContent = translate("preparing")
     this.statusTarget.setAttribute("role", "status")
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -37,22 +24,23 @@ export default class extends Controller {
       this.recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {})
       this.recorder.ondataavailable = event => { if (generation === this.generation && event.data.size) this.chunks.push(event.data) }
       this.recorder.onstop = () => { if (generation === this.generation && this.element.isConnected) this.finish() }
-      this.recorder.onerror = () => { this.cleanup(); if (this.element.isConnected) { this.resetControls(); this.showError("녹음이 중단됐어요. 다시 시도해주세요.") } }
+      this.recorder.onerror = () => { this.cleanup(); if (this.element.isConnected) { this.resetControls(); this.showError(translate("interrupted")) } }
       this.startedAt = performance.now()
       this.recorder.start(250)
+      if (this.hasHintTarget) this.hintTarget.hidden = true
       this.recordButtonTarget.disabled = false
       this.recordButtonTarget.classList.add("is-recording")
-      this.recordButtonTarget.setAttribute("aria-label", "녹음 끝내기")
+      this.recordButtonTarget.setAttribute("aria-label", translate("record_stop"))
       this.micIconTarget.setAttribute("hidden", "")
       this.stopIconTarget.hidden = false
       this.timerTarget.hidden = false
-      this.statusTarget.textContent = "녹음 중"
+      this.statusTarget.textContent = translate("recording")
       this.interval = window.setInterval(() => this.tick(), 100)
     } catch (error) {
       if (generation !== this.generation) return
       this.releaseStream()
       this.recordButtonTarget.disabled = false
-      this.showError(error.name === "NotAllowedError" ? "마이크 권한이 필요해요. 브라우저나 기기 설정에서 허용한 뒤 다시 눌러주세요." : "마이크를 켜지 못했어요. 연결을 확인하고 다시 시도해주세요.")
+      this.showError(error.name === "NotAllowedError" ? translate("permission") : translate("mic_error"))
     }
   }
 
@@ -76,7 +64,7 @@ export default class extends Controller {
     this.blob = new Blob(this.chunks, { type })
     this.releaseStream()
     this.resetControls()
-    if (!this.blob.size || this.durationMs < 1000) { this.blob = null; this.showError("한 문장을 1초 이상 녹음해주세요."); return }
+    if (!this.blob.size || this.durationMs < 1000) { this.blob = null; this.showError(translate("too_short")); return }
     this.previewURL = URL.createObjectURL(this.blob)
     this.previewTarget.dataset.durationMs = String(this.durationMs)
     this.previewTarget.src = this.previewURL
@@ -100,7 +88,7 @@ export default class extends Controller {
     this.sending = true
     this.submitButtonTarget.disabled = true
     this.discardButtonTarget.disabled = true
-    this.statusTarget.textContent = "전송 중…"
+    this.statusTarget.textContent = translate("sending")
     const form = new FormData()
     const extension = this.blob.type.includes("mp4") ? "m4a" : this.blob.type.includes("ogg") ? "ogg" : "webm"
     form.append("question_token", this.tokenValue)
@@ -111,11 +99,11 @@ export default class extends Controller {
       if (response.redirected) { window.Turbo.visit(response.url); return }
       const payload = await response.json()
       if (response.status === 409 && payload.redirect_url) { window.Turbo.visit(payload.redirect_url); return }
-      if (!response.ok) throw new Error(payload.error || "저장하지 못했어요. 다시 시도해주세요.")
+      if (!response.ok) throw new Error(payload.error || translate("save_error"))
       window.Turbo.visit(payload.redirect_url)
     } catch (error) {
       if (!this.element.isConnected) return
-      this.showError(error.message || "연결을 확인하고 다시 시도해주세요.")
+      this.showError(error instanceof TypeError ? translate("connection") : error.message || translate("connection"))
       this.sending = false
       this.submitButtonTarget.disabled = false
       this.discardButtonTarget.disabled = false
@@ -129,7 +117,7 @@ export default class extends Controller {
     this.recordButtonTarget.disabled = false
     this.recordButtonTarget.hidden = false
     this.recordButtonTarget.classList.remove("is-recording")
-    this.recordButtonTarget.setAttribute("aria-label", "녹음 시작")
+    this.recordButtonTarget.setAttribute("aria-label", translate("record_start"))
     this.micIconTarget.removeAttribute("hidden")
     this.stopIconTarget.hidden = true
     this.timerTarget.hidden = true

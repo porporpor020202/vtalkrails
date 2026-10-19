@@ -44,6 +44,9 @@ module Authentication
 
 
     def start_new_session_for(user)
+      if NativeLanguage.supported?(cookies[:native_language]) && user.native_language != cookies[:native_language]
+        user.update!(native_language: cookies[:native_language])
+      end
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         claim_guest_practice(user)
         Current.session = session

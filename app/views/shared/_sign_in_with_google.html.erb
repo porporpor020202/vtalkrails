@@ -1,14 +1,14 @@
 <% if native_app? %>
   <%= link_to "vtalk://sign-in?provider=google", class: "provider-button provider-google" do %>
     <%= image_tag "google.svg", alt: "" %>
-    <span>구글로 시작하기</span>
+    <span><%= t("ui.google") %></span>
   <% end %>
 <% else %>
   <%= form_with url: google_oauth_sessions_path, method: :post, data: { turbo: false } do |form| %>
     <%= form.hidden_field :platform, value: "web" %>
     <%= form.button class: "provider-button provider-google" do %>
       <%= image_tag "google.svg", alt: "" %>
-      <span>구글로 시작하기</span>
+      <span><%= t("ui.google") %></span>
     <% end %>
   <% end %>
 <% end %>

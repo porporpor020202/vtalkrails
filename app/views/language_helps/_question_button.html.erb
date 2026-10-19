@@ -1,5 +1,5 @@
 <%= form_with url: language_help_path do |form| %>
   <%= form.hidden_field :mode, value: "question" %>
   <%= form.hidden_field :question_token, value: params[:question_token].presence || @question&.signed_id(purpose: :daily_question) %>
-  <%= form.submit "번역 보기", class: "translation-button", data: { turbo_submits_with: "번역 중…" } %>
+  <%= form.submit t("ui.translation"), class: "translation-button", data: { turbo_submits_with: t("ui.translating") } %>
 <% end %>

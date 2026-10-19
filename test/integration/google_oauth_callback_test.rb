@@ -5,6 +5,7 @@ require "uri"
 class GoogleOauthCallbackTest < ActionDispatch::IntegrationTest
   setup do
     Current.reset
+    patch native_language_path, params: { native_language: "ko" }
     DailyQuestion.create!(asked_on: Date.current, question: "What made you smile today?", source: "sample")
   end
   teardown { Current.reset }

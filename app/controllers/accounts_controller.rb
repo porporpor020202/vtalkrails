@@ -4,6 +4,6 @@ class AccountsController < ApplicationController
     terminate_session
     user.destroy!
 
-    redirect_to new_session_path, notice: "Your account and associated data have been deleted.", status: :see_other
+    redirect_to new_session_path, notice: t("ui.deleted"), status: :see_other
   end
 end

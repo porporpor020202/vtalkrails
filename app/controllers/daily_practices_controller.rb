@@ -4,6 +4,10 @@ class DailyPracticesController < ApplicationController
   rate_limit to: 10, within: 1.minute, only: :create
 
   def show
+    unless selected_native_language
+      render "native_languages/show"
+      return
+    end
     @today = Date.current
     @question = DailyQuestion.for_date(@today)
     @guest = current_user.nil?
@@ -21,7 +25,7 @@ class DailyPracticesController < ApplicationController
     date = Date.current
     question = DailyQuestion.find_signed(params[:question_token], purpose: :daily_question)
     unless question&.asked_on == date
-      render json: { error: "새로운 하루가 시작됐어요. 오늘의 질문을 다시 열어주세요.", redirect_url: root_path }, status: :conflict
+      render json: { error: t("ui.new_day"), redirect_url: root_path }, status: :conflict
       return
     end
 
@@ -45,10 +49,10 @@ class DailyPracticesController < ApplicationController
       end
     end
     render json: { redirect_url: root_path }, status: :created
-  rescue ActiveRecord::RecordInvalid => error
-    render json: { error: error.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
+  rescue ActiveRecord::RecordInvalid
+    render json: { error: t("ui.invalid_recording") }, status: :unprocessable_entity
   rescue ActionController::ParameterMissing
-    render json: { error: "녹음한 음성을 보내주세요." }, status: :unprocessable_entity
+    render json: { error: t("ui.send_audio") }, status: :unprocessable_entity
   end
 
   def audio

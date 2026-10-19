@@ -1,19 +1,23 @@
 korean_native:
+  native_language: ko
   oauth_provider: google
   oauth_uid: fixture-google-korean
   email_address: korean@example.com
 
 english_native:
+  native_language: ko
   oauth_provider: apple
   oauth_uid: fixture-apple-english
   email_address: english@example.com
 
 spanish_native:
+  native_language: ko
   oauth_provider: google
   oauth_uid: fixture-google-spanish
   email_address: spanish@example.com
 
 japanese_native:
+  native_language: ko
   oauth_provider: apple
   oauth_uid: fixture-apple-japanese
   email_address: japanese@example.com

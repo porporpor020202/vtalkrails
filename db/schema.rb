@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -77,11 +77,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_010000) do
     t.datetime "created_at", null: false
     t.string "email_address", null: false
     t.datetime "last_active_at"
+    t.string "native_language"
     t.string "oauth_provider", null: false
     t.string "oauth_uid", null: false
     t.datetime "updated_at", null: false
     t.index ["last_active_at"], name: "index_users_on_last_active_at"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
+    t.check_constraint "native_language IS NULL OR (native_language::text = ANY (ARRAY['ko'::character varying, 'ja'::character varying, 'zh'::character varying, 'zh-TW'::character varying, 'es'::character varying]::text[]))", name: "users_native_language_supported"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

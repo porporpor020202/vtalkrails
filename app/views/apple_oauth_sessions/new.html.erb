@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= I18n.locale %>">
   <head>
-    <title>Redirecting to Apple Sign In...</title>
+    <title><%= t("ui.signin_redirect") %></title>
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -10,7 +10,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
-  <p>Redirecting to Apple Sign In...</p>
+  <p><%= t("ui.signin_redirect") %></p>
 
   <%= form_with(
         url: apple_oauth_sessions_path,
