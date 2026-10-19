@@ -13,11 +13,17 @@ class DailyPracticeFlowTest < ApplicationSystemTestCase
 
   setup do
     @user = users(:english_native)
-    question_for
+    question = question_for
+    @previous_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    Rails.cache.write([ "question-example", :ko, question.id, question.updated_at.to_i ], "친구의 농담에 웃었어요.")
     sign_in(user: @user)
   end
 
-  teardown { page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride") }
+  teardown do
+    Rails.cache = @previous_cache
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+  end
 
   test "record submit celebrate and reload without earning a second completion" do
     assert_selector "#daily-question"

@@ -1,0 +1,12 @@
+<% content_for :title, t("ui.trial_ended_title") %>
+<section class="daily-page">
+  <header class="daily-header"><span class="header-date">Say One Thing</span><%= link_to t("ui.settings"), settings_path, class: "translation-button" %></header>
+  <section class="daily-complete trial-ended">
+    <div class="completion-medal" aria-hidden="true">✦</div>
+    <p class="question-label"><%= t("ui.trial_progress", current: AiUsage::FREE_DAYS, total: AiUsage::FREE_DAYS) %></p>
+    <h1><%= t("ui.trial_ended_title") %></h1>
+    <p class="completion-praise"><%= t("ui.trial_ended_body") %></p>
+    <p class="trial-coming-soon"><%= t("ui.trial_payment_later") %></p>
+    <% unless current_user %><%= link_to t("ui.trial_sign_in"), new_session_path, class: "primary-button", data: { turbo: false } %><% end %>
+  </section>
+</section>

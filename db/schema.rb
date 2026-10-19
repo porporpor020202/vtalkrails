@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_030000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_usages", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "help_data", default: {}, null: false
+    t.date "help_on"
+    t.string "identity_key", null: false
+    t.bigint "merged_into_id"
+    t.date "training_dates", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.index ["identity_key"], name: "index_ai_usages_on_identity_key", unique: true
+    t.index ["merged_into_id"], name: "index_ai_usages_on_merged_into_id"
   end
 
   create_table "daily_practices", force: :cascade do |t|
@@ -83,11 +95,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_030000) do
     t.datetime "updated_at", null: false
     t.index ["last_active_at"], name: "index_users_on_last_active_at"
     t.index ["oauth_provider", "oauth_uid"], name: "index_users_on_oauth_provider_and_oauth_uid", unique: true
-    t.check_constraint "native_language IS NULL OR (native_language::text = ANY (ARRAY['ko'::character varying, 'ja'::character varying, 'zh'::character varying, 'zh-TW'::character varying, 'es'::character varying]::text[]))", name: "users_native_language_supported"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_usages", "ai_usages", column: "merged_into_id"
   add_foreign_key "daily_practices", "daily_questions"
   add_foreign_key "daily_practices", "users"
   add_foreign_key "sessions", "users"

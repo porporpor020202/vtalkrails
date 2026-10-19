@@ -98,7 +98,7 @@ export default class extends Controller {
       const response = await fetch(this.endpointValue, { method: "POST", headers: { Accept: "application/json", "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "" }, body: form, credentials: "same-origin" })
       if (response.redirected) { window.Turbo.visit(response.url); return }
       const payload = await response.json()
-      if (response.status === 409 && payload.redirect_url) { window.Turbo.visit(payload.redirect_url); return }
+      if ([401, 402, 409].includes(response.status) && payload.redirect_url) { window.Turbo.visit(payload.redirect_url); return }
       if (!response.ok) throw new Error(payload.error || translate("save_error"))
       window.Turbo.visit(payload.redirect_url)
     } catch (error) {

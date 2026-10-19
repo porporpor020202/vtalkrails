@@ -36,7 +36,7 @@ class NativeLanguagesTest < ActionDispatch::IntegrationTest
       follow_redirect!
       assert_select "html[lang=?]", language
       assert_select "input[type=submit][value=?]", I18n.t("ui.translate_answer", locale: language)
-      [privacy_path, support_path, delete_account_path, new_session_path].each do |path|
+      [ privacy_path, support_path, delete_account_path, new_session_path ].each do |path|
         get path
         assert_response :success
         assert_select "html[lang=?]", language
@@ -140,12 +140,18 @@ class NativeLanguagesTest < ActionDispatch::IntegrationTest
       requested_locales << I18n.locale.to_s
       { "translation" => translations.fetch(I18n.locale.to_s) }
     end
-    GeminiTranslation.stub(:new, -> { translator }) do
-      (NativeLanguage::OPTIONS.keys + ["zh-TW", "ko"]).each do |language|
-        patch native_language_path, params: { native_language: language }
-        post language_help_path, params: { mode: "question", question_token: question_for.signed_id(purpose: :daily_question) }
-        assert_response :success
-        assert_select ".question-translation p[lang=?]", language, text: translations.fetch(language)
+    Rails.stub(:cache, ActiveSupport::Cache::MemoryStore.new) do
+      GeminiTranslation.stub(:new, -> { translator }) do
+        (NativeLanguage::OPTIONS.keys + [ "zh-TW", "ko" ]).each do |language|
+          user = User.find_or_create_by!(oauth_provider: "google", oauth_uid: "locale-quota-#{language}") do |record|
+            record.email_address = "locale-#{language}@example.invalid"
+          end
+          sign_in_as(user)
+          patch native_language_path, params: { native_language: language }
+          post language_help_path, params: { mode: "question", question_token: question_for.signed_id(purpose: :daily_question) }
+          assert_response :success
+          assert_select ".question-translation p[lang=?]", language, text: translations.fetch(language)
+        end
       end
     end
     assert_equal NativeLanguage::OPTIONS.keys.sort, requested_locales.uniq.sort

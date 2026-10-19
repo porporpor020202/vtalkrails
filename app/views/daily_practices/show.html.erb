@@ -45,7 +45,7 @@
       <% end %>
     </section>
   <% else %>
-    <div class="daily-meta"><span><%= t("ui.one_day") %></span><span class="streak-pill"><%= t("ui.streak", count: @streak) %></span></div>
+    <div class="daily-meta"><span><%= t("ui.trial_progress", current: @trial_used, total: AiUsage::FREE_DAYS) %></span><span class="streak-pill"><%= t("ui.streak", count: @streak) %></span></div>
     <section class="question-card" aria-labelledby="daily-question">
       <span class="question-label"><span class="question-dot"></span><%= @question.source == 'gemini' ? t("ui.today_question") : t("ui.sample_question") %></span>
       <h2 id="daily-question" lang="en"><%= @question.question %></h2>

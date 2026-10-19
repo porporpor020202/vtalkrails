@@ -28,7 +28,7 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     end
     GeminiTranslation.stub(:new, -> { translator }) do
       assert_no_difference "DailyPractice.count" do
-        post language_help_path, params: { mode: "answer", input_text: "따뜻한 라테를 좋아해요." }
+        post language_help_path, params: { mode: "answer", question_token: @question.signed_id(purpose: :daily_question), input_text: "따뜻한 라테를 좋아해요." }
       end
       assert_response :success
       assert_select "turbo-frame#answer-helper .english-answer", text: "I like warm lattes."
@@ -39,7 +39,7 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
 
   test "empty or oversized inputs and forged questions are rejected" do
     [ "", "가" * 301 ].each do |text|
-      post language_help_path, params: { mode: "answer", input_text: text }
+      post language_help_path, params: { mode: "answer", question_token: @question.signed_id(purpose: :daily_question), input_text: text }
       assert_response :unprocessable_entity
       assert_select "[role=alert]"
     end
@@ -47,11 +47,11 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "Gemini errors keep the input and allow retry" do
+  test "Gemini errors keep the input" do
     translator = Object.new
     translator.define_singleton_method(:call) { |**| raise GeminiText::Unavailable, "offline" }
     GeminiTranslation.stub(:new, -> { translator }) do
-      post language_help_path, params: { mode: "answer", input_text: "라테를 좋아해요." }
+      post language_help_path, params: { mode: "answer", question_token: @question.signed_id(purpose: :daily_question), input_text: "라테를 좋아해요." }
       assert_response :service_unavailable
       assert_select "textarea", text: "라테를 좋아해요."
       assert_select "[role=alert]"
@@ -79,7 +79,7 @@ class LanguageHelpTest < ActionDispatch::IntegrationTest
     translator = Object.new
     translator.define_singleton_method(:call) { |**| { "english" => "Hello.", "ipa" => "/həˈloʊ/" } }
     GeminiTranslation.stub(:new, -> { translator }) do
-      post language_help_path, params: { mode: "answer", input_text: "안녕하세요" }
+      post language_help_path, params: { mode: "answer", question_token: @question.signed_id(purpose: :daily_question), input_text: "안녕하세요" }
       assert_response :success
     end
   end

@@ -1,6 +1,7 @@
 <%= turbo_frame_tag "answer-helper" do %>
   <%= form_with url: language_help_path, class: "answer-help-form" do |form| %>
     <%= form.hidden_field :mode, value: "answer" %>
+    <%= form.hidden_field :question_token, value: @question&.signed_id(purpose: :daily_question) || params[:question_token] %>
     <%= form.label :input_text, t("ui.input_label") %>
     <%= form.text_area :input_text, value: @input, placeholder: t("ui.input_placeholder"), required: true, maxlength: 300, rows: 3 %>
     <%= form.submit t("ui.translate_answer"), class: "primary-button", data: { turbo_submits_with: t("ui.finding") } %>

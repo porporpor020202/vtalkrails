@@ -103,12 +103,18 @@
       "signin_cancelled": "No se completó el inicio de sesión. Inténtalo de nuevo.",
       "invalid_request": "No se pudo verificar la solicitud. Inténtalo de nuevo.",
       "signin_redirect": "Abriendo el inicio de sesión…",
-      "invalid_recording": "Envía una grabación de 1 a 60 segundos y de hasta 10 MB."
+      "invalid_recording": "Envía una grabación de 1 a 60 segundos y de hasta 10 MB.",
+      "ai_daily_limit": "Ya has usado la ayuda de expresión de hoy. Graba tu respuesta con la primera expresión que creaste.",
+      "trial_progress": "Práctica gratuita %{current}/%{total}",
+      "trial_ended_title": "Has usado tus 3 prácticas gratuitas",
+      "trial_ended_body": "¿Seguimos con una frase al día? La siguiente práctica requerirá acceso de pago.",
+      "trial_payment_later": "Las prácticas de pago estarán disponibles próximamente.",
+      "trial_sign_in": "Inicia sesión para continuar"
     },
     "pages": {
       "privacy_intro": "Say One Thing es un servicio de práctica individual para grabar una frase en inglés al día.",
       "data_heading": "Información que guardamos",
-      "data_body": "Guardamos el ID y correo del proveedor de acceso, tu lengua materna, sesiones, preguntas y grabaciones diarias, y fechas y horas de finalización. Las fechas usan la hora de Corea. El idioma elegido también se guarda en una cookie de este dispositivo antes de iniciar sesión.",
+      "data_body": "Guardamos el ID y correo del proveedor de acceso, tu lengua materna, sesiones, preguntas y grabaciones diarias, y fechas y horas de finalización. Las fechas usan la hora de Corea. El idioma elegido también se guarda en una cookie de este dispositivo antes de iniciar sesión. Guardamos los días de prueba y las respuestas de IA del día. No guardamos el texto original; las respuestas de días anteriores se eliminan a diario. Tras eliminar la cuenta conservamos días de uso e identificadores para evitar pruebas repetidas, pero borramos las respuestas. Los identificadores se generan a partir de la cuenta del proveedor de acceso, una cookie o la IP; no guardamos sus valores originales en estos registros.",
       "ai_heading": "IA y audio",
       "ai_body": "Gemini usa preguntas recientes para generar preguntas en inglés. Para traducir o ayudar con expresiones, enviamos la pregunta o tu texto y el idioma elegido a Gemini. No enviamos correos ni grabaciones a Gemini ni guardamos los textos de ayuda en nuestra base de datos. Las grabaciones no se comparten con otros usuarios. Los operadores pueden acceder a ellas desde administración para operaciones y soporte.",
       "guest_heading": "Práctica antes de iniciar sesión",

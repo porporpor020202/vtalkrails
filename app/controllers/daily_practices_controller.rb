@@ -1,6 +1,9 @@
 class DailyPracticesController < ApplicationController
+  include AiAllowance
   allow_unauthenticated_access only: %i[show create]
   before_action :resume_session, only: %i[show create]
+  rescue_from AiUsage::TrialExpired, with: :trial_expired
+  rescue_from AiUsage::LoginRequired, with: :training_login_required
   rate_limit to: 10, within: 1.minute, only: :create
 
   def show
@@ -8,16 +11,18 @@ class DailyPracticesController < ApplicationController
       render "native_languages/show"
       return
     end
+    @trial_used = training_usage.training_dates.size
     @today = Date.current
     @question = DailyQuestion.for_date(@today)
     @guest = current_user.nil?
-    @practice = @guest ? DailyPractice.find_by(id: session[:guest_practice_id], user_id: nil) : current_user.daily_practices.find_by(practiced_on: @today)
+    @practice = @guest ? DailyPractice.find_by(id: session[:guest_practice_id], user_id: nil, practiced_on: @today) : current_user.daily_practices.find_by(practiced_on: @today)
+    @result = training_usage.help_data.dig("answer", "response")
     @saved = session.delete(:practice_saved)
     @streak = @guest ? (@practice ? 1 : 0) : current_user.streak(today: @today)
     if @practice
       @resets_at = @today.next_day.in_time_zone
       @week = (@today.beginning_of_week..@today.end_of_week).to_a
-      @completed_dates = @guest ? [@practice.practiced_on] : current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
+      @completed_dates = @guest ? [ @practice.practiced_on ] : current_user.daily_practices.where(practiced_on: @week).pluck(:practiced_on)
     end
   end
 
@@ -29,8 +34,9 @@ class DailyPracticesController < ApplicationController
       return
     end
 
+    training_usage
     unless current_user
-      unless DailyPractice.exists?(id: session[:guest_practice_id], user_id: nil)
+      unless DailyPractice.exists?(id: session[:guest_practice_id], user_id: nil, practiced_on: date)
         practice = DailyPractice.new(daily_question: question, practiced_on: date, completed_at: Time.current, duration_ms: recording_params[:duration_ms])
         practice.audio.attach(recording_params[:audio])
         practice.save!
@@ -62,6 +68,22 @@ class DailyPracticesController < ApplicationController
   end
 
   private
+
+  def trial_expired
+    if request.format.json?
+      render json: { error: t("ui.trial_ended_title"), redirect_url: root_path }, status: :payment_required
+    else
+      render :trial_ended
+    end
+  end
+
+  def training_login_required
+    if request.format.json?
+      render json: { error: t("ui.trial_sign_in"), redirect_url: new_session_path }, status: :unauthorized
+    else
+      redirect_to new_session_path, status: :see_other
+    end
+  end
 
   def recording_params
     params.require(:daily_practice).permit(:audio, :duration_ms)

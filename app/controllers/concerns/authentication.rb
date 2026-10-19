@@ -44,17 +44,18 @@ module Authentication
 
 
     def start_new_session_for(user)
+      training_usage = AiUsage.claim!(user: user, visitor_id: cookies.encrypted[:ai_visitor_id])
       if NativeLanguage.supported?(cookies[:native_language]) && user.native_language != cookies[:native_language]
         user.update!(native_language: cookies[:native_language])
       end
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
-        claim_guest_practice(user)
+        claim_guest_practice(user, training_usage: training_usage)
         Current.session = session
         cookies.encrypted.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
       end
     end
 
-    def claim_guest_practice(user)
+    def claim_guest_practice(user, training_usage:)
       id = session[:guest_practice_id] || cookies.encrypted[:apple_guest_practice_id]
       return unless id
 
@@ -62,6 +63,7 @@ module Authentication
         practice = DailyPractice.find_by(id: id, user_id: nil)
         practice&.with_lock do
           next if practice.user_id.present?
+          next unless training_usage.reload.available_on?(practice.practiced_on)
 
           if user.daily_practices.exists?(practiced_on: practice.practiced_on)
             practice.destroy!

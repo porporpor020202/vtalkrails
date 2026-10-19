@@ -153,3 +153,7 @@ main > .flash { flex: none; }
 .language-continue { width: 100%; min-height: 54px; border: 0; border-bottom: 5px solid #294b39; border-radius: 15px; background: #487456; color: white; font: inherit; font-weight: 800; cursor: pointer; }
 .language-continue:disabled { background: #e3e7dd; color: #9aa393; border-color: #d4dacc; cursor: default; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.trial-ended .completion-medal { font-size: 76px; color: #c2a567; }
+.trial-ended .question-label { justify-content: center; margin-bottom: 20px; }
+.trial-ended h1 { font-size: 27px; line-height: 1.45; }
+.trial-coming-soon { border: 1px solid #dce4d5; border-radius: 18px; padding: 20px; color: #6e8164; font-size: 14px; }
