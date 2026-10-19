@@ -52,7 +52,7 @@ module Authentication
     end
 
     def claim_guest_practice(user)
-      id = session[:guest_practice_id]
+      id = session[:guest_practice_id] || cookies.encrypted[:apple_guest_practice_id]
       return unless id
 
       user.with_lock do
@@ -69,6 +69,7 @@ module Authentication
         end
       end
       session.delete(:guest_practice_id)
+      cookies.delete(:apple_guest_practice_id, same_site: :none, secure: Rails.env.production? || request.ssl?)
     end
 
     def terminate_session

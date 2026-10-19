@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 require_relative "../test_helpers/daily_practice_test_helper"
 
 class GuestPracticeTest < ActionDispatch::IntegrationTest
@@ -67,6 +68,34 @@ class GuestPracticeTest < ActionDispatch::IntegrationTest
     ExpireGuestPracticeJob.perform_now(DailyPractice.last.id)
     get root_path
     assert_select "#daily-question"
+  end
+
+  test "Apple cross-site form callback retains the guest recording without the session cookie" do
+    https!
+    submit_recording
+    practice = DailyPractice.last
+    user = users(:english_native)
+    captured = {}
+    client = Object.new
+    client.define_singleton_method(:authorization_url) do |**args|
+      captured.merge!(args)
+      "https://appleid.apple.com/auth/authorize"
+    end
+    client.define_singleton_method(:authenticate) do |**args|
+      raise "Wrong nonce" unless args[:nonce] == captured[:nonce]
+      { uid: user.oauth_uid, email: user.email_address }
+    end
+    AppleOauthClient.stub(:new, -> { client }) do
+      post apple_oauth_sessions_path, params: { platform: "web" }
+      assert_response :redirect
+      # Browsers omit SameSite=Lax session cookies on Apple's cross-site form POST.
+      cookies.delete(Rails.application.config.session_options[:key])
+      post callback_apple_oauth_sessions_path, params: { state: captured[:state], code: "test-verified-code" }, headers: { "Origin" => "https://appleid.apple.com" }
+      assert_redirected_to root_url
+    end
+    assert_equal user.id, practice.reload.user_id
+    follow_redirect!
+    assert_select ".practice-saved", text: /첫 연습 기록이 저장됐어요/
   end
 
   private

@@ -64,6 +64,15 @@ class AppleOauthSessionsController < ApplicationController
       }
     end
 
+    # Apple's cross-site form POST does not carry the normal SameSite=Lax session.
+    # Preserve only the encrypted guest reference alongside the OAuth cookies.
+    if session[:guest_practice_id].present?
+      cookies.encrypted[:apple_guest_practice_id] = {
+        same_site: :none, secure: secure_cookie, httponly: true,
+        expires: 1.hour.from_now, value: session[:guest_practice_id]
+      }
+    end
+
     oauth_client = AppleOauthClient.new
     authorization_url = oauth_client.authorization_url(
       state: state,
