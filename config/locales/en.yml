@@ -28,4 +28,11 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  share_card:
+    card_headline: "I spoke English\ntoday!"
+    card_streak_text:
+      one: "%{count}-day streak"
+      other: "%{count}-day streak"
+    card_search_hint: "Search for Say One Thing"
+    practiced_sentence: "Today's sentence"
+    share_text: "I practiced speaking English today! %{count}-day streak. Join me on Say One Thing."

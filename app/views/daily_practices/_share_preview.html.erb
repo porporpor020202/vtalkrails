@@ -3,7 +3,10 @@
     <h2 id="share-card-title"><%= t("ui.card_preview_title") %></h2>
     <button type="button" class="share-card-close" data-action="practice-share#close" aria-label="<%= t("ui.card_close") %>">×</button>
   </header>
-  <div class="share-card-frame">
+  <div class="share-card-language">
+    <button type="button" class="share-card-language-button" data-action="practice-share#toggleEnglish" data-practice-share-target="languageButton" aria-pressed="false"><%= t("ui.card_make_english") %></button>
+  </div>
+  <div class="share-card-frame" data-practice-share-target="frame" aria-busy="true">
     <p data-practice-share-target="loading"><%= t("ui.card_preparing") %></p>
     <img hidden class="share-card-image" data-practice-share-target="cardImage" alt="<%= t("ui.card_alt") %>" width="1080" height="1350">
   </div>

@@ -36,7 +36,7 @@
       <p><%= t("ui.save_hint") %></p>
     </div>
   <% else %>
-    <div class="celebration-actions" data-controller="practice-share" data-practice-share-endpoint-value="<%= bonus_practice_path %>" data-practice-share-token-value="<%= @practice.signed_id(purpose: :share_bonus, expires_in: [(@resets_at - Time.current).to_i, 1].max.seconds) %>" data-practice-share-text-value="<%= t("ui.share_text", count: @streak) %>" data-practice-share-card-value="<%= practice_share_card_data.to_json %>">
+    <div class="celebration-actions" data-controller="practice-share" data-practice-share-endpoint-value="<%= bonus_practice_path %>" data-practice-share-token-value="<%= @practice.signed_id(purpose: :share_bonus, expires_in: [(@resets_at - Time.current).to_i, 1].max.seconds) %>" data-practice-share-card-value="<%= practice_share_card_data.to_json %>" data-practice-share-english-card-value="<%= practice_share_card_data(locale: :en).to_json %>">
       <p class="share-incentive"><%= @bonus&.completed? ? t("ui.bonus_done") : t("ui.share_incentive") %></p>
       <% if @bonus && !@bonus.completed? %>
         <%= link_to t("ui.continue_bonus"), bonus_practice_path, class: "primary-button celebration-share-button" %>

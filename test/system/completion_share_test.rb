@@ -142,6 +142,95 @@ class CompletionShareTest < ApplicationSystemTestCase
     assert_equal 0, BonusPractice.count
   end
 
+  test "English cards share the exact preview with English text while the app stays Korean" do
+    page.execute_script(<<~JS)
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => true });
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async data => {
+        window.sharedPractice = data;
+        window.sharedCardPNG = await new Promise(resolve => {
+          const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(data.files[0]);
+        });
+      } });
+    JS
+    with_bonus_services do
+      click_button "친구에게 공유하기"
+      native_png = card_png
+      click_button "영어 버전 만들기"
+      assert_selector '.share-card-image[lang="en"]'
+      english_png = card_png
+      assert_not_equal native_png, english_png
+      assert_selector "html[lang=ko]"
+      assert_button "한국어 버전 보기"
+      assert_button "카드 공유하기", disabled: false
+      assert_equal 0, BonusPractice.count
+      click_button "카드 공유하기"
+      assert_selector "#daily-question", text: "What is your favorite color?"
+      assert_equal "I spoke English today! · Say One Thing", page.evaluate_script("window.sharedPractice.title")
+      assert_includes page.evaluate_script("window.sharedPractice.text"), "1-day streak"
+      assert_equal "say-one-thing-en.png", page.evaluate_script("window.sharedPractice.files[0].name")
+      assert_equal english_png, page.evaluate_script("window.sharedCardPNG")
+    end
+  end
+
+  test "English native sharing and returning to the original card use the selected PNG" do
+    page.execute_script(<<~JS)
+      window.PracticeShare = { postMessage: message => {
+        const data = JSON.parse(message); window.nativeShareRequest = data;
+        setTimeout(() => window.dispatchEvent(new CustomEvent('practice-share-result', { detail: { id: data.id, completed: false } })), 10);
+      } };
+    JS
+    click_button "친구에게 공유하기"
+    native_png = card_png
+    click_button "영어 버전 만들기"
+    assert_selector '.share-card-image[lang="en"]'
+    english_png = card_png
+    click_button "카드 공유하기"
+    assert_button "한국어 버전 보기", disabled: false
+    assert_equal english_png, page.evaluate_script("window.nativeShareRequest.imageDataUrl")
+    assert_includes page.evaluate_script("window.nativeShareRequest.text"), "1-day streak"
+    click_button "한국어 버전 보기"
+    assert_selector '.share-card-image[lang="ko"]'
+    assert_equal native_png, card_png
+    assert_equal 0, BonusPractice.count
+  end
+
+  test "switching back during English generation cannot leave a stale preview or download" do
+    page.execute_script(<<~JS)
+      Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: undefined });
+      const decode = Image.prototype.decode;
+      Image.prototype.decode = function() {
+        const ready = decode.call(this);
+        return this.src.includes('app-store-en') ? ready.then(() => new Promise(resolve => { window.finishEnglishCard = resolve })) : ready;
+      };
+      document.querySelector('[data-practice-share-target="download"]').addEventListener('click', event => {
+        event.preventDefault(); window.downloadedCard = { href: event.currentTarget.href, name: event.currentTarget.download };
+      });
+    JS
+    click_button "친구에게 공유하기"
+    native_png = card_png
+    click_button "영어 버전 만들기"
+    assert_selector '.share-card-language-button[aria-pressed="true"]' do
+      page.evaluate_script("typeof window.finishEnglishCard === 'function'")
+    end
+    assert_button "이미지 저장하기", disabled: true
+    assert_no_selector ".share-card-image"
+    click_button "한국어 버전 보기"
+    assert_selector '.share-card-image[lang="ko"]'
+    page.evaluate_async_script("const done = arguments[0]; window.finishEnglishCard(); requestAnimationFrame(() => requestAnimationFrame(done))")
+    assert_equal native_png, card_png
+    click_button "이미지 저장하기"
+    assert_equal "say-one-thing-ko.png", page.evaluate_script("window.downloadedCard.name")
+    click_button "영어 버전 만들기"
+    assert_selector '.share-card-image[lang="en"]'
+    english_png = card_png
+    click_button "이미지 저장하기"
+    assert_equal "say-one-thing-en.png", page.evaluate_script("window.downloadedCard.name")
+    assert_equal page.find(".share-card-image")["src"], page.evaluate_script("window.downloadedCard.href")
+    assert_not_equal native_png, english_png
+    assert_equal 0, BonusPractice.count
+  end
+
   test "each language has a real PNG preview with the current streak and localized store badges" do
     %w[ko ja es zh zh-TW].each do |locale|
       @user.update!(native_language: locale)
@@ -163,11 +252,26 @@ class CompletionShareTest < ApplicationSystemTestCase
       assert_match /app-store-#{Regexp.escape(locale)}[^\/]*\.svg/, data["appStoreBadgeUrl"]
       assert_match /google-play-#{Regexp.escape(locale)}[^\/]*\.png/, data["googlePlayBadgeUrl"]
       png = Base64.decode64(card_png.split(",", 2).last)
-      assert_equal [1080, 1350], png.byteslice(16, 8).unpack("NN")
+      assert_equal [ 1080, 1350 ], png.byteslice(16, 8).unpack("NN")
       assert_operator png.bytesize, :<, 2_000_000, "Native share bridges must accept the actual export."
       File.binwrite(Rails.root.join("tmp/share-card-#{locale}.png"), png)
       page.save_screenshot(Rails.root.join("tmp/share-card-preview-#{locale}.png"))
       assert page.evaluate_script("document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth")
+      click_button I18n.t("ui.card_make_english", locale: locale)
+      assert_selector '.share-card-image[lang="en"]'
+      assert_selector "html[lang='#{locale}']"
+      english = page.evaluate_script("JSON.parse(document.querySelector('[data-practice-share-english-card-value]').dataset.practiceShareEnglishCardValue)")
+      assert_equal [ "I had a good day." ], english["sentences"]
+      assert_equal "1-day streak", english["streakText"]
+      assert_equal "Today's sentence", english["sentenceLabel"]
+      assert_equal "Search for Say One Thing", english["searchHint"]
+      assert_match /app-store-en[^\/]*\.svg/, english["appStoreBadgeUrl"]
+      assert_match /google-play-en[^\/]*\.png/, english["googlePlayBadgeUrl"]
+      assert_button I18n.t("ui.card_use_native", locale: locale)
+      if locale == "ko"
+        File.binwrite(Rails.root.join("tmp/share-card-en.png"), Base64.decode64(card_png.split(",", 2).last))
+        page.save_screenshot(Rails.root.join("tmp/share-card-preview-en.png"))
+      end
       click_button I18n.t("ui.card_close", locale: locale), enable_aria_label: true
       assert_no_selector "dialog[open]"
     end
@@ -182,7 +286,7 @@ class CompletionShareTest < ApplicationSystemTestCase
     assert page.evaluate_script("document.querySelector('main').scrollHeight > document.querySelector('main').clientHeight")
     click_button "친구에게 공유하기"
     png = Base64.decode64(card_png.split(",", 2).last)
-    assert_equal [1080, 1350], png.byteslice(16, 8).unpack("NN")
+    assert_equal [ 1080, 1350 ], png.byteslice(16, 8).unpack("NN")
     File.binwrite(Rails.root.join("tmp/share-card-long-sentence.png"), png)
     assert page.evaluate_script("document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth")
     click_button "닫기", enable_aria_label: true
@@ -195,6 +299,8 @@ class CompletionShareTest < ApplicationSystemTestCase
     page.execute_script("Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false })")
     click_button "친구에게 공유하기"
     assert_button I18n.t("ui.card_download", locale: :ko), disabled: false
+    click_button "영어 버전 만들기"
+    assert_selector '.share-card-image[lang="en"]'
     assert page.evaluate_script("document.querySelector('dialog').scrollHeight <= document.querySelector('dialog').clientHeight + 1")
     assert page.evaluate_script("document.documentElement.scrollWidth <= innerWidth")
     page.save_screenshot(Rails.root.join("tmp/share-card-preview-small.png"))

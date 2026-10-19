@@ -4,10 +4,13 @@ import { nativeShare, nativeShareAvailable } from "helpers/native_share"
 import { renderPracticeShareCard } from "helpers/practice_share_card"
 
 export default class extends Controller {
-  static targets = ["button", "status", "dialog", "cardImage", "loading", "sendButton", "download", "cardStatus"]
-  static values = { endpoint: String, token: String, text: String, card: Object }
+  static targets = ["button", "status", "dialog", "cardImage", "loading", "sendButton", "download", "cardStatus", "languageButton", "frame"]
+  static values = { endpoint: String, token: String, card: Object, englishCard: Object }
 
   connect() {
+    this.english = this.hasLanguageButtonTarget && this.languageButtonTarget.getAttribute("aria-pressed") === "true"
+    this.preparations = new Map()
+    this.previewRequest = this.previewRequest || 0
     if (this.hasDialogTarget) this.prepareCard().catch(() => {})
   }
 
@@ -15,35 +18,72 @@ export default class extends Controller {
     if (this.hasDialogTarget && this.dialogTarget.open) this.dialogTarget.close()
     if (this.previewURL) URL.revokeObjectURL(this.previewURL)
     this.previewURL = null
-    this.preparation = null
+    this.previewRequest += 1
+    this.preparations.clear()
     this.card = null
     this.file = null
   }
 
   async prepareCard() {
-    if (!this.preparation) {
-      this.preparation = renderPracticeShareCard(this.cardValue).then(card => {
-        if (!this.element.isConnected) return
-        this.card = card
-        this.file = new File([card.blob], `say-one-thing-${this.cardValue.locale}.png`, { type: "image/png" })
-        this.previewURL = URL.createObjectURL(card.blob)
-        this.cardImageTarget.src = this.previewURL
-        this.cardImageTarget.hidden = false
-        this.downloadTarget.href = this.previewURL
-        this.downloadTarget.download = this.file.name
-        this.loadingTarget.hidden = true
-        this.configureSharing()
-        this.sendButtonTarget.disabled = false
-      }).catch(error => { this.preparation = null; throw error })
+    const request = ++this.previewRequest
+    const data = this.english ? this.englishCardValue : this.cardValue
+    this.card = null
+    this.file = null
+    this.sendButtonTarget.disabled = true
+    this.downloadTarget.hidden = true
+    this.downloadTarget.removeAttribute("href")
+    this.cardImageTarget.hidden = true
+    this.loadingTarget.hidden = false
+    this.loadingTarget.textContent = translate("card_preparing")
+    this.frameTarget.setAttribute("aria-busy", "true")
+    this.cardStatusTarget.textContent = ""
+
+    const preparations = this.preparations
+    if (!preparations.has(data.locale)) {
+      preparations.set(data.locale, renderPracticeShareCard(data).catch(error => {
+        preparations.delete(data.locale)
+        throw error
+      }))
     }
-    return this.preparation
+    try {
+      const card = await preparations.get(data.locale)
+      // A previous render must never replace the language chosen more recently.
+      if (!this.element.isConnected || request !== this.previewRequest) return
+      this.card = card
+      this.activeCardData = data
+      this.file = new File([card.blob], `say-one-thing-${data.locale}.png`, { type: "image/png" })
+      if (this.previewURL) URL.revokeObjectURL(this.previewURL)
+      this.previewURL = URL.createObjectURL(card.blob)
+      this.cardImageTarget.src = this.previewURL
+      this.cardImageTarget.lang = data.locale
+      this.cardImageTarget.hidden = false
+      this.downloadTarget.href = this.previewURL
+      this.downloadTarget.download = this.file.name
+      this.loadingTarget.hidden = true
+      this.frameTarget.setAttribute("aria-busy", "false")
+      this.configureSharing()
+      this.sendButtonTarget.disabled = false
+    } catch (error) {
+      if (this.element.isConnected && request === this.previewRequest) {
+        this.frameTarget.setAttribute("aria-busy", "false")
+        this.loadingTarget.textContent = translate("card_error")
+      }
+      throw error
+    }
   }
 
-  async open() {
+  toggleEnglish() {
+    if (this.busy) return
+    this.english = !this.english
+    this.languageButtonTarget.textContent = translate(this.english ? "card_use_native" : "card_make_english")
+    this.languageButtonTarget.setAttribute("aria-pressed", String(this.english))
+    this.prepareCard().catch(() => {})
+  }
+
+  open() {
     if (this.busy) return
     if (!this.dialogTarget.open) this.dialogTarget.showModal()
-    try { await this.prepareCard(); if (this.element.isConnected) this.configureSharing() }
-    catch { if (this.element.isConnected) this.loadingTarget.textContent = translate("card_error") }
+    this.prepareCard().catch(() => {})
   }
 
   configureSharing() {
@@ -70,10 +110,11 @@ export default class extends Controller {
     }
     this.busy = true
     this.sendButtonTarget.disabled = true
+    this.languageButtonTarget.disabled = true
     this.cardStatusTarget.textContent = ""
     try {
       // Both the File and native PNG are ready before this tap: keep OS user activation.
-      const data = { title: `${this.cardValue.headline.replaceAll("\n", " ")} · Say One Thing`, text: this.textValue, url: "https://sayonething.net", imageDataUrl: this.card.dataURL }
+      const data = { title: `${this.activeCardData.headline.replaceAll("\n", " ")} · Say One Thing`, text: this.activeCardData.shareText, url: "https://sayonething.net", imageDataUrl: this.card.dataURL }
       const native = nativeShare(data)
       if (native) await native
       else await navigator.share({ title: data.title, text: `${data.text}\n${data.url}`, files: [this.file] })
@@ -100,6 +141,7 @@ export default class extends Controller {
     } finally {
       this.busy = false
       if (this.hasSendButtonTarget) this.sendButtonTarget.disabled = false
+      if (this.hasLanguageButtonTarget) this.languageButtonTarget.disabled = false
     }
   }
 }
